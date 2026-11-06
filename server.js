@@ -1,12 +1,13 @@
 // Máy chủ tĩnh gọn cho game. Không có phụ thuộc, không gắn đường dẫn ngoài dự án.
-// Mặc định chỉ nghe trên máy này. Thử trên điện thoại cùng mạng: npm run dien-thoai
+// Chạy ở máy: chỉ nghe trên máy này. Thử trên điện thoại cùng mạng: npm run dien-thoai
+// Lên Railway: nền tảng cấp PORT, lúc đó phải nghe mọi địa chỉ thì mới nhận được yêu cầu từ ngoài.
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
 const GOC = path.join(__dirname, 'public');
 const CONG = Number(process.env.PORT) || 4280;
-const CHU = process.env.HOST || '127.0.0.1';
+const CHU = process.env.HOST || (process.env.PORT ? '0.0.0.0' : '127.0.0.1');
 
 const LOAI = {
   '.html': 'text/html; charset=utf-8',
