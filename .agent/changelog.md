@@ -19,7 +19,7 @@
 - **Máy chủ:** `server.js` chỉ phục vụ `public/`, mặc định 127.0.0.1, thêm `npm run dien-thoai` để thử qua mạng LAN. Bỏ các đường mount ra ngoài dự án.
 - **Kiểm thử:** `tools/kiem-game.mjs` viết lại: màn đầu chưa đạt, lời giải đạt 3 sao qua thao tác của cơ khí, mỗi lỗi mẫu rơi đúng tiêu chí.
 - **Sửa sau khi chơi thử ở 375x812:** chấm chuyển cảnh DH-5-3 bị đoạn phim sau che nên chạm không ăn, nay có làn riêng dưới dải phim. Thanh cắt phim mất quãng kéo đầu tiên, nay tính từ lúc đặt ngón tay. Vùng chạm thanh cắt lệch vào đoạn đang chọn để không che đoạn ngắn kề bên. Màn xem trước hiện độ dài đang giữ của đoạn.
-- **Bản cũ v3** lưu ở `.agent/ban-cu-v3/`.
+- **Bản cũ v3** lưu ở `.agent/ban-cu-v3/`, chỉ còn trên máy, không đưa lên repo.
 
 ## [2026-11-04] Bản nâng cấp v3.0 — Game Design Tactile (3 Màn hình + On-Canvas Gizmos + Multi-Step Robot Cutscene + Hệ thống 27 Sao)
 - **[public/index.html](file:///d:/Users/tuanla2/game/diem10code-dohoa/public/index.html)** & **[public/css/style.css](file:///d:/Users/tuanla2/game/diem10code-dohoa/public/css/style.css)**:
