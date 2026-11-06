@@ -26,8 +26,8 @@ export default {
       mau: [goc(52, 50), goc(310, 50), goc(230, 130), goc(310, 210), goc(52, 210)],
       sanNhan: 'Lá cờ chữ nhật và đường nét đứt hình đuôi nheo',
       dan: [
-        { txt: 'Bấm <b>Thêm nút</b>, dấu cộng xanh hiện giữa mỗi cạnh.', nhan: 'them', xong: (d) => d.soNut > 4 },
-        { txt: 'Thấy nút mới ở mép phải chưa? <b>Kéo nó</b> sang trái tới góc nét đứt.', xong: (d) => d.lech <= 12 },
+        { txt: 'Chọn công cụ <b>Thêm nút</b>, rồi chạm dấu cộng xanh ở mép phải.', nhan: 'cu-them', xong: (d) => d.soNut > 4 },
+        { txt: 'Chọn công cụ <b>Nút</b>, kéo nút mới sang trái tới góc nét đứt. Gần tới nó tự hít.', nhan: 'cu-nut', xong: (d) => d.lech <= 12 },
         { txt: 'Bấm <b>Kéo cờ</b>.', xong: () => false },
       ],
       tieuChi: [
@@ -58,8 +58,8 @@ export default {
       san: { coTron: true },
       sanNhan: 'Lá cờ thẳng và đường nét đứt uốn sóng',
       dan: [
-        { txt: 'Nút giữa mép trên đang chọn. Bấm <b>Nút trơn</b> cho nó có tay nắm.', nhan: 'tron', xong: (d) => d.soTron >= 1 },
-        { txt: 'Kéo <b>chấm hồng</b> xiên lên phải cho mép cong theo nét đứt. Làm tương tự với nút giữa mép dưới.', xong: (d) => d.soTron >= 2 && d.lech <= 10 },
+        { txt: 'Chọn công cụ <b>Trơn, góc</b>, rồi chạm nút giữa mép trên cho nó có tay nắm.', nhan: 'cu-tron', xong: (d) => d.soTron >= 1 },
+        { txt: 'Kéo <b>chấm hồng</b> xiên lên phải cho mép cong theo nét đứt, gần đúng nó tự hít. Làm tương tự với nút giữa mép dưới.', xong: (d) => d.soTron >= 2 && d.lech <= 10 },
         { txt: 'Bấm <b>Kéo cờ</b>.', xong: () => false },
       ],
       tieuChi: [
@@ -103,8 +103,8 @@ export default {
       dungKiem: { lo: { x: 180, y: 70, r: 10 }, sao: { x: 180, y: 172 } },
       sanNhan: 'Hình tròn huy hiệu, bóng mờ thành phẩm và ba hình rời',
       dan: [
-        { txt: 'Kéo <b>Tai móc</b> lên đỉnh huy hiệu, rồi bấm <b>Gộp vào</b>.', nhan: 'gop', xong: (_d, st) => st.buoc.length >= 2 },
-        { txt: 'Làm tiếp với hai hình còn lại. Thứ tự làm có ý nghĩa đó.', xong: (d) => d.conThua === 0 },
+        { txt: 'Kéo <b>Tai móc</b> lên đỉnh huy hiệu, gần đúng nó tự hít. Rồi chọn công cụ <b>Gộp vào</b> và chạm vào nó.', nhan: 'cu-gop', xong: (_d, st) => st.buoc.length >= 2 },
+        { txt: 'Quay về <b>Di chuyển</b> đặt hình tiếp theo, rồi chọn công cụ ghép phù hợp. Thứ tự làm có ý nghĩa đó.', xong: (d) => d.conThua === 0 },
         { txt: 'Bấm <b>Xỏ dây</b>.', xong: () => false },
       ],
       tieuChi: [

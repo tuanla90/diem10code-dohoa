@@ -1,5 +1,16 @@
 # Nhật ký Thay đổi (Changelog) — Dự án `diem10code-dohoa`
 
+## [2026-11-06] Sẵn sàng deploy Railway
+- **Máy chủ:** có `PORT` mà không có `HOST` thì nghe `0.0.0.0`; chạy ở máy không có `PORT` vẫn chỉ nghe `127.0.0.1`.
+- **Cấu hình:** thêm `railway.json` (`npm start`, kiểm tra sức khỏe ở `/`), `engines.node >= 18`, `private: true` trong `package.json`.
+
+## [2026-11-06] Bộ công cụ và tự nắn theo app vẽ trên điện thoại
+- **Bộ công cụ:** mọi cơ khí trừ `xuat-tep` có thanh `#bo-cu`, phải chọn công cụ mới thao tác được, tay nắm và khay đổi theo công cụ. Sai công cụ thì có lời nhắc, không có gì xảy ra. Hoàn tác giữ công cụ, Làm lại về công cụ mặc định.
+- **Tự nắn:** `public/js/toan/hit.mjs` và các ngưỡng trong từng cơ khí. Kéo gần vùng, tâm, mép, cỡ của hình khác, khoảng cách đều, góc vuông, nút mẫu, tổng 30 giây, mép lời nói thì hít vào, có đường hồng, tiếng nhỏ và rung nhẹ. Đũa thần trượt về nền gần nhất, cọ bám mép và làm mượt nét.
+- **Kéo thay bấm:** bỏ Đưa lên/xuống, Sang trái/phải, nút cộng trừ 0,5 giây, thẻ chọn hình. Thứ tự lớp kéo thẻ, chọn nhiều bằng quét khung, đổi cỡ bằng 4 góc. Căn chỉnh giữ dạng lệnh vì C10-10 dạy lệnh căn chỉnh, có hình mẫu.
+- **Máy thấp:** sân khấu thu theo chiều cao, thanh công cụ dính trên thanh Chạy, chọn công cụ thì cuộn cho thấy khay.
+- **Kiểm thử:** `tools/kiem-game.mjs` thêm test công cụ và hàm hít; 17 màn chơi qua giao diện bằng sự kiện chạm giả lập ở 375x812 và 320x568, cố ý kéo lệch.
+
 ## [2026-11-06] Làm lại toàn bộ: "Gương Mặt Ngày Hội", điện thoại dọc, cùng chuỗi game diem-10-code
 - **Bối cảnh:** bỏ câu chuyện cứu hộ rô bốt, chuyển sang Ngày hội Tin học của CLB Tin học, THPT Hoa Phượng. Sola và Luna nhờ, người chơi là "bạn".
 - **Nội dung:** 17 màn trong 5 gói bám bài C10-09, C10-10, C10-28, U11-09 đến U11-15. Bỏ màn G12-01 (CSS, không thuộc mạch đồ họa, trùng WebCraft).

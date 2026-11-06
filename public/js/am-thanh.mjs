@@ -27,6 +27,7 @@ function not(tan, batDau, dai, am = 0.07, kieu = 'sine') {
 
 const BAN = {
   cham: () => not(620, 0, 0.06, 0.04, 'triangle'),
+  hit: () => not(1040, 0, 0.05, 0.05, 'triangle'),
   chay: () => { not(330, 0, 0.1); not(440, 0.08, 0.12); },
   sai: () => { not(220, 0, 0.16, 0.07, 'triangle'); not(165, 0.14, 0.24, 0.07, 'triangle'); },
   dung: () => { not(523, 0, 0.14); not(659, 0.12, 0.14); not(784, 0.24, 0.28); },

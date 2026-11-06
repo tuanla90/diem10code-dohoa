@@ -25,6 +25,7 @@ export function moBan(root, man, { tiep }) {
     </section>
     <section class="khung-san" id="san"></section>
     <div class="loi-dan" id="dan" aria-live="polite"></div>
+    <nav class="bo-cu" id="bo-cu" aria-label="Bộ công cụ"></nav>
     <section class="khay" id="khay"></section>
     <footer class="thanh-chay">
       <button type="button" id="nut-goi-y">${icon('denGoiY')}Gợi ý</button>
@@ -36,16 +37,30 @@ export function moBan(root, man, { tiep }) {
   const san = root.querySelector('#san');
   const khay = root.querySelector('#khay');
   const dan = root.querySelector('#dan');
+  const boCu = root.querySelector('#bo-cu');
   const nutHoan = root.querySelector('#nut-hoan');
   const nutChay = root.querySelector('#nut-chay');
   const lichSu = [];
   let donCk = null;
   let soGoiY = 0;
   let henCanh = 0;
+  let hitTruoc = '';
 
   const ctx = {
-    san, khay, man,
+    san, khay, man, boCu,
+    cu: null,
     st: ck.tao(man),
+    // Báo lúc vừa hít vào một mốc mới: một tiếng nhỏ và rung nhẹ, ngón tay không cần nhìn cũng biết.
+    hit(khoa) {
+      const k = khoa || '';
+      if (k && k !== hitTruoc) {
+        phat('hit');
+        try { navigator.vibrate?.(8); } catch { /* máy không rung được */ }
+      }
+      hitTruoc = k;
+    },
+    // Nhắc một câu khi người chơi thao tác không đúng với công cụ đang cầm.
+    nhac(txt) { dan.innerHTML = txt; dan.classList.add('loi-dan--nhac'); },
     ghi() {
       lichSu.push(JSON.stringify(ctx.st));
       if (lichSu.length > 80) lichSu.shift();
@@ -58,17 +73,20 @@ export function moBan(root, man, { tiep }) {
   };
 
   function capNhatDan() {
-    khay.querySelectorAll('.cu--nhac').forEach((n) => n.classList.remove('cu--nhac'));
+    root.querySelectorAll('.cu--nhac').forEach((n) => n.classList.remove('cu--nhac'));
+    dan.classList.remove('loi-dan--nhac');
     if (!man.dan) { dan.textContent = ''; return; }
     const d = ck.do(ctx.st, man);
-    const buoc = man.dan.find((b) => !b.xong(d, ctx.st));
+    const buoc = man.dan.find((b) => !b.xong(d, ctx.st, ctx.cu));
     if (!buoc) { dan.textContent = ''; return; }
     dan.innerHTML = buoc.txt;
-    if (buoc.nhan) khay.querySelector(`[data-cu="${buoc.nhan}"]`)?.classList.add('cu--nhac');
+    const canNhac = buoc.nhan && root.querySelector(`[data-cu="${buoc.nhan}"]`);
+    if (canNhac && canNhac.getAttribute('aria-pressed') !== 'true') canNhac.classList.add('cu--nhac');
   }
 
   function dung() {
     if (donCk) donCk();
+    boCu.innerHTML = '';
     donCk = ck.ve(ctx) || null;
     capNhatDan();
   }
@@ -86,6 +104,7 @@ export function moBan(root, man, { tiep }) {
   root.querySelector('#nut-lai').addEventListener('click', () => {
     ctx.ghi();
     ctx.st = ck.tao(man);
+    ctx.cu = null; // Làm lại về đúng bước đầu của lời dẫn, nên công cụ cũng về mặc định.
     dung();
   });
 

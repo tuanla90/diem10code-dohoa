@@ -1,7 +1,8 @@
 // Cơ khí lớp và nhóm: đổi thứ tự lớp, nhóm mảnh, kéo cả cụm, đổi cỡ cụm, căn hàng và cách đều (C10-10).
 import { giong, kep } from '../toan/hinh-hoc.mjs';
 import { MAU, MANH_LOGO, BIEU_TUONG, datVao, tieuDe } from '../hinh.mjs';
-import { taoSvg, batKeo, hangCu } from './chung.mjs';
+import { hitTruc, hitMoc, mocCachDeu } from '../toan/hit.mjs';
+import { taoSvg, batKeo, hangCu, hangKeo, dungBoCu } from './chung.mjs';
 
 export const W = 360, H = 300;
 
@@ -31,13 +32,9 @@ const cumCua = (st, id) => {
 
 const lam = {
   // Thứ tự mảng st.manh là thứ tự lớp: phần tử cuối nằm trên cùng.
-  len(st, id) {
-    const i = st.manh.findIndex((m) => m.id === id);
-    if (i < st.manh.length - 1) [st.manh[i], st.manh[i + 1]] = [st.manh[i + 1], st.manh[i]];
-  },
-  xuong(st, id) {
-    const i = st.manh.findIndex((m) => m.id === id);
-    if (i > 0) [st.manh[i], st.manh[i - 1]] = [st.manh[i - 1], st.manh[i]];
+  doiLop(st, i, j) {
+    const [m] = st.manh.splice(i, 1);
+    st.manh.splice(j, 0, m);
   },
   nhom(st, ids) {
     if (ids.length < 2) return;
@@ -67,14 +64,17 @@ const lam = {
       m.s *= k;
     }
   },
-  canGiua(st, ids) {
+  // Có hình mẫu thì các hình khác làm theo mẫu, không có thì lấy trung bình.
+  canGiua(st, ids, mauId) {
     const ds = st.manh.filter((m) => ids.includes(m.id));
-    const tb = ds.reduce((t, m) => { const b = hop(m); return t + b.y + b.h / 2; }, 0) / ds.length;
+    const mau = ds.find((m) => m.id === mauId);
+    const tb = mau ? hop(mau).y + hop(mau).h / 2 : ds.reduce((t, m) => { const b = hop(m); return t + b.y + b.h / 2; }, 0) / ds.length;
     for (const m of ds) { const b = hop(m); m.y += tb - (b.y + b.h / 2); }
   },
-  cungCo(st, ids) {
+  cungCo(st, ids, mauId) {
     const ds = st.manh.filter((m) => ids.includes(m.id));
-    const tb = ds.reduce((t, m) => t + m.s, 0) / ds.length;
+    const mau = ds.find((m) => m.id === mauId);
+    const tb = mau ? mau.s : ds.reduce((t, m) => t + m.s, 0) / ds.length;
     for (const m of ds) {
       const b0 = hop(m), cx = b0.x + b0.w / 2, cy = b0.y + b0.h / 2;
       m.s = tb;
@@ -147,6 +147,17 @@ export default {
     san.innerHTML = '';
     const svg = taoSvg(san, W, H, man.sanNhan || 'Sân các lớp hình');
     const cu = man.san.cu;
+    let quet = null;
+    let gion = null;
+    let trungCo = [];
+
+    const cumDangChon = () => {
+      const st = ctx.st;
+      const chon = st.chon || [];
+      if (!chon.length) return null;
+      const ids = cumCua(st, chon[0]);
+      return ids.length === chon.length && ids.every((i) => chon.includes(i)) ? ids : null;
+    };
 
     const ve = () => {
       const st = ctx.st;
@@ -162,14 +173,30 @@ export default {
         const rong = m.id === 'tieu-de' ? 200 : 100, cao = m.id === 'tieu-de' ? 50 : 100;
         s += `<g data-h="m:${m.id}">${datVao(t.ve(), m.x + (rong * m.s) / 2, m.y + (cao * m.s) / 2, rong * m.s, cao * m.s, 0, rong, cao)}<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="transparent"/></g>`;
       }
-      if (chon.length) {
+      if (chon.length && ctx.cu === 'can') {
+        // Căn chỉnh: hình chọn đầu tiên là mẫu, các hình kia làm theo nó.
+        chon.forEach((id, i) => {
+          const b = hop(st.manh.find((m) => m.id === id));
+          s += `<rect x="${b.x - 2}" y="${b.y - 2}" width="${b.w + 4}" height="${b.h + 4}" fill="none" stroke="${MAU.cyan}" stroke-width="${i ? 2 : 3}" stroke-dasharray="${i ? '5 4' : '0'}"/>`;
+          if (!i) s += `<text x="${b.x + b.w / 2}" y="${b.y - 6}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${MAU.chan}" font-family="var(--font)">mẫu</text>`;
+        });
+      } else if (chon.length) {
         const h = hopCum(st, chon);
         s += `<rect x="${h.x - 2}" y="${h.y - 2}" width="${h.w + 4}" height="${h.h + 4}" fill="none" stroke="${MAU.cyan}" stroke-width="2" stroke-dasharray="5 4"/>`;
-        // Tay nắm đổi cỡ chỉ hiện khi đang chọn đúng một cụm, để không gợi ý đổi cỡ một nửa cụm.
-        if (cu.includes('coCum') && cumCua(st, chon[0]).length === chon.length) {
-          s += `<g data-h="co"><circle cx="${h.x + h.w}" cy="${h.y + h.h}" r="22" fill="transparent"/><circle cx="${h.x + h.w}" cy="${h.y + h.h}" r="8" fill="${MAU.trang}" stroke="${MAU.chan}" stroke-width="2.5"/></g>`;
+        // Tay nắm chỉ hiện với công cụ Đổi cỡ, và chỉ khi đang chọn đúng một cụm.
+        if (ctx.cu === 'co' && cumDangChon()) {
+          for (const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+            const x = a > 0 ? h.x + h.w : h.x, y = b > 0 ? h.y + h.h : h.y;
+            s += `<g data-h="co:${a}:${b}"><circle cx="${x}" cy="${y}" r="22" fill="transparent"/><circle cx="${x}" cy="${y}" r="8" fill="${MAU.trang}" stroke="${MAU.chan}" stroke-width="2.5"/></g>`;
+          }
         }
       }
+      for (const id of trungCo) {
+        const b = hop(st.manh.find((m) => m.id === id));
+        s += `<rect x="${b.x - 2}" y="${b.y - 2}" width="${b.w + 4}" height="${b.h + 4}" rx="3" fill="none" stroke="${MAU.hong}" stroke-width="2.5"/>`;
+      }
+      if (gion) s += `<path d="${gion}" fill="none" stroke="${MAU.hong}" stroke-width="1.8" stroke-dasharray="5 4"/>`;
+      if (quet) s += `<rect x="${Math.min(quet.x0, quet.x1)}" y="${Math.min(quet.y0, quet.y1)}" width="${Math.abs(quet.x1 - quet.x0)}" height="${Math.abs(quet.y1 - quet.y0)}" fill="${MAU.cyan}" fill-opacity=".14" stroke="${MAU.chan}" stroke-width="1.5" stroke-dasharray="4 3"/>`;
       svg.innerHTML = s;
     };
 
@@ -177,85 +204,167 @@ export default {
       const st = ctx.st;
       const chon = st.chon || [];
       khay.innerHTML = '';
-      const manh = [...st.manh].map((m) => ({
-        id: `m-${m.id}`, nhan: TRANH[m.id].ten, bat: chon.includes(m.id),
-        tranh: `<svg class="cu-thu" viewBox="0 0 ${m.id === 'tieu-de' ? '200 50' : '100 100'}" aria-hidden="true"><rect width="200" height="100" fill="${MAU.xam}" opacity=".35"/>${TRANH[m.id].ve()}</svg>`,
-        sub: m.nhom ? `nhóm ${m.nhom}` : '',
-        bam() {
-          const idx = chon.indexOf(m.id);
-          if (idx >= 0) chon.splice(idx, 1);
-          else if (cu.includes('nhom') || cu.includes('can')) chon.push(m.id);
-          else chon.splice(0, chon.length, m.id);
-          st.chon = chon;
-          ve(); veKhay(); ctx.doi();
-        },
-      }));
-      if (cu.includes('lop')) {
+      const thanhLenh = (ds) => hangCu(khay, ds, { deu: true });
+      if (ctx.cu === 'lop') {
         const nhan = document.createElement('div');
         nhan.className = 'nhan-phu';
-        nhan.textContent = 'Thứ tự lớp, từ dưới lên trên:';
+        nhan.textContent = 'Kéo thẻ để đổi lớp. Thẻ bên phải đè lên thẻ bên trái.';
         khay.appendChild(nhan);
+        hangKeo(khay, st.manh.map((m) => ({
+          id: `m-${m.id}`, nhan: TRANH[m.id].ten, bat: chon.includes(m.id),
+          tranh: `<svg class="cu-thu" viewBox="0 0 ${m.id === 'tieu-de' ? '200 50' : '100 100'}" aria-hidden="true"><rect width="200" height="100" fill="${MAU.xam}" opacity=".35"/>${TRANH[m.id].ve()}</svg>`,
+          bam() { st.chon = [m.id]; ve(); veKhay(); ctx.doi(); },
+        })), (i, j) => { ctx.ghi(); lam.doiLop(st, i, j); ve(); veKhay(); ctx.doi(); });
       }
-      hangCu(khay, manh, { deu: true });
-      const mot = chon[0];
-      const lenh = [];
-      if (cu.includes('lop')) {
-        const dinh = (fn) => () => { if (!mot) return; ctx.ghi(); fn(st, mot); ve(); veKhay(); ctx.doi(); };
-        lenh.push({ id: 'len', nhan: 'Đưa lên', ic: 'len', tat: !mot, bam: dinh(lam.len) });
-        lenh.push({ id: 'xuong', nhan: 'Đưa xuống', ic: 'xuong', tat: !mot, bam: dinh(lam.xuong) });
-      }
-      if (cu.includes('nhom')) {
+      if (ctx.cu === 'chon' && cu.includes('nhom')) {
+        const mot = chon[0];
         const coNhom = mot && st.manh.find((m) => m.id === mot)?.nhom;
-        lenh.push({ id: 'nhom', nhan: 'Nhóm', ic: 'nhom', tat: chon.length < 2, bam() { ctx.ghi(); lam.nhom(st, chon); ve(); veKhay(); ctx.doi(); } });
-        lenh.push({ id: 'ra', nhan: 'Rã nhóm', ic: 'raNhom', tat: !coNhom, bam() { ctx.ghi(); lam.raNhom(st, mot); st.chon = []; ve(); veKhay(); ctx.doi(); } });
+        thanhLenh([
+          { id: 'nhom', nhan: 'Nhóm', ic: 'nhom', tat: chon.length < 2, bam() { ctx.ghi(); lam.nhom(st, chon); ve(); veKhay(); ctx.doi(); } },
+          { id: 'ra', nhan: 'Rã nhóm', ic: 'raNhom', tat: !coNhom, bam() { ctx.ghi(); lam.raNhom(st, mot); st.chon = []; ve(); veKhay(); ctx.doi(); } },
+        ]);
       }
-      if (cu.includes('can')) {
-        const ca = st.manh.map((m) => m.id);
-        const voi = (fn) => () => { ctx.ghi(); fn(st, chon.length >= 2 ? chon : ca); ve(); veKhay(); ctx.doi(); };
-        lenh.push({ id: 'tatca', nhan: 'Chọn hết', ic: 'tatCa', bam() { st.chon = [...ca]; ve(); veKhay(); ctx.doi(); } });
-        lenh.push({ id: 'cungco', nhan: 'Cùng cỡ', ic: 'cungCo', bam: voi(lam.cungCo) });
-        lenh.push({ id: 'cangiua', nhan: 'Căn hàng', ic: 'canGiua', bam: voi(lam.canGiua) });
-        lenh.push({ id: 'cachdeu', nhan: 'Cách đều', ic: 'cachDeu', bam: voi(lam.cachDeu) });
+      if (ctx.cu === 'can') {
+        const voi = (fn) => () => { ctx.ghi(); fn(st, chon, chon[0]); ve(); veKhay(); ctx.doi(); };
+        thanhLenh([
+          { id: 'cungco', nhan: 'Cùng cỡ', ic: 'cungCo', tat: chon.length < 2, bam: voi(lam.cungCo) },
+          { id: 'cangiua', nhan: 'Căn hàng', ic: 'canGiua', tat: chon.length < 2, bam: voi(lam.canGiua) },
+          { id: 'cachdeu', nhan: 'Cách đều', ic: 'cachDeu', tat: chon.length < 3, bam: voi(lam.cachDeu) },
+        ]);
       }
-      hangCu(khay, lenh);
+    };
+
+    // Công cụ Chọn: kéo hình thì dời, có đường gióng và hít vào khung, vào hàng, vào khoảng hở đều.
+    const batDauDoi = (id) => {
+      const st = ctx.st;
+      if (!st.chon?.includes(id)) st.chon = cumCua(st, id);
+      const ids = [...new Set(st.chon.flatMap((k) => cumCua(st, k)))];
+      const goc = ids.map((k) => { const m = st.manh.find((o) => o.id === k); return { m, x: m.x, y: m.y }; });
+      const h0 = hopCum(st, ids);
+      const z = man.san.vung;
+      const mocX = [], mocY = [];
+      if (z) {
+        mocX.push({ t: z.x, neo: 0 }, { t: z.x + z.w / 2, neo: 0.5 }, { t: z.x + z.w, neo: 1 });
+        mocY.push({ t: z.y, neo: 0 }, { t: z.y + z.h / 2, neo: 0.5 }, { t: z.y + z.h, neo: 1 });
+      }
+      if (man.hang) {
+        const khac = st.manh.filter((m) => !ids.includes(m.id)).map(hop);
+        for (const b of khac) mocY.push({ t: b.y + b.h / 2, neo: 0.5 });
+        mocX.push(...mocCachDeu(khac, h0.w));
+      }
+      return (dx, dy) => {
+        const hx = hitTruc(h0.x + dx, h0.w, mocX);
+        const hy = hitTruc(h0.y + dy, h0.h, mocY);
+        const ddx = dx + (hx ? hx.doi : 0), ddy = dy + (hy ? hy.doi : 0);
+        for (const g of goc) { g.m.x = g.x + ddx; g.m.y = g.y + ddy; }
+        gion = '';
+        if (hx) gion += hx.moc.ho ? `M${h0.x + ddx} ${h0.y + ddy - 8}v${h0.h + 16}M${h0.x + ddx + h0.w} ${h0.y + ddy - 8}v${h0.h + 16}` : `M${hx.moc.t} 0V${H}`;
+        if (hy) gion += `M0 ${hy.moc.t}H${W}`;
+        ctx.hit(gion);
+      };
+    };
+
+    // Công cụ Đổi cỡ: góc đối diện đứng yên, cỡ gần bằng cỡ hình khác hoặc gần vừa khung thì hít.
+    const batDauCo = (a, b) => {
+      const st = ctx.st;
+      const ids = cumDangChon();
+      if (!ids) return null;
+      const goc = ids.map((k) => { const m = st.manh.find((o) => o.id === k); return { m, x: m.x, y: m.y, s: m.s }; });
+      const h0 = hopCum(st, ids);
+      const neo = { x: a > 0 ? h0.x : h0.x + h0.w, y: b > 0 ? h0.y : h0.y + h0.h };
+      const z = man.san.vung;
+      const khac = st.manh.filter((m) => !ids.includes(m.id));
+      const mocRong = man.hang ? khac.map((m) => hop(m).w) : [];
+      if (z && !man.hang) mocRong.push(z.w, a > 0 ? z.x + z.w - neo.x : neo.x - z.x);
+      ctx.ghi();
+      return {
+        di(p) {
+          const rong = (a > 0 ? p.x - neo.x : neo.x - p.x);
+          const cao = (b > 0 ? p.y - neo.y : neo.y - p.y);
+          let k = kep(Math.max(rong / h0.w, cao / h0.h), 0.2, 3);
+          if (h0.w * k < 24) k = 24 / h0.w;
+          const rongHit = hitMoc(h0.w * k, mocRong, 8);
+          gion = null;
+          trungCo = [];
+          if (rongHit !== null) {
+            k = rongHit / h0.w;
+            if (man.hang) trungCo = khac.filter((m) => Math.abs(hop(m).w - rongHit) < 0.01).map((m) => m.id);
+            else if (z) gion = `M${z.x} ${z.y}h${z.w}v${z.h}h${-z.w}z`;
+          }
+          for (const g of goc) {
+            g.m.s = g.s * k;
+            g.m.x = neo.x + (g.x - neo.x) * k;
+            g.m.y = neo.y + (g.y - neo.y) * k;
+          }
+          ctx.hit(rongHit === null ? '' : String(rongHit));
+          ve();
+        },
+        nha() { gion = null; trungCo = []; ctx.hit(); ve(); veKhay(); ctx.doi(); },
+      };
     };
 
     batKeo(svg, W, H, (h, pt) => {
       const st = ctx.st;
-      if (h === 'co') {
-        const dd = st.chon?.[0];
-        if (!dd) return null;
-        const h0 = hopCum(st, cumCua(st, dd));
-        ctx.ghi();
+      if (h?.startsWith('co:')) {
+        const [, a, b] = h.split(':');
+        return batDauCo(+a, +b);
+      }
+      if (!h || !h.startsWith('m:')) {
+        // Kéo trên nền là quét chọn, chạm nền là bỏ chọn.
+        quet = { x0: pt.x, y0: pt.y, x1: pt.x, y1: pt.y };
         return {
-          di(p) {
-            const hh = hopCum(st, cumCua(st, dd));
-            const k = kep((p.x - h0.x) / Math.max(1, hh.w), 0.4, 3);
-            if (hh.w * k > 24) lam.coCum(st, dd, k);
-            ve();
+          di(p) { quet.x1 = p.x; quet.y1 = p.y; ve(); },
+          nha() {
+            const x0 = Math.min(quet.x0, quet.x1), x1 = Math.max(quet.x0, quet.x1);
+            const y0 = Math.min(quet.y0, quet.y1), y1 = Math.max(quet.y0, quet.y1);
+            const nho = x1 - x0 < 6 && y1 - y0 < 6;
+            quet = null;
+            st.chon = nho ? [] : [...new Set(st.manh.filter((m) => {
+              const b = hop(m);
+              return b.x >= x0 && b.y >= y0 && b.x + b.w <= x1 && b.y + b.h <= y1;
+            }).flatMap((m) => cumCua(st, m.id)))];
+            ve(); veKhay(); ctx.doi();
           },
-          nha() { veKhay(); ctx.doi(); },
         };
       }
-      if (!h || !h.startsWith('m:')) return null;
       const id = h.slice(2);
-      const ds = cumCua(st, id);
-      const dangCo = st.chon?.includes(id);
-      if (!dangCo) { st.chon = ds; ve(); veKhay(); }
-      if (man.san.khoaKeo) { veKhay(); ctx.doi(); return null; }
-      let px = pt.x, py = pt.y;
-      let daGhi = false;
+      if (ctx.cu === 'co') {
+        const cum = cumCua(st, id);
+        if (cumDangChon()?.includes(id)) ctx.nhac('Đang cầm <b>Đổi cỡ</b>: kéo chấm tròn ở góc. Muốn dời hình thì chọn <b>Chọn, dời</b>.');
+        else { st.chon = cum; ve(); veKhay(); ctx.doi(); }
+        return null;
+      }
+      let doi = null;
+      let daDoi = false;
       return {
         di(p) {
-          if (!daGhi) { ctx.ghi(); daGhi = true; }
-          lam.di(st, id, p.x - px, p.y - py);
-          px = p.x; py = p.y;
+          if (ctx.cu !== 'chon' || man.san.khoaKeo) return;
+          const dx = p.x - pt.x, dy = p.y - pt.y;
+          if (!daDoi && Math.hypot(dx, dy) < 4) return;
+          if (!daDoi) { ctx.ghi(); doi = batDauDoi(id); daDoi = true; }
+          doi(dx, dy);
           ve();
         },
-        nha() { veKhay(); ve(); ctx.doi(); },
+        nha() {
+          if (daDoi) { gion = null; ctx.hit(); ve(); veKhay(); ctx.doi(); return; }
+          // Chạm: thêm hoặc bớt khỏi vùng chọn. Ở Căn chỉnh, chạm hình đã chọn là đặt nó làm mẫu.
+          const cum = cumCua(st, id);
+          const chon = st.chon || [];
+          if (ctx.cu === 'lop') st.chon = [id];
+          else if (!chon.includes(id)) st.chon = [...chon, ...cum];
+          else if (ctx.cu === 'can') st.chon = [id, ...chon.filter((k) => k !== id)];
+          else st.chon = chon.filter((k) => !cum.includes(k));
+          ve(); veKhay(); ctx.doi();
+        },
       };
     });
 
+    dungBoCu(ctx, [
+      { id: 'chon', nhan: 'Chọn, dời', ic: 'diChuyen' },
+      (cu.includes('coCum') || cu.includes('can')) && { id: 'co', nhan: 'Đổi cỡ', ic: 'doiCo' },
+      cu.includes('lop') && { id: 'lop', nhan: 'Lớp', ic: 'lop' },
+      cu.includes('can') && { id: 'can', nhan: 'Căn chỉnh', ic: 'canGiua' },
+    ], 'chon', () => { ve(); veKhay(); });
     ve();
     veKhay();
   },

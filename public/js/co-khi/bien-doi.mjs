@@ -2,9 +2,16 @@
 // Dùng cho C10-09. Đây là mẫu tay nắm tốt nhất của bản cũ, viết lại cho ngón tay.
 import { keoTay, datCoTheoNeo, gocChuan, gocKhung, giong, kep } from '../toan/hinh-hoc.mjs';
 import { MAU, datVao, logoLong, logoKhoi, tieuDe } from '../hinh.mjs';
-import { taoSvg, batKeo, hangCu } from './chung.mjs';
+import { hitTruc, hitGoc, DUNG_SAI } from '../toan/hit.mjs';
+import { taoSvg, batKeo, hangCu, dungBoCu } from './chung.mjs';
 
 export const W = 360, H = 300;
+
+const NHAC_CU = {
+  co: 'Đang cầm <b>Đổi cỡ</b>: kéo chấm tròn ở góc. Muốn dời hình thì chọn <b>Di chuyển</b>.',
+  xoay: 'Đang cầm <b>Xoay</b>: kéo chấm xanh trên đỉnh. Muốn dời hình thì chọn <b>Di chuyển</b>.',
+  soi: 'Đang cầm <b>Soi tệp</b>. Muốn dời hình thì chọn <b>Di chuyển</b>.',
+};
 
 export const TEP = {
   chup: { ten: 'logo-chup.jpg', mo: 'Ảnh chụp, 200 điểm', px: 200 },
@@ -60,7 +67,6 @@ export default {
     san.innerHTML = '';
     const svg = taoSvg(san, W, H, man.sanNhan || 'Sân kéo thả');
     const cu = man.san.cu || [];
-    let soi = false;
     let dangKeo = false;
     let dan = null;
 
@@ -82,16 +88,19 @@ export default {
       const st = ctx.st;
       const { x, y, w, h, goc } = v;
       let s = `<g transform="translate(${x} ${y}) rotate(${goc})"><rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" fill="none" stroke="${MAU.chan}" stroke-width="2"/>`;
-      if (cu.includes('xoay')) {
+      // Tay nắm chỉ hiện với đúng công cụ của nó.
+      if (ctx.cu === 'xoay') {
         s += `<path d="M0 ${-h / 2}V${-h / 2 - 26}" stroke="${MAU.chan}" stroke-width="2"/><g data-h="xoay"><circle cy="${-h / 2 - 30}" r="22" fill="transparent"/><circle cy="${-h / 2 - 30}" r="9" fill="${MAU.cyan}" stroke="${MAU.muc}" stroke-width="2"/></g>`;
       }
-      if (!st.khoa) {
-        for (const [a, b] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
-          s += `<g data-h="tay:${a}:${b}"><circle cx="${(a * w) / 2}" cy="${(b * h) / 2}" r="18" fill="transparent"/><rect x="${(a * w) / 2 - 6}" y="${(b * h) / 2 - 6}" width="12" height="12" rx="3" fill="${MAU.xamNhat}" stroke="${MAU.chan}" stroke-width="2"/></g>`;
+      if (ctx.cu === 'co') {
+        if (!st.khoa) {
+          for (const [a, b] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
+            s += `<g data-h="tay:${a}:${b}"><circle cx="${(a * w) / 2}" cy="${(b * h) / 2}" r="18" fill="transparent"/><rect x="${(a * w) / 2 - 6}" y="${(b * h) / 2 - 6}" width="12" height="12" rx="3" fill="${MAU.xamNhat}" stroke="${MAU.chan}" stroke-width="2"/></g>`;
+          }
         }
-      }
-      for (const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-        s += `<g data-h="tay:${a}:${b}"><circle cx="${(a * w) / 2}" cy="${(b * h) / 2}" r="22" fill="transparent"/><circle cx="${(a * w) / 2}" cy="${(b * h) / 2}" r="8" fill="${MAU.trang}" stroke="${MAU.chan}" stroke-width="2.5"/></g>`;
+        for (const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+          s += `<g data-h="tay:${a}:${b}"><circle cx="${(a * w) / 2}" cy="${(b * h) / 2}" r="22" fill="transparent"/><circle cx="${(a * w) / 2}" cy="${(b * h) / 2}" r="8" fill="${MAU.trang}" stroke="${MAU.chan}" stroke-width="2.5"/></g>`;
+        }
       }
       return s + '</g>';
     };
@@ -118,22 +127,18 @@ export default {
       }
       if (dan) s += `<path d="${dan}" stroke="${MAU.hong}" stroke-width="1.6" stroke-dasharray="5 4"/>`;
       if (chon) s += tay(chon);
-      if (soi && !dangKeo) s += kinhSoi();
+      if (ctx.cu === 'soi' && !dangKeo) s += kinhSoi();
       svg.innerHTML = s;
     };
 
+    // Bảng tùy chọn đổi theo công cụ đang cầm.
     const veKhay = () => {
       const st = ctx.st;
       khay.innerHTML = '';
-      hangCu(khay, [
-        cu.includes('khoa') && { id: 'khoa', nhan: st.khoa ? 'Đang khóa tỉ lệ' : 'Khóa tỉ lệ', ic: st.khoa ? 'khoa' : 'moKhoa', bat: st.khoa, bam() { ctx.ghi(); st.khoa = !st.khoa; ve(); veKhay(); ctx.doi(); } },
-        cu.includes('soi') && { id: 'soi', nhan: 'Soi', ic: 'soi', bat: soi, bam() { soi = !soi; st.daSoi = true; ve(); veKhay(); ctx.doi(); } },
-        ...(st.vat.length > 1 ? st.vat.map((v) => ({
-          id: `chon-${v.id}`, nhan: v.loai === 'tieu-de' ? 'Tiêu đề' : 'Logo', ic: 'tep', bat: st.chon === v.id,
-          bam() { st.chon = v.id; ve(); veKhay(); },
-        })) : []),
-      ]);
-      if (cu.includes('tep')) {
+      if (ctx.cu === 'co' && cu.includes('khoa')) {
+        hangCu(khay, [{ id: 'khoa', nhan: st.khoa ? 'Đang khóa tỉ lệ' : 'Khóa tỉ lệ', ic: st.khoa ? 'khoa' : 'moKhoa', bat: st.khoa, bam() { ctx.ghi(); st.khoa = !st.khoa; ve(); veKhay(); ctx.doi(); } }]);
+      }
+      if (ctx.cu === 'soi' && cu.includes('tep')) {
         hangCu(khay, Object.entries(TEP).map(([k, t]) => ({
           id: `tep-${k}`, nhan: t.ten, sub: t.mo, ic: 'tep', bat: st.tep === k,
           bam() { ctx.ghi(); st.tep = k; ve(); veKhay(); ctx.doi(); },
@@ -146,23 +151,31 @@ export default {
       if (!h) { return null; }
       if (h.startsWith('vat:')) {
         const id = h.slice(4);
-        if (st.chon !== id) { st.chon = id; veKhay(); }
+        if (st.chon !== id) { st.chon = id; ve(); veKhay(); ctx.doi(); }
+        else if (ctx.cu !== 'chon') ctx.nhac(NHAC_CU[ctx.cu]);
+        // Chạm hình nào cũng chọn được hình đó, nhưng chỉ công cụ Di chuyển mới dời được.
+        if (ctx.cu !== 'chon') return null;
         const v = st.vat.find((o) => o.id === id);
         const dx = pt.x - v.x, dy = pt.y - v.y;
         ctx.ghi();
         dangKeo = true;
         const z = man.san.vung[id];
+        const mocX = [{ t: z.x, neo: 0 }, { t: z.x + z.w / 2, neo: 0.5 }, { t: z.x + z.w, neo: 1 }];
+        const mocY = [{ t: z.y, neo: 0 }, { t: z.y + z.h / 2, neo: 0.5 }, { t: z.y + z.h, neo: 1 }];
         return {
           di(p) {
             v.x = kep(p.x - dx, 0, W);
             v.y = kep(p.y - dy, 0, H);
             dan = null;
-            const cx = z.x + z.w / 2, cy = z.y + z.h / 2;
-            if (Math.abs(v.x - cx) < 6) { v.x = cx; dan = `M${cx} 0V${H}`; }
-            if (Math.abs(v.y - cy) < 6) { v.y = cy; dan = `${dan || ''}M0 ${cy}H${W}`; }
+            // Lệch một chút so với tâm hay mép khung thì hít vào, kèm đường gióng cho thấy đã hít.
+            const hx = hitTruc(v.x - v.w / 2, v.w, mocX);
+            const hy = hitTruc(v.y - v.h / 2, v.h, mocY);
+            if (hx) { v.x += hx.doi; dan = `M${hx.moc.t} 0V${H}`; }
+            if (hy) { v.y += hy.doi; dan = `${dan || ''}M0 ${hy.moc.t}H${W}`; }
+            ctx.hit(dan);
             ve();
           },
-          nha() { dangKeo = false; dan = null; ve(); ctx.doi(); },
+          nha() { dangKeo = false; dan = null; ctx.hit(); ve(); ctx.doi(); },
         };
       }
       const v = st.vat.find((o) => o.id === st.chon);
@@ -174,11 +187,14 @@ export default {
           di(p) {
             let g = (Math.atan2(p.y - v.y, p.x - v.x) * 180) / Math.PI + 90;
             g = gocChuan(g);
-            if (Math.abs(g) < 5) g = 0;
+            const vuong = hitGoc(g);
+            dan = null;
+            if (vuong !== null) { g = vuong; dan = `M${v.x} 0V${H}M0 ${v.y}H${W}`; }
+            ctx.hit(dan);
             v.goc = Math.round(g);
             ve();
           },
-          nha() { dangKeo = false; ve(); ctx.doi(); },
+          nha() { dangKeo = false; dan = null; ctx.hit(); ve(); ctx.doi(); },
         };
       }
       if (h.startsWith('tay:')) {
@@ -189,22 +205,46 @@ export default {
         return {
           di(p) {
             const tay = { sx: +a, sy: +b };
-            let moi = keoTay(v0, tay, p.x, p.y, st.khoa);
-            // Gần chạm cạnh khung thì hít vào, ngón tay không cần trúng từng điểm.
             const z = man.san.vung[v.id];
-            if (st.khoa && z) {
-              const k = [z.w / moi.w, z.h / moi.h].find((x) => Math.abs(x - 1) * Math.max(moi.w, moi.h) < 5);
-              if (k && (moi.w * k <= z.w + 0.01) && (moi.h * k <= z.h + 0.01)) moi = datCoTheoNeo(v0, tay, moi.w * k, moi.h * k);
+            const thang = Math.abs(gocChuan(v0.goc)) < 1;
+            dan = null;
+            let px = p.x, py = p.y;
+            // Không khóa tỉ lệ: mép đang kéo gần mép khung thì hít vào mép đó.
+            if (z && !st.khoa && thang) {
+              const hx = tay.sx ? hitTruc(px, 0, [{ t: tay.sx > 0 ? z.x + z.w : z.x, neo: 0 }]) : null;
+              const hy = tay.sy ? hitTruc(py, 0, [{ t: tay.sy > 0 ? z.y + z.h : z.y, neo: 0 }]) : null;
+              if (hx) { px += hx.doi; dan = `M${px} 0V${H}`; }
+              if (hy) { py += hy.doi; dan = `${dan || ''}M0 ${py}H${W}`; }
             }
+            let moi = keoTay(v0, tay, px, py, st.khoa);
+            // Khóa tỉ lệ: cỡ gần vừa khít khung thì hít đúng cỡ đó, ngón tay không cần trúng từng điểm.
+            if (st.khoa && z) {
+              const k = [z.w / moi.w, z.h / moi.h].find((x) => Math.abs(x - 1) * Math.max(moi.w, moi.h) < DUNG_SAI && moi.w * x <= z.w + 0.01 && moi.h * x <= z.h + 0.01);
+              if (k) {
+                moi = datCoTheoNeo(v0, tay, moi.w * k, moi.h * k);
+                dan = `M${z.x} ${z.y}h${z.w}v${z.h}h${-z.w}z`;
+              }
+            }
+            ctx.hit(dan);
             Object.assign(v, moi);
             ve();
           },
-          nha() { dangKeo = false; ve(); ctx.doi(); },
+          nha() { dangKeo = false; dan = null; ctx.hit(); ve(); ctx.doi(); },
         };
       }
       return null;
     });
 
+    dungBoCu(ctx, [
+      { id: 'chon', nhan: 'Di chuyển', ic: 'diChuyen' },
+      { id: 'co', nhan: 'Đổi cỡ', ic: 'doiCo' },
+      cu.includes('xoay') && { id: 'xoay', nhan: 'Xoay', ic: 'xoay' },
+      cu.includes('soi') && { id: 'soi', nhan: 'Soi tệp', ic: 'soi' },
+    ], 'chon', () => {
+      if (ctx.cu === 'soi') ctx.st.daSoi = true;
+      ve();
+      veKhay();
+    });
     ve();
     veKhay();
   },

@@ -1,7 +1,7 @@
 // Cơ khí ghép hình: gộp, khoét, giữ phần chung. Thứ tự phép làm ra hình khác nhau (C10-28).
 import { giong, lapMatNa, tiLeTrung, dinhSao } from '../toan/hinh-hoc.mjs';
 import { MAU, saoPath } from '../hinh.mjs';
-import { taoSvg, batKeo, hangCu } from './chung.mjs';
+import { taoSvg, batKeo, dungBoCu } from './chung.mjs';
 
 export const W = 360, H = 300;
 
@@ -88,6 +88,7 @@ export default {
     dich.width = W * 2;
     dich.height = H * 2;
     veKetQua(dich, man.dichBuoc, MAU.xam);
+    let gion = null;
 
     const ve = () => {
       const st = ctx.st;
@@ -111,36 +112,26 @@ export default {
         else s += `<circle cx="${h.x}" cy="${h.y}" r="${h.r}" fill="transparent"/><path d="${saoPath(h.x, h.y, h.r)}" ${net}/>`;
         s += '</g>';
       }
+      if (gion) s += `<path d="${gion}" stroke="${MAU.hong}" stroke-width="1.8" stroke-dasharray="5 4"/>`;
       svg.innerHTML = s;
     };
 
-    const veKhay = () => {
-      const st = ctx.st;
-      khay.innerHTML = '';
-      hangCu(khay, st.hinh.map((h) => ({
-        id: `hinh-${h.id}`, nhan: h.ten, bat: st.chon === h.id, ic: h.loai === 'sao' ? 'sao' : h.loai === 'tron' ? 'tatCa' : 'cungCo',
-        bam() { st.chon = h.id; ve(); veKhay(); ctx.doi(); },
-      })));
-      const voi = (p) => () => {
-        if (!st.chon) return;
-        ctx.ghi();
-        lam.ap(st, st.chon, p);
-        ve(); veKhay(); ctx.doi();
-      };
-      const tat = !st.chon;
-      hangCu(khay, [
-        { id: 'gop', nhan: 'Gộp vào', ic: 'gop', tat, bam: voi('gop') },
-        { id: 'khoet', nhan: 'Khoét đi', ic: 'khoet', tat, bam: voi('khoet') },
-        { id: 'giao', nhan: 'Giữ phần chung', ic: 'giao', tat, bam: voi('giao') },
-      ]);
-    };
-
     batKeo(svg, W, H, (h, pt) => {
-      if (!h || !h.startsWith('h:')) return null;
+      if (!h || !h.startsWith('h:')) {
+        if (ctx.cu !== 'chon') ctx.nhac('Chạm vào một hình rời để áp dụng công cụ này.');
+        return null;
+      }
       const st = ctx.st;
       const id = h.slice(2);
       const v = st.hinh.find((o) => o.id === id);
-      if (st.chon !== id) { st.chon = id; veKhay(); ve(); }
+      // Công cụ ghép: chạm hình nào là áp dụng lên hình đó.
+      if (ctx.cu !== 'chon') {
+        ctx.ghi();
+        lam.ap(st, id, ctx.cu);
+        ve(); ctx.doi();
+        return null;
+      }
+      if (st.chon !== id) { st.chon = id; ve(); }
       const dx = pt.x - v.x, dy = pt.y - v.y;
       let daGhi = false;
       return {
@@ -148,14 +139,25 @@ export default {
           if (!daGhi) { ctx.ghi(); daGhi = true; }
           v.x = Math.max(0, Math.min(W, p.x - dx));
           v.y = Math.max(0, Math.min(H, p.y - dy));
-          if (Math.hypot(v.x - v.dx, v.y - v.dy) < 8) { v.x = v.dx; v.y = v.dy; }
+          gion = null;
+          if (Math.hypot(v.x - v.dx, v.y - v.dy) < 12) {
+            v.x = v.dx; v.y = v.dy;
+            gion = `M${v.x} 0V${H}M0 ${v.y}H${W}`;
+          }
+          ctx.hit(gion);
           ve();
         },
-        nha() { ctx.doi(); },
+        nha() { gion = null; ctx.hit(); ve(); ctx.doi(); },
       };
     });
 
+    dungBoCu(ctx, [
+      { id: 'chon', nhan: 'Di chuyển', ic: 'diChuyen' },
+      { id: 'gop', nhan: 'Gộp vào', ic: 'gop' },
+      { id: 'khoet', nhan: 'Khoét đi', ic: 'khoet' },
+      { id: 'giao', nhan: 'Giữ chung', ic: 'giao' },
+    ], 'chon', () => ve());
+    khay.innerHTML = '';
     ve();
-    veKhay();
   },
 };

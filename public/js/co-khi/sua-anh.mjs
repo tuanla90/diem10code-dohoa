@@ -1,7 +1,7 @@
 // Cơ khí chỉnh sáng, tương phản trên điểm ảnh thật kèm biểu đồ histogram sống (U11-10).
 import { giong } from '../toan/hinh-hoc.mjs';
 import { anhHoiTruong, apChinh, doAnh } from '../toan/anh.mjs';
-import { thanhTruot } from './chung.mjs';
+import { thanhTruot, dungBoCu } from './chung.mjs';
 
 let goc = null;
 export const anhGoc = () => (goc ||= anhHoiTruong());
@@ -24,6 +24,7 @@ export default {
     cv.height = a.h;
     cv.setAttribute('role', 'img');
     cv.setAttribute('aria-label', man.sanNhan || 'Ảnh hội trường đang chỉnh');
+    san.style.setProperty('--tile', a.w / a.h);
     san.appendChild(cv);
     const nut = document.createElement('button');
     nut.type = 'button';
@@ -83,17 +84,20 @@ export default {
       bd.setAttribute('aria-label', 'Biểu đồ phân bố độ sáng, trái là tối, phải là sáng');
       khay.appendChild(bd);
       const dinh = (v) => (v > 0 ? `+${v}` : `${v}`);
-      for (const [nhan, k, id] of [['Độ sáng', 'sang', 'sang'], ['Tương phản', 'tp', 'tp']]) {
-        let daGhi = false;
-        thanhTruot(khay, {
-          nhan, min: -100, max: 100, buoc: 5, gia: st[k], dinh, id,
-          doi(v) { if (!daGhi) { ctx.ghi(); daGhi = true; } st[k] = v; ve(); },
-          xong() { daGhi = false; ctx.doi(); },
-        });
-      }
+      const k = ctx.cu;
+      let daGhi = false;
+      thanhTruot(khay, {
+        nhan: k === 'sang' ? 'Độ sáng' : 'Tương phản', min: -100, max: 100, buoc: 5, gia: st[k], dinh, id: k,
+        doi(v) { if (!daGhi) { ctx.ghi(); daGhi = true; } st[k] = v; ve(); },
+        xong() { daGhi = false; ctx.doi(); },
+      });
       veBieuDo();
     };
 
+    dungBoCu(ctx, [
+      { id: 'sang', nhan: 'Độ sáng', ic: 'mat' },
+      { id: 'tp', nhan: 'Tương phản', ic: 'tuongPhan' },
+    ], 'sang', () => veKhay());
     ve();
     veKhay();
   },

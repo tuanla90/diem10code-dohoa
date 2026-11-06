@@ -46,6 +46,13 @@ const NET = {
   cat: '<circle cx="6" cy="7" r="2.5"/><circle cx="6" cy="17" r="2.5"/><path d="M8 8.5L20 16M8 15.5L20 8"/>',
   chu: '<path d="M6 6h12M12 6v13"/>',
   dai: '<rect x="3" y="9" width="18" height="6" rx="1"/>',
+  diChuyen: '<path d="M12 3v18M3 12h18M12 3L9 6M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>',
+  doiCo: '<rect x="4" y="10" width="10" height="10" rx="1"/><path d="M13 4h7v7M20 4l-7 7"/>',
+  xoay: '<path d="M20 12a8 8 0 11-2.5-5.8"/><path d="M20 3v4h-4"/>',
+  lop: '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
+  tuongPhan: '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z" fill="currentColor"/>',
+  nutNeo: '<path d="M5 19C8 8 16 16 19 5"/><rect x="2.5" y="17" width="5" height="5" rx="1"/><rect x="16.5" y="2" width="5" height="5" rx="1"/>',
+  xep: '<rect x="3" y="8" width="7" height="8" rx="1"/><rect x="14" y="8" width="7" height="8" rx="1"/><path d="M8 4h8l-2-2M16 20H8l2 2"/>',
 };
 
 export function icon(ten, lop = '') {

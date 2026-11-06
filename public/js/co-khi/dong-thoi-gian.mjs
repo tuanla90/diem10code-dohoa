@@ -1,7 +1,7 @@
 // Cơ khí dòng thời gian: cắt đầu cuối từng đoạn, đổi thứ tự, chuyển cảnh ăn mất thời lượng, nhạc nền (U11-14, U11-15).
 import { giong, kep } from '../toan/hinh-hoc.mjs';
 import { MAU } from '../hinh.mjs';
-import { taoSvg, batKeo, hangCu, thanhTruot } from './chung.mjs';
+import { taoSvg, batKeo, hangCu, thanhTruot, dungBoCu } from './chung.mjs';
 
 export const W = 360, H = 262;
 const X0 = 8;
@@ -65,6 +65,7 @@ export default {
     const DV_GIAY = (W - X0 - 8) / giayHien;
     let phatTai = null;
     let hen = 0;
+    let dangHit = false;
 
     const ve = () => {
       const st = ctx.st;
@@ -91,7 +92,7 @@ export default {
       const xs = (g) => X0 + g * DV_GIAY;
       s += `<path d="M${X0} 138H${W - 8}" stroke="${MAU.xam}" stroke-width="1"/>`;
       for (let g = 0; g <= giayHien; g += 10) s += `<path d="M${xs(g)} 134v8" stroke="${MAU.xam}"/><text x="${xs(g)}" y="130" text-anchor="middle" font-size="9.5" fill="${MAU.xam}" font-family="var(--mono)">${g}</text>`;
-      s += `<path d="M${xs(man.dich)} 126V${dayThuoc}" stroke="${MAU.vang}" stroke-width="2" stroke-dasharray="5 4"/>`;
+      s += `<path d="M${xs(man.dich)} 126V${dayThuoc}" stroke="${dangHit ? MAU.hong : MAU.vang}" stroke-width="${dangHit ? 3 : 2}" stroke-dasharray="5 4"/>`;
       // Đoạn hình
       let g = 0;
       let cham = '';
@@ -112,14 +113,16 @@ export default {
           if (mo) g -= CHONG_MO;
           const jx = xs(g);
           // Vẽ sau cùng, ở làn riêng dưới dải phim: đoạn kế tiếp và tay nắm không che được chấm.
-          cham += `<path d="M${jx} ${YV + 46}V${YJ}" stroke="${MAU.xam}" stroke-width="1.5"/><g data-h="j:${i}"><circle cx="${jx}" cy="${YJ}" r="20" fill="transparent"/><circle cx="${jx}" cy="${YJ}" r="9" fill="${mo ? MAU.hong : MAU.trang}" stroke="${MAU.xam}" stroke-width="2"/></g>`;
+          // Chỉ công cụ Chuyển cảnh mới chạm được chấm, công cụ khác chỉ thấy chỗ nào đang mờ.
+          if (ctx.cu === 'chuyen') cham += `<path d="M${jx} ${YV + 46}V${YJ}" stroke="${MAU.xam}" stroke-width="1.5"/><g data-h="j:${i}"><circle cx="${jx}" cy="${YJ}" r="20" fill="transparent"/><circle cx="${jx}" cy="${YJ}" r="9" fill="${mo ? MAU.hong : MAU.trang}" stroke="${MAU.xam}" stroke-width="2"/></g>`;
+          else if (mo) cham += `<circle cx="${jx}" cy="${YJ - 12}" r="4.5" fill="${MAU.hong}"/>`;
         } else g += d;
       });
       // Tay nắm đầu cuối đoạn đang chọn
       let g2 = 0;
       st.clip.forEach((c, i) => {
         const d = daiClip(c);
-        if (c.id === st.chon) {
+        if (c.id === st.chon && ctx.cu === 'cat') {
           // Vùng chạm lệch vào trong đoạn đang chọn để không che mất đoạn ngắn nằm kề bên.
           for (const [dau, gx, lech] of [['vao', g2, -6], ['ra', g2 + d, -24]]) {
             s += `<g data-h="t:${dau}"><rect x="${xs(gx) + lech}" y="${YV - 10}" width="30" height="66" fill="transparent"/><rect x="${xs(gx) - 4}" y="${YV - 6}" width="8" height="58" rx="3" fill="${MAU.vang}" stroke="${MAU.muc}" stroke-width="1.5"/></g>`;
@@ -130,7 +133,7 @@ export default {
       // Nhạc
       if (st.nhac) {
         const n = st.nhac;
-        const chon = st.chon === 'nhac';
+        const chon = ctx.cu === 'nhac';
         // Nhạc dài hơn thước thì vẽ tới mép và để tay nắm ở mép, kéo vào là cắt ngay.
         const cuoi = Math.min(xs(n.ra), W - 6);
         s += `<g data-h="nhac"><rect x="${X0}" y="${YA}" width="${cuoi - X0}" height="30" rx="5" fill="${MAU.xanh}" fill-opacity="${0.35 + (n.am / 100) * 0.6}" stroke="${chon ? MAU.vang : MAU.muc}" stroke-width="${chon ? 3 : 1}"/><text x="${X0 + 6}" y="${YA + 19}" font-size="10.5" font-weight="700" fill="${MAU.muc}" font-family="var(--font)">Nhạc nền, ${n.ra.toFixed(1)}s, ${n.am}%${n.mo ? ', mờ dần' : ''}</text></g>`;
@@ -140,56 +143,32 @@ export default {
       const t = tongDai(st);
       s += `<text x="16" y="30" font-size="13" font-weight="800" fill="${Math.abs(t - man.dich) <= 0.5 ? MAU.xanh : MAU.vang}" font-family="var(--mono)">${t.toFixed(1)}s</text><text x="16" y="46" font-size="10.5" fill="${MAU.xam}" font-family="var(--font)">đích ${man.dich}s</text>`;
       if (phatTai !== null) s += `<path d="M${xs(phatTai)} 126V${dayThuoc}" stroke="${MAU.trang}" stroke-width="2"/>`;
+      s += `<g data-h="phat"><circle cx="326" cy="34" r="24" fill="transparent"/><circle cx="326" cy="34" r="17" fill="${MAU.trang}"/>${phatTai === null ? `<path d="M321 26l13 8-13 8z" fill="${MAU.muc}"/>` : `<path d="M320 27h4v14h-4zM328 27h4v14h-4z" fill="${MAU.muc}"/>`}</g>`;
       svg.innerHTML = s;
     };
 
     const veKhay = () => {
       const st = ctx.st;
       khay.innerHTML = '';
-      const lenh = (fn) => () => { ctx.ghi(); fn(); ve(); veKhay(); ctx.doi(); };
-      const c = st.clip.find((o) => o.id === st.chon);
-      const i = st.clip.indexOf(c);
-      const buoc = 0.5;
-      const ds = [{ id: 'phat', nhan: phatTai === null ? 'Xem thử' : 'Dừng', ic: phatTai === null ? 'chay' : 'dung', bam: () => (phatTai === null ? batDauPhat() : dungPhat()) }];
-      if (c) {
-        ds.push({ id: 'trai', nhan: 'Sang trái', ic: 'trai', tat: i === 0, bam: lenh(() => lam.doi(st, i, i - 1)) });
-        ds.push({ id: 'phai', nhan: 'Sang phải', ic: 'phai', tat: i === st.clip.length - 1, bam: lenh(() => lam.doi(st, i, i + 1)) });
-        ds.push({ id: 'dau-', nhan: 'Đầu sớm', sub: '-0.5', ic: 'lamLai', bam: lenh(() => lam.cat(st, c.id, 'vao', c.vao - buoc)) });
-        ds.push({ id: 'dau+', nhan: 'Đầu muộn', sub: '+0.5', ic: 'cat', bam: lenh(() => lam.cat(st, c.id, 'vao', c.vao + buoc)) });
-        ds.push({ id: 'cuoi-', nhan: 'Cuối sớm', sub: '-0.5', ic: 'cat', bam: lenh(() => lam.cat(st, c.id, 'ra', c.ra - buoc)) });
-        ds.push({ id: 'cuoi+', nhan: 'Cuối muộn', sub: '+0.5', ic: 'lamLai', bam: lenh(() => lam.cat(st, c.id, 'ra', c.ra + buoc)) });
-        if (st.chuyen && i < st.clip.length - 1) {
-          const mo = st.chuyen[i] === 'mo';
-          ds.splice(1, 0, { id: 'chuyen', nhan: mo ? 'Sau đoạn: mờ' : 'Sau đoạn: cắt', ic: mo ? 'mo' : 'cat', bat: mo, bam: lenh(() => lam.chuyen(st, i, mo ? 'cat' : 'mo')) });
-        }
-      }
-      hangCu(khay, ds);
-      if (st.nhac) {
-        const n = st.nhac;
-        hangCu(khay, [
-          { id: 'chon-nhac', nhan: 'Nhạc nền', ic: 'nhac', bat: st.chon === 'nhac', bam() { st.chon = st.chon === 'nhac' ? null : 'nhac'; ve(); veKhay(); ctx.doi(); } },
-          { id: 'nhac-', nhan: 'Ngắn đi', sub: '-0.5', ic: 'cat', bam: lenh(() => lam.nhac(st, { ra: Math.max(1, n.ra - buoc) })) },
-          { id: 'nhac+', nhan: 'Dài ra', sub: '+0.5', ic: 'lamLai', bam: lenh(() => lam.nhac(st, { ra: Math.min(n.goc, n.ra + buoc) })) },
-          { id: 'nhac-mo', nhan: 'Mờ dần cuối', ic: 'mo', bat: n.mo, bam: lenh(() => lam.nhac(st, { mo: !n.mo })) },
-        ]);
-        let daGhi = false;
-        thanhTruot(khay, {
-          nhan: 'Âm lượng', min: 0, max: 100, buoc: 5, gia: n.am, dinh: (v) => `${v}%`, id: 'am',
-          doi(v) { if (!daGhi) { ctx.ghi(); daGhi = true; } n.am = v; ve(); },
-          xong() { daGhi = false; ctx.doi(); },
-        });
-      }
+      if (ctx.cu !== 'nhac' || !st.nhac) return;
+      const n = st.nhac;
+      hangCu(khay, [{ id: 'nhac-mo', nhan: 'Mờ dần cuối', ic: 'mo', bat: n.mo, bam() { ctx.ghi(); lam.nhac(st, { mo: !n.mo }); ve(); veKhay(); ctx.doi(); } }]);
+      let daGhi = false;
+      thanhTruot(khay, {
+        nhan: 'Âm lượng', min: 0, max: 100, buoc: 5, gia: n.am, dinh: (v) => `${v}%`, id: 'am',
+        doi(v) { if (!daGhi) { ctx.ghi(); daGhi = true; } n.am = v; ve(); },
+        xong() { daGhi = false; ctx.doi(); },
+      });
     };
 
     const dungPhat = () => {
       clearInterval(hen);
       phatTai = null;
       ve();
-      veKhay();
     };
     const batDauPhat = () => {
       phatTai = 0;
-      veKhay();
+      ve();
       hen = setInterval(() => {
         phatTai += 0.4;
         if (phatTai >= tongDai(ctx.st)) dungPhat();
@@ -200,8 +179,41 @@ export default {
     batKeo(svg, W, cao, (h, pt) => {
       const st = ctx.st;
       if (!h) return null;
-      if (h.startsWith('c:')) { st.chon = h.slice(2); ve(); veKhay(); ctx.doi(); return null; }
-      if (h === 'nhac') { st.chon = 'nhac'; ve(); veKhay(); ctx.doi(); return null; }
+      if (h === 'phat') { if (phatTai === null) batDauPhat(); else dungPhat(); return null; }
+      if (h.startsWith('c:')) {
+        const id = h.slice(2);
+        st.chon = id;
+        ve();
+        ctx.doi();
+        if (ctx.cu !== 'xep') {
+          if (ctx.cu !== 'cat') ctx.nhac(`Đang cầm <b>${ctx.cu === 'chuyen' ? 'Chuyển cảnh' : 'Nhạc'}</b>. Muốn đổi chỗ đoạn phim thì chọn <b>Xếp đoạn</b>.`);
+          return null;
+        }
+        let daGhi = false;
+        return {
+          // Kéo qua giữa đoạn kề bên thì hai đoạn đổi chỗ ngay.
+          di(p) {
+            const t = (p.x - X0) / DV_GIAY;
+            const i = st.clip.findIndex((c) => c.id === id);
+            let dau = 0;
+            for (let k = 0; k < i; k++) dau += daiClip(st.clip[k]);
+            const truoc = st.clip[i - 1], sau = st.clip[i + 1];
+            let j = i;
+            if (sau && t > dau + daiClip(st.clip[i]) + daiClip(sau) / 2) j = i + 1;
+            else if (truoc && t < dau - daiClip(truoc) / 2) j = i - 1;
+            if (j !== i) {
+              if (!daGhi) { ctx.ghi(); daGhi = true; }
+              lam.doi(st, i, j);
+              ve();
+            }
+          },
+          nha() { ve(); ctx.doi(); },
+        };
+      }
+      if (h === 'nhac') {
+        if (ctx.cu !== 'nhac') ctx.nhac('Muốn sửa nhạc thì chọn công cụ <b>Nhạc</b>.');
+        return null;
+      }
       if (h.startsWith('j:')) {
         const i = +h.slice(2);
         ctx.ghi();
@@ -213,8 +225,16 @@ export default {
         const n = st.nhac;
         ctx.ghi();
         return {
-          di(p) { n.ra = kep(Math.round(((p.x - X0) / DV_GIAY) * 2) / 2, 1, n.goc); ve(); },
-          nha() { veKhay(); ctx.doi(); },
+          di(p) {
+            const ra = kep(Math.round(((p.x - X0) / DV_GIAY) * 2) / 2, 1, n.goc);
+            // Gần hết phim thì nhạc hít đúng vào điểm hết phim.
+            const tong = tongDai(st);
+            dangHit = Math.abs(ra - tong) <= 1.5;
+            n.ra = dangHit ? tong : ra;
+            ctx.hit(dangHit ? 'nhac' : '');
+            ve();
+          },
+          nha() { dangHit = false; ctx.hit(); ve(); ctx.doi(); },
         };
       }
       if (h.startsWith('t:')) {
@@ -224,15 +244,38 @@ export default {
         ctx.ghi();
         return {
           di(p) {
-            lam.cat(st, c.id, dau, Math.round((gt0 + (p.x - pt.x) / DV_GIAY) * 2) / 2);
+            let gia = Math.round((gt0 + (p.x - pt.x) / DV_GIAY) * 2) / 2;
+            dangHit = false;
+            let khoa = '';
+            // Lệch một chút so với mép câu nói thì hít vào, để không cắt lẹm lời.
+            if (c.noi) {
+              const moc = dau === 'vao' ? c.noi[0] : c.noi[1];
+              if (Math.abs(gia - moc) <= 1) { gia = moc; khoa = 'noi'; }
+            }
+            lam.cat(st, c.id, dau, gia);
+            // Tổng phim lệch đích dưới 1 giây thì hít đúng đích, trừ khi làm mất lời nói.
+            const thieu = man.dich - tongDai(st);
+            const giaDich = c[dau] + (dau === 'ra' ? thieu : -thieu);
+            const matLoi = c.noi && (dau === 'ra' ? giaDich < c.noi[1] : giaDich > c.noi[0]);
+            if (Math.abs(thieu) <= 1 && !matLoi) {
+              lam.cat(st, c.id, dau, giaDich);
+              if (Math.abs(man.dich - tongDai(st)) < 0.01) { dangHit = true; khoa = 'dich'; }
+            }
+            ctx.hit(khoa);
             ve();
           },
-          nha() { veKhay(); ctx.doi(); },
+          nha() { dangHit = false; ctx.hit(); ve(); veKhay(); ctx.doi(); },
         };
       }
       return null;
     });
 
+    dungBoCu(ctx, [
+      { id: 'xep', nhan: 'Xếp đoạn', ic: 'xep' },
+      { id: 'cat', nhan: 'Cắt', ic: 'cat' },
+      ctx.st.chuyen && { id: 'chuyen', nhan: 'Chuyển cảnh', ic: 'mo' },
+      ctx.st.nhac && { id: 'nhac', nhan: 'Nhạc', ic: 'nhac' },
+    ], 'xep', () => { ve(); veKhay(); });
     ve();
     veKhay();
     return () => clearInterval(hen);

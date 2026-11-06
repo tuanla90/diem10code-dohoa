@@ -31,9 +31,9 @@ export default {
       },
       sanNhan: 'Ảnh động rô bốt và dải khung hình',
       dan: [
-        { txt: 'Khung đang chọn có rô bốt nhắm mắt. Bấm <b>Xóa khung</b>.', nhan: 'xoa', xong: (d) => d.loi === 0 },
-        { txt: 'Dùng <b>Sang trái, Sang phải</b> xếp cho tay lên dần rồi hạ dần.', xong: (d) => d.giat <= 20 },
-        { txt: 'Kéo <b>Mỗi khung</b> cho một vòng khoảng 1 giây rồi bấm <b>Đăng thử</b>.', xong: () => false },
+        { txt: 'Khung 4 có rô bốt nhắm mắt. Chọn công cụ <b>Xóa khung</b> rồi chạm vào nó.', nhan: 'cu-xoa', xong: (d) => d.loi === 0 },
+        { txt: 'Chọn <b>Xếp khung</b>, kéo các khung đổi chỗ cho tay lên dần rồi hạ dần.', nhan: 'cu-xep', xong: (d) => d.giat <= 20 },
+        { txt: 'Chọn <b>Nhịp</b>, kéo thanh cho một vòng khoảng 1 giây rồi bấm <b>Đăng thử</b>.', nhan: 'cu-nhip', xong: () => false },
       ],
       tieuChi: [
         { id: 'loi', ok: (d) => d.loi === 0, ten: 'Bỏ khung lỗi', loi: 'Cứ mỗi vòng rô bốt lại nhắm mắt một cái, như đang ngủ gật.', ai: 'sola', matLoi: 'facepalm' },
@@ -65,8 +65,8 @@ export default {
       dau: { clip: [giong('mo'), giong('kt'), giong('pv'), giong('hd'), giong('rb')], chon: 'kt' },
       sanNhan: 'Dòng thời gian phim với năm đoạn',
       dan: [
-        { txt: 'Đoạn <b>Logo</b> đang chọn. Bấm <b>Sang phải</b> cho nó về cuối phim.', nhan: 'phai', xong: (d) => d.cuoiDung },
-        { txt: 'Chọn từng đoạn, kéo <b>thanh vàng</b> hai đầu để cắt. Vạch vàng trên đoạn Luna là phần đang nói.', xong: (d) => Math.abs(d.tong - 30) <= 0.5 },
+        { txt: 'Đang cầm <b>Xếp đoạn</b>. Kéo đoạn <b>Logo</b> về cuối phim.', xong: (d) => d.cuoiDung },
+        { txt: 'Chọn công cụ <b>Cắt</b>, chạm từng đoạn rồi kéo <b>thanh vàng</b> hai đầu. Gần đủ 30 giây hay gần mép lời nói thì nó tự hít.', nhan: 'cu-cat', xong: (d) => Math.abs(d.tong - 30) <= 0.5 },
         { txt: 'Bấm <b>Chiếu thử</b>.', xong: () => false },
       ],
       tieuChi: [
@@ -116,9 +116,10 @@ export default {
       },
       sanNhan: 'Dòng thời gian có năm đoạn và rãnh nhạc nền',
       dan: [
-        { txt: 'Chạm <b>chấm tròn</b> giữa hai đoạn để đổi cắt thẳng thành chuyển mờ. Mỗi chỗ mờ ăn mất 1 giây.', xong: (d) => d.thieuMo === 0 },
-        { txt: 'Phim vừa ngắn đi. Nới đoạn nào đó cho về đủ 30 giây.', xong: (d) => Math.abs(d.tong - 30) <= 0.5 },
-        { txt: 'Chọn <b>Nhạc nền</b>: cắt cho hết cùng phim, giảm âm lượng, bật mờ dần cuối.', nhan: 'chon-nhac', xong: (d) => d.lechNhac <= 1 && d.am <= 50 },
+        { txt: 'Chọn công cụ <b>Chuyển cảnh</b>, chạm <b>chấm tròn</b> giữa hai đoạn để đổi cắt thẳng thành chuyển mờ. Mỗi chỗ mờ ăn mất 1 giây.', nhan: 'cu-chuyen', xong: (d) => d.thieuMo === 0 },
+        { txt: 'Phim vừa ngắn đi. Chọn <b>Cắt</b> và nới đoạn nào đó cho về đủ 30 giây, gần đủ nó tự hít.', nhan: 'cu-cat', xong: (d) => Math.abs(d.tong - 30) <= 0.5 },
+        { txt: 'Chọn <b>Nhạc</b>: kéo thanh vàng cuối rãnh về hết phim, giảm âm lượng, bật mờ dần cuối.', nhan: 'cu-nhac', xong: (d) => d.lechNhac <= 1 && d.am <= 50 },
+        { txt: 'Bấm <b>Chiếu thử</b>.', xong: () => false },
       ],
       tieuChi: [
         { id: 'chuyen', ok: (d) => d.thieuMo === 0, ten: 'Mờ ở chỗ đổi chủ đề', loi: 'Từ cảnh này nhảy sang cảnh khác chủ đề mà không có chuyển tiếp, người xem giật mình.', ai: 'luna', matLoi: 'thinking' },

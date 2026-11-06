@@ -25,15 +25,16 @@ export default {
       sanNhan: 'Logo năm mảnh, mảnh nền đang đè lên trên',
       phaiTren: [['chu', 'dai'], ['chu', 'nen'], ['dai', 'nen'], ['sao', 'nen'], ['vong', 'nen'], ['dai', 'vong'], ['sao', 'vong']],
       dan: [
-        { txt: 'Mảnh <b>Nền tròn</b> đang chọn. Bấm <b>Đưa xuống</b> tới khi nó nằm dưới cùng.', nhan: 'xuong', xong: (d) => d.nenDay },
-        { txt: 'Hàng trên xếp từ dưới lên: mảnh bên phải đè mảnh bên trái. Chọn mảnh khác để đổi tiếp.', xong: (d) => d.saiThuTu.length === 0 },
+        { txt: 'Chọn công cụ <b>Lớp</b>.', nhan: 'cu-lop', xong: (d, _st, cu) => cu === 'lop' || d.saiThuTu.length === 0 },
+        { txt: 'Kéo thẻ <b>Nền tròn</b> về tận cùng bên trái: đó là lớp dưới cùng.', xong: (d) => d.nenDay },
+        { txt: 'Thẻ bên phải đè thẻ bên trái. Kéo tiếp các thẻ khác cho đủ năm mảnh hiện ra.', xong: (d) => d.saiThuTu.length === 0 },
         { txt: 'Đủ năm mảnh rồi, bấm <b>In thử</b>.', xong: () => false },
       ],
       tieuChi: [
         { id: 'thuTu', ok: (d) => d.saiThuTu.length === 0, ten: 'Thấy đủ năm mảnh', loi: 'In ra vẫn có mảnh bị che: dải tên phải đè lên vòng trong, chữ phải đè lên dải tên, sao phải đè lên vòng.', ai: 'sola', matLoi: 'worried' },
       ],
       goiY: [
-        'Hình ảnh trên sân được vẽ từ trái sang phải của hàng lớp. Mảnh vẽ sau đè mảnh vẽ trước.',
+        'Hình ảnh trên sân được vẽ từ trái sang phải của hàng thẻ. Mảnh vẽ sau đè mảnh vẽ trước.',
         'Mảnh to nhất phải vẽ đầu tiên, nên nó nằm tận cùng bên trái hàng.',
         'Chữ nằm trên dải tên, dải tên nằm trên vòng trong, vòng trong nằm trên nền. Sao nằm trên vòng.',
       ],
@@ -62,9 +63,10 @@ export default {
       sanNhan: 'Poster có logo năm mảnh, tiêu đề và khung vàng ở góc phải',
       cumLogo: { goc: Object.fromEntries(IDS.map((id) => [id, gocCum])), tieuDe: { x: 55, y: 178 } },
       dan: [
-        { txt: 'Chạm lần lượt <b>năm mảnh logo</b> ở hàng dưới. Đừng chọn Tiêu đề.', xong: (_d, st) => (st.chon || []).filter((k) => k !== 'tieu-de').length === 5 || st.manh.some((m) => m.nhom) },
-        { txt: 'Bấm <b>Nhóm</b>.', nhan: 'nhom', xong: (d) => d.cungNhom },
-        { txt: 'Kéo cụm vào khung vàng, kéo <b>nút tròn</b> để thu nhỏ cả cụm.', xong: (d) => d.trongVung },
+        { txt: 'Với <b>Chọn, dời</b>, kéo trên nền một khung <b>quét qua cả logo</b> để chọn năm mảnh. Đừng quét trúng Tiêu đề.', nhan: 'cu-chon', xong: (_d, st) => (st.chon || []).filter((k) => k !== 'tieu-de').length === 5 || st.manh.some((m) => m.nhom) },
+        { txt: 'Vẫn ở <b>Chọn, dời</b>, bấm <b>Nhóm</b>.', nhan: 'nhom', xong: (d) => d.cungNhom },
+        { txt: 'Chọn <b>Đổi cỡ</b>, kéo chấm tròn để thu nhỏ cả cụm. Gần vừa khung nó tự hít.', nhan: 'cu-co', xong: (d) => d.phu <= 1.03 },
+        { txt: 'Về lại <b>Chọn, dời</b>, kéo cụm vào khung vàng. Gần mép khung nó tự hít.', nhan: 'cu-chon', xong: (d) => d.trongVung },
         { txt: 'Bấm <b>In thử</b>.', xong: () => false },
       ],
       tieuChi: [
@@ -77,7 +79,7 @@ export default {
       ],
       goiY: [
         'Vector giữ từng mảnh riêng, nên kéo là chỉ một mảnh đi. Phải bảo máy rằng chúng đi cùng nhau.',
-        'Chọn nhiều mảnh ở hàng chip, rồi Nhóm. Sau đó chạm mảnh nào cũng kéo được cả cụm.',
+        'Quét khung qua cả logo, hoặc chạm từng mảnh, rồi Nhóm. Sau đó chạm mảnh nào cũng kéo được cả cụm.',
         'Thu nhỏ trước rồi kéo vào khung thì dễ hơn. Nếu lỡ nhóm cả Tiêu đề, bấm Rã nhóm làm lại.',
       ],
       soTay: ['nhom', 'lop'],
@@ -109,6 +111,12 @@ export default {
       san: { nen: 'bang', cu: ['can'], vung: { x: 14, y: 66, w: 332, h: 150, ten: '' } },
       sanNhan: 'Bảng tin có năm biểu tượng so le',
       hang: ['hd1', 'hd2', 'hd3', 'hd4', 'hd5'],
+      dan: [
+        { txt: 'Dùng <b>Chọn, dời</b> kéo cho đúng thứ tự, hình nào thò ra thì kéo vào khung. Đường hồng hiện là đã hít thẳng hàng hoặc cách đều.', xong: (d) => d.dungThu && d.trongVung },
+        { txt: 'Chỉnh tay bằng <b>Đổi cỡ</b>: cỡ gần bằng hình khác thì tự hít. Hoặc chọn <b>Căn chỉnh</b>, quét chọn cả năm rồi dùng lệnh.', nhan: 'cu-can', xong: (d) => d.lechCo <= 0.03 },
+        { txt: 'Cho thẳng hàng và cách đều bằng tay hoặc bằng lệnh. Lệnh <b>Cách đều</b> giữ yên hai hình ngoài cùng.', xong: (d) => d.lechHang <= 3 && d.lechHo <= 3 && !d.hoAm },
+        { txt: 'Bấm <b>Dán thử</b>.', xong: () => false },
+      ],
       tieuChi: [
         { id: 'trong', ok: (d) => d.trongVung, ten: 'Trong khung', loi: 'Có biểu tượng thò khỏi khung vàng, tờ in sẽ cắt mất.', ai: 'luna', matLoi: 'worried' },
         { id: 'co', ok: (d) => d.lechCo <= 0.03, ten: 'Cùng cỡ', loi: 'Biểu tượng to nhỏ khác nhau, nhìn như hoạt động này quan trọng hơn hoạt động kia.', ai: 'sola', matLoi: 'confused' },
@@ -120,7 +128,7 @@ export default {
       goiY: [
         'Có một biểu tượng đang thò ra ngoài khung. Lệnh căn hàng giữ nguyên hai đầu, nên phải kéo nó vào trước.',
         'Thứ tự lệnh có ý nghĩa: cùng cỡ làm mọi khoảng hở thay đổi, nên Cách đều phải làm sau Cùng cỡ.',
-        'Đổi chỗ hai biểu tượng đầu bằng cách kéo tay, rồi Chọn hết, Cùng cỡ, Căn hàng, Cách đều.',
+        'Kéo đổi chỗ hai biểu tượng đầu, quét chọn cả năm, chạm hình làm mẫu, rồi Cùng cỡ, Căn hàng, Cách đều.',
       ],
       soTay: ['can-hang'],
       canh: (st) => canhBanTin(`<rect width="360" height="300" fill="${MAU.trang}"/>${logoTheoLop(st)}`),

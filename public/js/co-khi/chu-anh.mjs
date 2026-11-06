@@ -2,7 +2,8 @@
 import { giong } from '../toan/hinh-hoc.mjs';
 import { anhSanTruong, doChoi, tuongPhanWcag } from '../toan/anh.mjs';
 import { MAU } from '../hinh.mjs';
-import { taoSvg, batKeo, hangCu, thanhTruot } from './chung.mjs';
+import { hitTruc } from '../toan/hit.mjs';
+import { taoSvg, batKeo, hangCu, dungBoCu } from './chung.mjs';
 
 export const W = 360, H = 202;
 const MAU_CHU = {
@@ -77,16 +78,25 @@ export default {
     const svg = taoSvg(chong, W, H, man.sanNhan || 'Ảnh sân trường, kéo chữ để đặt');
     svg.style.height = '100%';
     svg.setAttribute('preserveAspectRatio', 'none');
+    let gion = null;
 
     const ve = () => {
       const st = ctx.st;
       const b = hopChu(st);
-      svg.innerHTML = `<g data-h="chu">${veChu(st)}<rect x="${b.x}" y="${b.y - 6}" width="${b.w}" height="${b.h + 12}" fill="transparent" stroke="${MAU.cyan}" stroke-width="1.5" stroke-dasharray="5 4"/></g>`;
+      let s = `<g data-h="chu">${veChu(st)}<rect x="${b.x}" y="${b.y - 6}" width="${b.w}" height="${b.h + 12}" fill="transparent" stroke="${MAU.cyan}" stroke-width="1.5" stroke-dasharray="5 4"/></g>`;
+      if (ctx.cu === 'co') {
+        const hx = Math.min(b.x + b.w, W - 12), hy = b.y + b.h / 2;
+        s += `<g data-h="co"><circle cx="${hx}" cy="${hy}" r="22" fill="transparent"/><circle cx="${hx}" cy="${hy}" r="8" fill="${MAU.trang}" stroke="${MAU.chan}" stroke-width="2.5"/></g>`;
+        s += `<text x="12" y="${H - 10}" font-size="13" font-weight="800" fill="${MAU.muc}" font-family="var(--mono)">cỡ ${st.co}</text>`;
+      }
+      if (gion) s += `<path d="${gion}" stroke="${MAU.hong}" stroke-width="1.8" stroke-dasharray="5 4"/>`;
+      svg.innerHTML = s;
     };
 
     const veKhay = () => {
       const st = ctx.st;
       khay.innerHTML = '';
+      if (ctx.cu !== 'mau') return;
       hangCu(khay, [
         ...Object.entries(MAU_CHU).map(([k, m]) => ({
           id: `mau-${k}`, nhan: m.ten, bat: st.mau === k,
@@ -94,31 +104,54 @@ export default {
           bam() { ctx.ghi(); st.mau = k; ve(); veKhay(); ctx.doi(); },
         })),
         { id: 'dai', nhan: 'Dải nền', ic: 'dai', bat: !!st.dai, bam() { ctx.ghi(); st.dai = !st.dai; ve(); veKhay(); ctx.doi(); } },
-      ]);
-      let daGhi = false;
-      thanhTruot(khay, {
-        nhan: 'Cỡ chữ', min: 12, max: 40, buoc: 1, gia: st.co, id: 'co',
-        doi(v) { if (!daGhi) { ctx.ghi(); daGhi = true; } st.co = v; ve(); },
-        xong() { daGhi = false; ctx.doi(); },
-      });
+      ], { deu: true });
     };
 
     batKeo(svg, W, H, (h, pt) => {
-      if (h !== 'chu') return null;
       const st = ctx.st;
+      if (h === 'co') {
+        ctx.ghi();
+        return {
+          di(p) {
+            const dai = NOI_DUNG.length * 0.6;
+            st.co = Math.max(12, Math.min(40, Math.round((Math.abs(p.x - st.x) * 2) / dai)));
+            ve();
+          },
+          nha() { ctx.doi(); },
+        };
+      }
+      if (h !== 'chu') return null;
+      if (ctx.cu !== 'chon') {
+        ctx.nhac(ctx.cu === 'co' ? 'Đang cầm <b>Cỡ chữ</b>: kéo chấm tròn ở đầu chữ. Muốn dời chữ thì chọn <b>Di chuyển</b>.' : 'Đang cầm <b>Màu</b>. Muốn dời chữ thì chọn <b>Di chuyển</b>.');
+        return null;
+      }
       const dx = pt.x - st.x, dy = pt.y - st.y;
+      const LE = 6;
       let daGhi = false;
       return {
         di(p) {
           if (!daGhi) { ctx.ghi(); daGhi = true; }
           st.x = Math.max(0, Math.min(W, Math.round(p.x - dx)));
           st.y = Math.max(0, Math.min(H, Math.round(p.y - dy)));
+          // Gần giữa ảnh hoặc gần lề an toàn thì hít vào, có đường gióng báo hiệu.
+          const b = hopChu(st);
+          const hx = hitTruc(b.x, b.w, [{ t: W / 2, neo: 0.5 }, { t: LE, neo: 0 }, { t: W - LE, neo: 1 }]);
+          const hy = hitTruc(b.y, b.h, [{ t: LE, neo: 0 }, { t: H - LE, neo: 1 }]);
+          gion = null;
+          if (hx) { st.x += hx.doi; gion = `M${hx.moc.t} 0V${H}`; }
+          if (hy) { st.y += hy.doi; gion = `${gion || ''}M0 ${hy.moc.t}H${W}`; }
+          ctx.hit(gion);
           ve();
         },
-        nha() { ctx.doi(); },
+        nha() { gion = null; ctx.hit(); ve(); ctx.doi(); },
       };
     });
 
+    dungBoCu(ctx, [
+      { id: 'chon', nhan: 'Di chuyển', ic: 'diChuyen' },
+      { id: 'co', nhan: 'Cỡ chữ', ic: 'doiCo' },
+      { id: 'mau', nhan: 'Màu', ic: 'chu' },
+    ], 'chon', () => { ve(); veKhay(); });
     ve();
     veKhay();
   },

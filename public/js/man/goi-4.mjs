@@ -22,7 +22,11 @@ export default {
       muc: 'Làm ảnh sáng rõ, nhưng cửa sổ không được cháy trắng.',
       dau: { sang: 0, tp: 0 },
       sanNhan: 'Ảnh hội trường chụp thiếu sáng',
-      dan: [{ txt: 'Biểu đồ dưới ảnh cho biết độ sáng các điểm: lệch trái là tối. Vạch đỏ hai đầu là mất chi tiết.', xong: (d) => d.tb > 90 }],
+      dan: [
+        { txt: 'Kéo thanh <b>Độ sáng</b> lên. Biểu đồ lệch trái là ảnh tối, vạch đỏ hai đầu là mất chi tiết.', xong: (d) => d.tb > 90 },
+        { txt: 'Chọn công cụ <b>Tương phản</b> để các cột giãn ra.', nhan: 'cu-tp', xong: (d, _st, cu) => cu === 'tp' || d.gian >= 110 },
+        { txt: 'Kéo tương phản đến khi cột trải rộng mà chưa hiện vạch đỏ, rồi bấm <b>Chiếu thử</b>.', xong: () => false },
+      ],
       tieuChi: [
         { id: 'toi', ok: (d) => d.tb >= 88, ten: 'Đủ sáng', loi: 'Chiếu lên màn vẫn tối mờ, hàng ghế cuối hỏi có ảnh hay chưa.', ai: 'sola', matLoi: 'confused' },
         { id: 'chay', ok: (d) => d.chay <= 0.03, ten: 'Cửa sổ còn chi tiết', loi: 'Sáng quá tay, vùng cửa sổ cháy trắng, mất luôn khung cửa.', ai: 'luna', matLoi: 'worried' },
@@ -90,8 +94,8 @@ export default {
       sanNhan: 'Ảnh rô bốt có hai tay gần trùng màu tường',
       dan: [
         { txt: 'Dùng đũa thần dọn nền trước, kệ hai cái tay.', xong: (d) => d.conSot < 0.2 },
-        { txt: 'Bấm <b>Cọ giữ</b> rồi tô dọc hai cánh tay để lấy chúng về.', nhan: 'coGiu', xong: (d) => d.anMat < 0.1 },
-        { txt: 'Lem ra ngoài thì <b>Cọ xóa</b> lại. Xong bấm <b>Ghép poster</b>.', xong: () => false },
+        { txt: 'Chọn công cụ <b>Cọ giữ</b> rồi tô dọc hai cánh tay. Cọ bám mép nên lệch một chút cũng không lem.', nhan: 'cu-giu', xong: (d) => d.anMat < 0.1 },
+        { txt: 'Còn sót nền thì dùng <b>Cọ xóa</b>. Xong bấm <b>Ghép poster</b>.', xong: () => false },
       ],
       tieuChi: [
         { id: 'tay', ok: (d) => d.anMat <= 0.1, ten: 'Còn đủ hai tay', loi: 'Rô bốt lên poster không có tay, trông như đang xin lỗi cả trường.', ai: 'sola', matLoi: 'facepalm' },
@@ -102,7 +106,7 @@ export default {
       goiY: [
         'Đũa thần chỉ biết màu, không biết đâu là tay. Khi màu trùng nhau thì phải dùng tay người.',
         'Vùng chọn sửa được: Cọ giữ lấy lại phần lỡ xóa, Cọ xóa bỏ phần còn sót.',
-        'Cỡ cọ khoảng 5 tô dọc cánh tay, rồi tô ngang chỗ vai và cổ tay. Đừng sợ lem, sửa lại được.',
+        'Cỡ cọ khoảng 5 tô dọc cánh tay, rồi tô ngang chỗ vai và cổ tay. Tâm cọ nằm trên tay là không lem ra tường.',
       ],
       soTay: ['vung-chon', 'mat-na'],
       canh: (st, _k, _d, man) => canhTachNen(st, man),
@@ -133,6 +137,11 @@ export default {
       nho: 'Sola đặt chữ ngay giữa, nhỏ xíu, trắng trên nền lốm đốm. Đứng cách 3 mét thì mình không đọc nổi.',
       muc: 'Chữ tiêu đề đọc được từ xa, không che rô bốt và không chạm mép ảnh.',
       vungCam: { x: 150, y: 62, w: 60, h: 92 },
+      dan: [
+        { txt: 'Dùng <b>Di chuyển</b> đưa chữ khỏi rô bốt. Gần giữa ảnh hay gần lề nó tự hít.', xong: (d) => !d.cheNguoi },
+        { txt: 'Chọn <b>Cỡ chữ</b>, kéo chấm tròn cho chữ to lên.', nhan: 'cu-co', xong: (d) => d.co >= 22 },
+        { txt: 'Chọn <b>Màu</b> cho chữ nổi trên nền, rồi bấm <b>Treo thử</b>.', nhan: 'cu-mau', xong: () => false },
+      ],
       dau: { x: 180, y: 100, co: 15, mau: 'trang', dai: false },
       sanNhan: 'Ảnh sân trường có rô bốt ở giữa, chữ tiêu đề nằm đè lên',
       tieuChi: [

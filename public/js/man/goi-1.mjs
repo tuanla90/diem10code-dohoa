@@ -21,9 +21,9 @@ export default {
       san: { nen: 'poster', vung: { logo: { x: 70, y: 40, w: 220, h: 150, ten: 'Khung đặt logo' } }, cu: ['khoa'] },
       sanNhan: 'Poster có khung vàng và logo nhỏ phía dưới',
       dan: [
-        { txt: 'Bật <b>Khóa tỉ lệ</b> trước khi đổi cỡ.', nhan: 'khoa', xong: (_d, st) => st.khoa },
-        { txt: 'Kéo <b>thân logo</b> vào giữa khung vàng.', xong: (d) => d.logo.lech < 50 },
-        { txt: 'Kéo <b>nút tròn ở góc</b> cho logo to lên.', xong: (d) => d.logo.phu >= 0.85 },
+        { txt: 'Chọn công cụ <b>Đổi cỡ</b>.', nhan: 'cu-co', xong: (d, st, cu) => cu === 'co' || d.logo.phu >= 0.85 },
+        { txt: 'Bật <b>Khóa tỉ lệ</b> rồi kéo <b>chấm tròn ở góc</b> cho logo to lên. Gần vừa khung nó tự hít.', nhan: 'khoa', xong: (d, st) => st.khoa && d.logo.phu >= 0.85 },
+        { txt: 'Chọn <b>Di chuyển</b>, kéo logo vào giữa khung. Gần tâm nó tự hít, có đường hồng báo hiệu.', nhan: 'cu-chon', xong: (d) => d.logo.lech < 5 },
         { txt: 'Xong rồi thì bấm <b>In thử</b>.', xong: () => false },
       ],
       tieuChi: [
@@ -66,7 +66,12 @@ export default {
         },
       },
       sanNhan: 'Poster có logo và tiêu đề đang nghiêng',
-      dan: [{ txt: 'Nút <b>xanh trên đỉnh</b> để xoay. Gần 0 độ nó tự hít thẳng.', nhan: 'chon-tieu', xong: (d) => d.logo.goc <= 2 && d.tieu.goc <= 2 }],
+      dan: [
+        { txt: 'Chọn công cụ <b>Xoay</b>, chạm từng món rồi kéo chấm xanh trên đỉnh. Gần thẳng nó tự hít.', nhan: 'cu-xoay', xong: (d, st, cu) => cu === 'xoay' || (d.logo.goc <= 2 && d.tieu.goc <= 2) },
+        { txt: 'Kéo <b>chấm xanh</b> của cả hai món cho thẳng. Chạm món kia để đổi sang nó.', xong: (d) => d.logo.goc <= 2 && d.tieu.goc <= 2 },
+        { txt: 'Xong xoay thì dùng <b>Đổi cỡ</b> và <b>Di chuyển</b> đưa từng món vào khung của nó.', xong: (d) => d.logo.phu >= 0.85 && d.tieu.phu >= 0.85 && d.logo.trong && d.tieu.trong },
+        { txt: 'Bấm <b>In thử</b>.', xong: () => false },
+      ],
       tieuChi: [
         { id: 'nghieng', ok: (d) => d.logo.goc <= 2 && d.tieu.goc <= 2, ten: 'Cả hai thẳng', loi: 'Treo lên bảng tin, ai đi qua cũng nghiêng đầu nhìn.', ai: 'sola', matLoi: 'facepalm' },
         { id: 'meo', ok: (d) => d.logo.meo <= 0.03 && d.tieu.meo <= 0.03, ten: 'Không méo', loi: 'Có một món bị kéo méo tỉ lệ. Chữ tiêu đề bè ra trông rất lạ.', ai: 'luna', matLoi: 'worried' },
@@ -100,8 +105,8 @@ export default {
       san: { nen: 'bang-ron', cmMoiDv: 300 / 340, vung: { logo: { x: 28, y: 96, w: 90, h: 90, ten: '' } }, cu: ['khoa', 'soi', 'tep'] },
       sanNhan: 'Băng rôn ba mét có khung vàng đặt logo',
       dan: [
-        { txt: 'Bấm <b>Soi</b>: đó là ô điểm ảnh khi in thật ra.', nhan: 'soi', xong: (_d, st) => st.daSoi },
-        { txt: 'Thử đổi tệp và kéo to logo, nhìn kính soi thay đổi.', xong: (d) => d.logo.phu >= 0.85 },
+        { txt: 'Chọn công cụ <b>Soi tệp</b>: kính soi cho thấy ô điểm ảnh khi in thật ra.', nhan: 'cu-soi', xong: (_d, st) => st.daSoi },
+        { txt: 'Dùng <b>Đổi cỡ</b> và <b>Di chuyển</b> đưa logo vào khung. Rồi quay lại <b>Soi tệp</b> xem kính soi đã đổi ra sao.', xong: (d) => d.logo.phu >= 0.85 },
         { txt: 'Chọn được tệp ưng ý thì bấm <b>In thử</b>.', xong: () => false },
       ],
       tieuChi: [

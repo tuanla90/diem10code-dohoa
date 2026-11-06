@@ -191,11 +191,15 @@ export function duaThan(a, x, y, nguong, dich) {
   }
 }
 
-export function toCo(a, x, y, r, giaTri, dich) {
+// bamMep: cọ bám mép. Tâm cọ nằm bên nào thì chỉ tô bên đó, lem một chút qua mép rô bốt không tính.
+export function toCo(a, x, y, r, giaTri, dich, bamMep = false) {
   const { w, h } = a;
+  const tamThat = bamMep && a.that ? a.that[Math.round(y) * w + Math.round(x)] : null;
   for (let j = Math.max(0, Math.floor(y - r)); j <= Math.min(h - 1, Math.ceil(y + r)); j++) {
     for (let i = Math.max(0, Math.floor(x - r)); i <= Math.min(w - 1, Math.ceil(x + r)); i++) {
-      if ((i - x) ** 2 + (j - y) ** 2 <= r * r) dich[j * w + i] = giaTri;
+      if ((i - x) ** 2 + (j - y) ** 2 > r * r) continue;
+      if (bamMep && a.that && !!a.that[j * w + i] !== !!tamThat) continue;
+      dich[j * w + i] = giaTri;
     }
   }
 }

@@ -11,8 +11,11 @@
 .loi-nho-ai { font-size: 11px; font-weight: 750; color: var(--fg-phu); letter-spacing: .04em; }
 .loi-nho-muc { display: block; font-weight: 750; margin-top: 2px; }
 
-.khung-san { position: relative; background: var(--the); border: 1px solid var(--vien); border-radius: var(--r-the); overflow: hidden; }
+.khung-san { position: relative; background: var(--lom); border: 1px solid var(--vien); border-radius: var(--r-the); overflow: hidden; }
 .khung-san svg.san-svg, .khung-san canvas.san-canvas { display: block; width: 100%; height: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+/* Máy thấp: sân khấu thu theo chiều cao để bộ công cụ và khay vẫn nằm trong màn hình.
+   362px là phần đầu màn, lời nhờ, lời dẫn, bộ công cụ, một hàng khay và thanh Chạy. --tile là rộng chia cao của sân khấu. */
+.khung-san > svg.san-svg, .khung-san > canvas.san-canvas, .san-chong { width: min(100%, max(240px, calc((100dvh - 362px) * var(--tile, 1)))); margin-inline: auto; }
 .san-chong { position: relative; }
 .san-chong svg.san-svg { position: absolute; inset: 0; }
 .san-hang { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
@@ -20,8 +23,21 @@
 .loi-dan { min-height: 26px; font-size: 13.5px; color: var(--fg-phu); padding: 0 4px; line-height: 1.3; }
 .loi-dan b { color: var(--brand-dam); font-weight: 750; }
 .loi-dan--ok { color: var(--ok); font-weight: 650; }
+.loi-dan--nhac { color: var(--fg); font-weight: 600; }
 
-.khay { display: flex; flex-direction: column; gap: 7px; }
+/* Bộ công cụ: luôn cùng một chỗ, công cụ đang cầm tô đặc để nhìn là biết. */
+.bo-cu { position: sticky; bottom: calc(67px + env(safe-area-inset-bottom)); z-index: 4; display: flex; gap: 4px; padding: 4px; background: var(--lom); border-radius: var(--r-vua); }
+.bo-cu:empty { display: none; }
+.cong-cu { flex: 1 1 0; min-width: 0; min-height: 54px; padding: 5px 2px; border-radius: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11.5px; font-weight: 650; line-height: 1.1; text-align: center; color: var(--fg-phu); background: transparent; border: 1px solid transparent; }
+.cong-cu .icon { width: 22px; height: 22px; }
+.cong-cu:active { background: var(--the); }
+.cong-cu[aria-pressed='true'] { background: var(--brand); color: var(--tren-brand); box-shadow: 0 3px 8px var(--bong-nut); }
+
+.hang-keo .cu { touch-action: none; user-select: none; -webkit-user-select: none; transition: transform .14s ease-out; position: relative; }
+.hang-keo .cu:active { transition: none; }
+
+.khay { display: flex; flex-direction: column; gap: 7px; scroll-margin-bottom: 75px; }
+.khay:empty { display: none; }
 .hang-cu { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; padding: 1px; }
 .hang-cu::-webkit-scrollbar { display: none; }
 .cu { flex: none; min-width: 58px; min-height: 52px; padding: 5px 9px; border-radius: var(--r-nho); background: var(--the); border: 1px solid var(--vien); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11.5px; font-weight: 650; line-height: 1.1; text-align: center; white-space: nowrap; }
@@ -74,8 +90,11 @@
 .so-sanh { position: absolute; right: 8px; bottom: 8px; min-height: 40px; padding: 0 12px; border-radius: 99px; background: var(--phu-lop); color: var(--tren-brand); font-size: 12.5px; font-weight: 700; touch-action: none; }
 
 @media (max-height: 690px) {
+  .loi-nho { padding: 6px 9px; }
   .loi-nho .mat { width: 34px; height: 34px; }
+  .loi-nho-ai { display: none; }
   .loi-nho-than { font-size: 13px; }
+  .cong-cu { min-height: 48px; }
   /* Màn thấp: lời nhờ gói còn một dòng để sân khấu không bị đẩy khỏi tầm nhìn, mục tiêu vẫn đủ. */
   .loi-nho-cau { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; }
 }

@@ -11,6 +11,9 @@ import { fileURLToPath } from 'node:url';
 import { GOI, CO_KHI, TAT_CA_MAN, cham } from '../public/js/man/index.mjs';
 import { SO_TAY } from '../public/js/so-tay.mjs';
 import { keoTay, gocKhung, chenNut, doLech, giong } from '../public/js/toan/hinh-hoc.mjs';
+import { hitMoc, hitGoc, hitTruc, mocCachDeu } from '../public/js/toan/hit.mjs';
+import { toCo } from '../public/js/toan/anh.mjs';
+import { diemNenGan } from '../public/js/co-khi/tach-nen.mjs';
 
 const GOC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PUB = path.join(GOC, 'public');
@@ -93,13 +96,45 @@ for (const man of TAT_CA_MAN) {
   // Hai đường so bằng điểm lấy mẫu cách nhau khoảng 4 đơn vị, nên dung sai 3 là đúng hình.
   kiem('Thêm nút: hình giữ nguyên', doLech(n, n2) < 3);
 
-  // Lớp: đưa lên, xuống đổi đúng hai vị trí kề nhau.
+  // Lớp: kéo thẻ từ chỗ này sang chỗ kia, các thẻ giữa nhường chỗ.
   const lop = CO_KHI['lop-nhom'].lam;
   const st = { manh: [{ id: 'a', x: 0, y: 0, s: 1 }, { id: 'b', x: 0, y: 0, s: 1 }, { id: 'c', x: 0, y: 0, s: 1 }] };
-  lop.len(st, 'a');
-  kiem('Đưa lên: đổi chỗ với lớp ngay trên', st.manh.map((m) => m.id).join('') === 'bac');
-  lop.xuong(st, 'b');
-  kiem('Đưa xuống ở đáy: không đổi', st.manh.map((m) => m.id).join('') === 'bac');
+  lop.doiLop(st, 2, 0);
+  kiem('Kéo thẻ lớp về đầu: các thẻ khác nhường chỗ', st.manh.map((m) => m.id).join('') === 'cab');
+  lop.doiLop(st, 0, 1);
+  kiem('Kéo thẻ lớp sang kề bên', st.manh.map((m) => m.id).join('') === 'acb');
+
+  // Căn chỉnh theo hình mẫu: hình mẫu đứng yên, các hình kia làm theo.
+  const s3 = { manh: [{ id: 'hd1', x: 0, y: 10, s: 0.5 }, { id: 'hd2', x: 80, y: 60, s: 0.8 }, { id: 'hd3', x: 200, y: 30, s: 0.6 }] };
+  const y2 = s3.manh[1].y, s2g = s3.manh[1].s;
+  lop.cungCo(s3, ['hd1', 'hd2', 'hd3'], 'hd2');
+  kiem('Cùng cỡ theo mẫu: mọi hình bằng cỡ hình mẫu', s3.manh.every((m) => m.s === s2g));
+  kiem('Cùng cỡ theo mẫu: hình mẫu đứng yên', s3.manh[1].y === y2 && s3.manh[1].x === 80);
+  lop.canGiua(s3, ['hd1', 'hd2', 'hd3'], 'hd2');
+  kiem('Căn hàng theo mẫu: hàng đi theo hình mẫu', s3.manh[0].y === y2 && s3.manh[2].y === y2 && s3.manh[1].y === y2);
+
+  // Bộ hít: lệch ít thì nắn về, lệch nhiều thì để yên.
+  kiem('Hít mốc: lệch ít về đúng mốc', hitMoc(107, [100, 200]) === 100);
+  kiem('Hít mốc: lệch nhiều không hít', hitMoc(130, [100, 200]) === null);
+  kiem('Hít mốc: chọn mốc gần hơn', hitMoc(150, [145, 153]) === 153);
+  kiem('Hít góc: gần thẳng về 0', hitGoc(4) === 0 && hitGoc(-5) === 0);
+  kiem('Hít góc: nghiêng rõ thì giữ nguyên', hitGoc(14) === null);
+  const ht = hitTruc(92, 20, [{ t: 100, neo: 0 }, { t: 105, neo: 0.5 }]);
+  kiem('Hít trục: tâm hộp về đường gióng gần nhất', ht?.doi === 3 && ht?.moc.t === 105);
+  kiem('Hít trục: xa mọi mốc thì không hít', hitTruc(0, 20, [{ t: 100, neo: 0 }]) === null);
+  const cd = mocCachDeu([{ x: 0, w: 20 }, { x: 40, w: 20 }], 20);
+  kiem('Cách đều: gợi ý đúng chỗ giữ khoảng hở', cd.some((m) => m.t === 80) && cd.some((m) => m.t === -40));
+
+  // Cọ bám mép: tâm cọ bên nào thì chỉ tô bên đó.
+  const anhThu = { w: 5, h: 1, that: Uint8Array.from([0, 0, 1, 1, 1]) };
+  const mn = new Uint8Array(5);
+  toCo(anhThu, 1, 0, 3, 1, mn, true);
+  kiem('Cọ xóa bám mép: tâm ở nền thì không xóa vào rô bốt', mn.join('') === '11000');
+  const mc = new Uint8Array(5);
+  toCo(anhThu, 1, 0, 3, 1, mc);
+  kiem('Cọ không bám mép vẫn lem như cũ', mc.join('') === '11111');
+  kiem('Đũa thần: chạm lệch lên rô bốt thì trượt sang nền', diemNenGan(anhThu, 2, 0).x === 1);
+  kiem('Đũa thần: chạm đúng nền thì giữ nguyên', diemNenGan(anhThu, 0, 0).x === 0);
 
   // Nhóm: kéo một mảnh, cả cụm đi. Không nhóm: chỉ mảnh đó đi.
   const s2 = { manh: [{ id: 'a', x: 0, y: 0, s: 1, nhom: 0 }, { id: 'b', x: 5, y: 5, s: 1, nhom: 0 }] };
@@ -161,6 +196,11 @@ const css = fs.readFileSync(path.join(PUB, 'css', 'ban-choi.css'), 'utf8') + fs.
 kiem('Khung dọc 430px có token', fs.readFileSync(path.join(PUB, 'css', 'tokens.css'), 'utf8').includes('--khung: 430px'));
 kiem('Giảm chuyển động được tôn trọng', css.includes('prefers-reduced-motion'));
 kiem('Sân khấu chặn cuộn khi kéo', css.includes('touch-action: none'));
+// Mọi màn thao tác đồ họa phải đi qua thanh công cụ. Riêng xuất tệp là hộp thoại, giống phần mềm thật.
+for (const ten of fs.readdirSync(path.join(PUB, 'js', 'co-khi'))) {
+  if (ten === 'chung.mjs' || ten === 'xuat-tep.mjs') continue;
+  kiem(`${ten} dùng thanh công cụ`, fs.readFileSync(path.join(PUB, 'js', 'co-khi', ten), 'utf8').includes('dungBoCu('));
+}
 
 /* ---------- 5. Máy chủ ---------- */
 function goi(cong, duong) {
