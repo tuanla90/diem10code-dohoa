@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dohoa-kiem",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "process.env.PORT='4281';require('./server.js')"],
+      "port": 4281
+    }
+  ]
+}

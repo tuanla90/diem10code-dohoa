@@ -1,0 +1,13 @@
+{
+  "name": "diem10code-dohoa",
+  "version": "2.0.0",
+  "description": "Gương Mặt Ngày Hội: game mô phỏng thao tác đồ họa trên điện thoại, chuỗi game diem10code, bám Tin 10 và Tin 11",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dien-thoai": "node -e \"process.env.HOST='0.0.0.0';require('./server.js')\"",
+    "test": "node tools/kiem-game.mjs"
+  },
+  "keywords": ["diem10code", "do-hoa", "tin-hoc-thpt", "game-dien-thoai"],
+  "license": "UNLICENSED"
+}

@@ -1,0 +1,117 @@
+/* Màu, bán kính, bóng và phông của game. Cùng giá trị với mach-den/src/tokens.css + mau-game.css.
+   Tầng 1 --p-*: mã hex, CHỈ được viết ở đây (riêng tranh trong js/hinh.mjs, js/toan/anh.mjs có bảng màu tranh).
+   Tầng 2 vai trò: CSS giao diện chỉ chạm tầng này. Không dùng color-mix() vì Android Chrome cũ. */
+:root {
+  --p-trang: #ffffff;
+  --p-nen: #f5f4fc;
+  --p-ngoai: #e8e6f6;
+  --p-muc: #1e1b4b;
+  --p-phu: #625f7e;
+  --p-vien: #e2e0f0;
+  --p-ke: #b8b3d8;
+  --p-tint: #f2f1fc;
+  --p-chan: #4f46e5;
+  --p-chan-dam: #3730a3;
+  --p-chan-nhat: #eef2ff;
+  --p-cyan: #0891b2;
+  --p-cyan-nhat: #cffafe;
+  --p-vang: #f59e0b;
+  --p-vang-dam: #b45309;
+  --p-vang-nhat: #fef3c7;
+  --p-do: #e11d48;
+  --p-do-nhat: #ffe4e6;
+  --p-xanh: #15803d;
+  --p-xanh-nhat: #dcfce7;
+  --p-logo-tim: #6d5df6;
+  --p-logo-giua: #a35cf0;
+  --p-logo-hong: #ec6fbf;
+  --p-chu-tim: #7c4deb;
+  --p-chu-giua: #8e3fd9;
+  --p-chu-hong: #b23a86;
+  --p-phu-lop: rgba(15, 23, 42, .45);
+  --p-bong: rgba(49, 46, 129, .09);
+  --p-bong-nut: rgba(79, 70, 229, .2);
+
+  --p-t-nen: #090d16;
+  --p-t-the: #141c2e;
+  --p-t-lom: #1e293b;
+  --p-t-chu: #f8fafc;
+  --p-t-phu: #94a3b8;
+  --p-t-vien: #1e293b;
+  --p-t-ke: #334155;
+  --p-t-chan: #6366f1;
+  --p-t-chan-dam: #a78bfa;
+  --p-t-chan-nhat: #1c1940;
+  --p-t-cyan: #2dd4bf;
+  --p-t-cyan-nhat: #123038;
+  --p-t-vang: #fbbf24;
+  --p-t-vang-nhat: #3b2a06;
+  --p-t-do: #fb7185;
+  --p-t-do-nhat: #4c0519;
+  --p-t-xanh: #4ade80;
+  --p-t-xanh-nhat: #14361f;
+}
+
+:root, [data-theme='light'] {
+  --bg: var(--p-nen);
+  --ngoai: var(--p-ngoai);
+  --the: var(--p-trang);
+  --lom: var(--p-tint);
+  --fg: var(--p-muc);
+  --fg-phu: var(--p-phu);
+  --vien: var(--p-vien);
+  --ke: var(--p-ke);
+  --brand: var(--p-chan);
+  --brand-dam: var(--p-chan-dam);
+  --brand-nhat: var(--p-chan-nhat);
+  --tren-brand: var(--p-trang);
+  --cyan: var(--p-cyan);
+  --cyan-nhat: var(--p-cyan-nhat);
+  --vang: var(--p-vang);
+  --vang-dam: var(--p-vang-dam);
+  --vang-nhat: var(--p-vang-nhat);
+  --err: var(--p-do);
+  --err-nhat: var(--p-do-nhat);
+  --ok: var(--p-xanh);
+  --ok-nhat: var(--p-xanh-nhat);
+  --phu-lop: var(--p-phu-lop);
+  --bong: var(--p-bong);
+  --bong-nut: var(--p-bong-nut);
+}
+
+[data-theme='dark'] {
+  --bg: var(--p-t-nen);
+  --ngoai: var(--p-t-nen);
+  --the: var(--p-t-the);
+  --lom: var(--p-t-lom);
+  --fg: var(--p-t-chu);
+  --fg-phu: var(--p-t-phu);
+  --vien: var(--p-t-vien);
+  --ke: var(--p-t-ke);
+  --brand: var(--p-t-chan);
+  --brand-dam: var(--p-t-chan-dam);
+  --brand-nhat: var(--p-t-chan-nhat);
+  --cyan: var(--p-t-cyan);
+  --cyan-nhat: var(--p-t-cyan-nhat);
+  --vang: var(--p-t-vang);
+  --vang-dam: var(--p-t-vang);
+  --vang-nhat: var(--p-t-vang-nhat);
+  --err: var(--p-t-do);
+  --err-nhat: var(--p-t-do-nhat);
+  --ok: var(--p-t-xanh);
+  --ok-nhat: var(--p-t-xanh-nhat);
+  --bong: var(--p-phu-lop);
+  --bong-nut: var(--p-phu-lop);
+}
+
+:root {
+  --dai-logo: linear-gradient(135deg, var(--p-logo-tim), var(--p-logo-giua), var(--p-logo-hong));
+  --dai-chu: linear-gradient(135deg, var(--p-chu-tim), var(--p-chu-giua), var(--p-chu-hong));
+  --font: 'Google Sans Flex', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'Google Sans Code', ui-monospace, 'DejaVu Sans Mono', monospace;
+  --khung: 430px;
+  --r-nho: 11px;
+  --r-vua: 15px;
+  --r-the: 18px;
+  --r-lon: 22px;
+}

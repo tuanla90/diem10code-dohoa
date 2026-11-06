@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kitchen Sink · Hệ Thống Thiết Kế &amp; Kho Tài Nguyên Gốc (Điểm 10 Đồ Họa)</title>
+  <link rel="stylesheet" href="/robot-game/font/font.css">
+  <link rel="stylesheet" href="/tin-hoc/css/tokens.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .sink-wrap { max-width: 1360px; margin: 0 auto; padding: 24px; display: grid; gap: 20px; }
+    .sink-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .swatch { padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-size: 13px; font-weight: 700; }
+    .robot-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-soft); text-align: center; }
+    .robot-card img { object-fit: contain; }
+    .icon-cell { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-soft); font-size: 12.5px; }
+    .backdrop-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg-soft); }
+    .backdrop-card img { width: 100%; height: 110px; object-fit: cover; display: block; }
+    .backdrop-card div { padding: 8px 10px; font-size: 12px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="brand-area">
+      <div class="brand-logo" aria-hidden="true">
+        <img src="/robot-game/phim-clb/a/robot/m8/sola-bot.webp" width="36" height="36" alt="Sola Bot"/>
+        <img src="/robot-game/phim-clb/a/robot/m8/luna-bot.webp" width="36" height="36" alt="Luna Bot"/>
+      </div>
+      <div class="brand-titles">
+        <h1>KITCHEN SINK · HỆ THỐNG THIẾT KẾ &amp; TÀI NGUYÊN ĐỒ HỌA GỐC</h1>
+        <p>Kiểm thử Typography, Bảng màu, Linh vật Sola &amp; Luna (/tin-hoc/), 8 Cỗ máy Robot, 9 Nhân vật &amp; Bối cảnh (/robot-game/)</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <a href="index.html" class="nav-btn">Quay về Sân Khấu Chính</a>
+      <button type="button" id="sink-theme-btn" class="nav-btn">Đổi Sáng / Tối</button>
+    </div>
+  </header>
+
+  <main class="sink-wrap">
+    <!-- 1. Typography -->
+    <section class="panel-card">
+      <div class="panel-heading"><span>1. Typography (Google Sans Flex &amp; Google Sans Code)</span></div>
+      <h1>H1: Đội Robot Chấn Hưng — Sân Khấu Tổng Kết Đồ Họa</h1>
+      <h2>H2: Hồi I (Lớp 10) · Hồi II (Lớp 11) · Hồi III (Lớp 12)</h2>
+      <h3>H3: Cảm biến Hình ảnh &amp; Máy chấm Thuộc tính SVG</h3>
+      <h4>H4: Điểm neo Bézier, Phép toán Boolean, Hệ màu RGB &amp; Mặt nạ lớp</h4>
+      <p>Paragraph: Mọi nhân vật, cỗ máy cứu hộ, ô địa hình và đạo cụ trên sân khấu đều tái sử dụng trực tiếp kho tài nguyên đồ họa gốc từ hai dự án Điểm 10 Code và Đội Robot Chấn Hưng.</p>
+      <blockquote style="margin:10px 0;padding:10px 14px;border-left:4px solid var(--primary);background:var(--bg-soft)">
+        Blockquote: “Điểm neo quyết định đường đi qua đâu, tay nắm điều khiển quyết định đường uốn cong theo dáng nào.” — Luna (Bài C10-28)
+      </blockquote>
+    </section>
+
+    <!-- 2. Color Palette -->
+    <section class="panel-card">
+      <div class="panel-heading"><span>2. Color Palette (Bảng màu Hệ thống)</span></div>
+      <div class="sink-grid">
+        <div class="swatch" style="background:var(--primary);color:#fff">Primary (#0284c7 / #38bdf8)</div>
+        <div class="swatch" style="background:var(--teal);color:#fff">Teal Accent (#0d9488 / #2dd4bf)</div>
+        <div class="swatch" style="background:var(--success);color:#fff">Success (#16a34a / #22c55e)</div>
+        <div class="swatch" style="background:var(--warning);color:#fff">Warning (#d97706 / #f59e0b)</div>
+        <div class="swatch" style="background:var(--danger);color:#fff">Danger / Destructive (#dc2626)</div>
+        <div class="swatch" style="background:var(--bg-soft);color:var(--text-main)">Muted Surface (var(--bg-soft))</div>
+      </div>
+    </section>
+
+    <!-- 3. Linh vật Sola & Luna (Điểm 10 Code + CLB Robot) -->
+    <section class="panel-card">
+      <div class="panel-heading"><span>3. Linh vật Sola &amp; Luna (Ảnh Chibi Gốc &amp; Biểu cảm Sân khấu)</span></div>
+      <div id="sink-mascots-grid" class="sink-grid"></div>
+    </section>
+
+    <!-- 4. 8 Cỗ máy Robot Chấn Hưng & 9 Nhân vật Cứu hộ -->
+    <section class="panel-card">
+      <div class="panel-heading"><span>4. 8 Cỗ Máy Robot Chấn Hưng &amp; 9 Nhân Vật Cần Cứu Hộ (Mùa 1–9)</span></div>
+      <div id="sink-actors-grid" class="sink-grid"></div>
+    </section>
+
+    <!-- 5. Bối cảnh 9 Mùa (nen-doc/*.webp) -->
+    <section class="panel-card">
+      <div class="panel-heading"><span>5. Bối Cảnh Sân Khấu 9 Mùa (/robot-game/phim-clb/a/nen-doc/)</span></div>
+      <div id="sink-backdrops-grid" class="sink-grid"></div>
+    </section>
+
+    <!-- 6. Bộ Biểu tượng SVG Công cụ Đồ họa -->
+    <section class="panel-card">
+      <div class="panel-heading"><span>6. Thư viện Biểu tượng Công cụ Đồ họa (100% Pure SVG)</span></div>
+      <div id="sink-icons-grid" class="sink-grid"></div>
+    </section>
+
+    <!-- 7. Primitives, Buttons, Badges & Interactive Controls -->
+    <section class="panel-card">
+      <div class="panel-heading"><span>7. Primitives, Interactive Sliders &amp; Feedback Banners</span></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <button type="button" class="btn-action play-primary">Primary Action</button>
+        <button type="button" class="btn-action demo-accent">Teal Secondary</button>
+        <button type="button" class="btn-action">Outline Default</button>
+        <button type="button" class="btn-tool" style="width:auto" disabled>Disabled Tool</button>
+        <span class="score-pill ok">4 / 4 ĐẠT</span>
+        <span class="score-pill pending">1 / 4 ĐANG CHỜ</span>
+      </div>
+      <div class="verdict-banner ok">
+        <div><strong>Alert Thành công:</strong> Cảm biến Robot đã nhận diện đúng cấu trúc SVG trên sân khấu!</div>
+      </div>
+      <div class="verdict-banner err">
+        <div><strong>Alert Cảnh báo lỗi:</strong> Phát hiện hình tròn trắng đè lên tường thay vì dùng Phép Trừ (Boolean Difference)!</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/icons-svg.js"></script>
+  <script src="js/ve-san-khau.js"></script>
+  <script>
+    (function () {
+      var VSK = window.VeSanKhau;
+      var IC = window.IconsSvg;
+
+      /* 3. Sola & Luna Gallery */
+      var mascotCards = [
+        { img: '/tin-hoc/asset/mascot/nam/light/hero.png', label: 'Sola Hero (Điểm 10 Code)' },
+        { img: '/tin-hoc/asset/mascot/nu/light/hero.png', label: 'Luna Hero (Điểm 10 Code)' },
+        { img: VSK.layUrlLinhVat('sola', 'thinking'), label: 'Sola (Đọc sách SGK)' },
+        { img: VSK.layUrlLinhVat('luna', 'explaining'), label: 'Luna (Giải thích bài)' },
+        { img: VSK.layUrlLinhVat('luna', 'magnifier'), label: 'Luna (Soi kính lúp)' },
+        { img: VSK.layUrlLinhVat('sola', 'win'), label: 'Sola (Mừng chiến thắng)' },
+        { img: VSK.layUrlLinhVat('luna', 'win'), label: 'Luna (Tuyệt vời!)' },
+        { img: VSK.layUrlLinhVat('sola', 'fail'), label: 'Sola (Ôi nhầm rồi!)' }
+      ];
+      document.getElementById('sink-mascots-grid').innerHTML = mascotCards.map(function (m) {
+        return '<div class="robot-card"><img src="' + m.img + '" width="88" height="88" alt="' + m.label + '"/><strong>' + m.label + '</strong></div>';
+      }).join('');
+
+      /* 4. 8 Robots & Rescued People */
+      var robots = [
+        { loai: 'hai-banh', ten: '1. Xe Chở Hàng (G1)' },
+        { loai: 'xich', ten: '2. Xe Cứu Hỏa (G2)' },
+        { loai: 'nhen', ten: '3. Nhện Phân Loại (G3)' },
+        { loai: 'cau', ten: '4. Cần Cẩu Cảng (G4)' },
+        { loai: 'xuong', ten: '5. Xuồng Thủy Lợi (G5)' },
+        { loai: 'drone', ten: '6. Drone Nông Nghiệp (G6)' },
+        { loai: 'omni', ten: '7. Máy Khai Thác (G7)' },
+        { loai: 'gai', ten: '8. Xe Hang Động (G8)' },
+        { loai: 'omni-luoi', ten: '9. Xe Tời Bờ (Lai M9)' }
+      ];
+      var peopleKeys = Object.keys(VSK.RESCUE_PEOPLE);
+      var actorsHtml = robots.map(function (r) {
+        var sp = VSK.ROBOT_SPRITES[r.loai];
+        return (
+          '<div class="robot-card">' +
+          '<div style="display:flex;gap:6px"><img src="' + sp.idle + '" width="62" height="62" alt="' + r.ten + '"/><img src="' + sp.thang + '" width="62" height="62" alt="' + r.ten + ' vui"/></div>' +
+          '<strong>' + r.ten + '</strong>' +
+          '</div>'
+        );
+      }).join('') + peopleKeys.map(function (pk) {
+        var p = VSK.RESCUE_PEOPLE[pk];
+        return (
+          '<div class="robot-card">' +
+          '<div style="display:flex;gap:6px"><img src="' + p.wait + '" width="58" height="58" alt="' + p.ten + '"/><img src="' + p.win + '" width="58" height="58" alt="' + p.ten + ' mừng"/></div>' +
+          '<strong>' + p.ten + '</strong>' +
+          '</div>'
+        );
+      }).join('');
+      document.getElementById('sink-actors-grid').innerHTML = actorsHtml;
+
+      /* 5. Backdrops */
+      var bdKeys = Object.keys(VSK.STAGE_BACKDROPS);
+      document.getElementById('sink-backdrops-grid').innerHTML = bdKeys.map(function (k) {
+        var b = VSK.STAGE_BACKDROPS[k];
+        return '<div class="backdrop-card"><img src="' + b.bg + '" alt="' + k + '"/><div>Màn ' + k + '</div></div>';
+      }).join('');
+
+      /* 6. Pure SVG Tool Icons */
+      var iconKeys = Object.keys(IC.PATHS);
+      document.getElementById('sink-icons-grid').innerHTML = iconKeys.map(function (k) {
+        return '<div class="icon-cell">' + IC.icon(k, 20) + '<code>' + k + '</code></div>';
+      }).join('');
+
+      document.getElementById('sink-theme-btn').addEventListener('click', function () {
+        var cur = document.documentElement.getAttribute('data-theme');
+        document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+      });
+    })();
+  </script>
+</body>
+</html>

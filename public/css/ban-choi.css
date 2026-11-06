@@ -1,0 +1,81 @@
+/* Bàn chơi: đầu màn, lời nhờ, sân khấu, khay công cụ, thanh Chạy. Vị trí các vùng không đổi giữa các màn. */
+.ban { flex: 1; display: flex; flex-direction: column; min-height: 100dvh; padding: 8px 12px 0; gap: 8px; }
+@media (min-width: 600px) { .ban { min-height: calc(100dvh - 48px); } }
+.ban-dau { display: flex; align-items: center; gap: 8px; }
+.ban-ten { flex: 1; min-width: 0; font-size: 14px; font-weight: 750; line-height: 1.25; }
+.ban-ten small { display: block; font-size: 12px; font-weight: 500; color: var(--fg-phu); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.loi-nho { display: flex; gap: 9px; padding: 9px 11px; background: var(--the); border: 1px solid var(--vien); border-radius: var(--r-vua); }
+.loi-nho .mat { width: 42px; height: 42px; }
+.loi-nho-than { flex: 1; min-width: 0; font-size: 14px; line-height: 1.35; }
+.loi-nho-ai { font-size: 11px; font-weight: 750; color: var(--fg-phu); letter-spacing: .04em; }
+.loi-nho-muc { display: block; font-weight: 750; margin-top: 2px; }
+
+.khung-san { position: relative; background: var(--the); border: 1px solid var(--vien); border-radius: var(--r-the); overflow: hidden; }
+.khung-san svg.san-svg, .khung-san canvas.san-canvas { display: block; width: 100%; height: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+.san-chong { position: relative; }
+.san-chong svg.san-svg { position: absolute; inset: 0; }
+.san-hang { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+
+.loi-dan { min-height: 26px; font-size: 13.5px; color: var(--fg-phu); padding: 0 4px; line-height: 1.3; }
+.loi-dan b { color: var(--brand-dam); font-weight: 750; }
+.loi-dan--ok { color: var(--ok); font-weight: 650; }
+
+.khay { display: flex; flex-direction: column; gap: 7px; }
+.hang-cu { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; padding: 1px; }
+.hang-cu::-webkit-scrollbar { display: none; }
+.cu { flex: none; min-width: 58px; min-height: 52px; padding: 5px 9px; border-radius: var(--r-nho); background: var(--the); border: 1px solid var(--vien); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11.5px; font-weight: 650; line-height: 1.1; text-align: center; white-space: nowrap; }
+.cu .icon { width: 20px; height: 20px; }
+.cu:active { background: var(--lom); }
+.cu[aria-pressed='true'] { background: var(--brand-nhat); border-color: var(--brand); color: var(--brand-dam); }
+.cu[disabled] { opacity: .38; cursor: default; }
+.cu--chu { flex-direction: row; gap: 7px; font-size: 13px; }
+.cu--nhac { animation: nhac 1.25s ease-in-out infinite; border-color: var(--brand); }
+@keyframes nhac { 50% { box-shadow: 0 0 0 4px var(--brand-nhat); } }
+.hang-cu--deu .cu { flex: 1 1 0; min-width: 0; padding-inline: 3px; white-space: normal; }
+.cu-sub { display: block; font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--fg-phu); }
+.cu-thu { width: 30px; height: 30px; display: block; }
+
+.truot { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 13px; font-weight: 650; }
+.truot label { flex: none; min-width: 74px; }
+.truot input[type='range'] { flex: 1; min-width: 0; height: 44px; accent-color: var(--brand); margin: 0; }
+.truot output { flex: none; min-width: 40px; text-align: right; font-family: var(--mono); font-size: 12.5px; color: var(--fg-phu); }
+
+.thanh-chay { position: sticky; bottom: 0; z-index: 5; margin: auto -12px 0; display: grid; grid-template-columns: 1fr 1fr 1.6fr; gap: 7px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--vien); }
+.thanh-chay button { min-height: 50px; border-radius: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; font-size: 14px; background: var(--the); border: 1px solid var(--vien); }
+.thanh-chay .nut-so-tay { color: var(--cyan); }
+.thanh-chay .nut-chay { background: var(--brand); border-color: var(--brand); color: var(--tren-brand); font-size: 16px; font-weight: 750; box-shadow: 0 5px 12px var(--bong-nut); }
+.thanh-chay .nut-chay:active { background: var(--brand-dam); }
+.thanh-chay .nut-chay[disabled] { opacity: .6; }
+
+/* Cảnh hậu quả phủ lên sân khấu */
+.canh { position: absolute; inset: 0; z-index: 3; background: var(--the); animation: hien .22s ease-out; display: grid; place-items: center; overflow: hidden; }
+.canh svg { display: block; width: 100%; height: 100%; }
+.canh-nhan { position: absolute; left: 8px; top: 8px; padding: 3px 9px; border-radius: 99px; background: var(--phu-lop); color: var(--tren-brand); font-size: 12px; font-weight: 700; }
+.canh-ro { animation: ro-vao .7s ease-out; }
+@keyframes ro-vao { from { transform: scale(1.12); filter: blur(2px); } }
+.canh-tung { transform-box: fill-box; transform-origin: 0 50%; animation: tung 1.4s ease-in-out infinite; }
+@keyframes tung { 50% { transform: skewY(-3deg) scaleX(.98); } }
+.canh-roi { animation: roi 1s cubic-bezier(.3, 0, .7, 1) forwards; animation-delay: var(--tre, .25s); }
+@keyframes roi { to { transform: translate(var(--dx, 0), 150px) rotate(var(--xoay, 30deg)); opacity: .6; } }
+
+/* Thẻ xuất tệp */
+.the-don { display: flex; gap: 10px; align-items: center; width: 100%; min-height: 64px; padding: 7px 9px; text-align: left; border: 1px solid var(--vien); border-radius: var(--r-nho); background: var(--the); }
+.the-don[aria-pressed='true'] { border-color: var(--brand); background: var(--brand-nhat); }
+.the-don svg { width: 74px; height: 50px; flex: none; border-radius: 7px; }
+.the-don b { display: block; font-size: 14px; font-weight: 750; line-height: 1.25; }
+.the-don small { display: block; font-size: 12px; color: var(--fg-phu); line-height: 1.3; }
+.the-don .co-tep { margin-left: auto; flex: none; text-align: right; font-family: var(--mono); font-size: 12px; font-weight: 600; }
+
+.bieu-do { display: block; width: 100%; height: 44px; background: var(--lom); border-radius: 8px; }
+.nhan-phu { font-size: 12px; color: var(--fg-phu); }
+
+/* Máy chiếu: nhấn giữ xem ảnh gốc */
+.so-sanh { position: absolute; right: 8px; bottom: 8px; min-height: 40px; padding: 0 12px; border-radius: 99px; background: var(--phu-lop); color: var(--tren-brand); font-size: 12.5px; font-weight: 700; touch-action: none; }
+
+@media (max-height: 690px) {
+  .loi-nho .mat { width: 34px; height: 34px; }
+  .loi-nho-than { font-size: 13px; }
+  /* Màn thấp: lời nhờ gói còn một dòng để sân khấu không bị đẩy khỏi tầm nhìn, mục tiêu vẫn đủ. */
+  .loi-nho-cau { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; }
+}
