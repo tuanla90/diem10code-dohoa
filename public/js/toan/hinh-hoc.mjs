@@ -127,10 +127,10 @@ export function batTron(nut, i) {
 export function trongHinh(h, x, y) {
   if (h.loai === 'tron') return (x - h.x) ** 2 + (y - h.y) ** 2 <= h.r * h.r;
   if (h.loai === 'vuong') return Math.abs(x - h.x) <= h.w / 2 && Math.abs(y - h.y) <= h.h / 2;
-  if (h.loai === 'sao') {
-    // Sao năm cánh: dùng thuật toán tia với đa giác đỉnh sao.
+  if (h.loai === 'sao' || h.loai === 'da-giac') {
+    // Đa giác bất kỳ: dùng thuật toán tia.
     let trong = false;
-    const d = dinhSao(h);
+    const d = h.loai === 'sao' ? dinhSao(h) : dinhDaGiac(h);
     for (let i = 0, j = d.length - 1; i < d.length; j = i++) {
       const a = d[i], b = d[j];
       if (a.y > y !== b.y > y && x < ((b.x - a.x) * (y - a.y)) / (b.y - a.y) + a.x) trong = !trong;
@@ -139,6 +139,9 @@ export function trongHinh(h, x, y) {
   }
   return false;
 }
+
+// Đa giác tự do: h.dinh là các đỉnh tính từ tâm (h.x, h.y).
+export const dinhDaGiac = (h) => h.dinh.map(([x, y]) => ({ x: h.x + x, y: h.y + y }));
 
 export function dinhSao(h) {
   const d = [];

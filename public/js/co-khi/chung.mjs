@@ -62,8 +62,22 @@ export function hangCu(host, ds, { deu = false } = {}) {
   return h;
 }
 
-// Thanh công cụ của mọi cơ khí: luôn hiện, chỉ một công cụ được cầm, sân khấu làm theo công cụ đang cầm.
-// Công cụ đang cầm nằm ở ctx.cu nên Hoàn tác không làm rơi công cụ.
+// Vùng chạm của tay nắm, tính quanh tâm hình; a, b là -1, 0 hoặc 1. Luôn đủ rộng cho ngón tay nhưng hình càng nhỏ
+// thì vùng càng đẩy ra ngoài, nên phần giữa hình vẫn kéo được thân. Trả null khi cạnh quá ngắn cho tay nắm giữa cạnh.
+export function vungTay(a, b, w, h, co = 44) {
+  const truc = (huong, canh) => {
+    const vao = Math.min(co / 2, canh * 0.2);
+    if (huong > 0) return [canh / 2 - vao, canh / 2 - vao + co];
+    if (huong < 0) return [-canh / 2 + vao - co, -canh / 2 + vao];
+    const dai = Math.min(co, canh - 2 * vao);
+    return dai < 24 ? null : [-dai / 2, dai / 2];
+  };
+  const x = truc(a, w), y = truc(b, h);
+  return x && y ? { x: x[0], y: y[0], w: x[1] - x[0], h: y[1] - y[0] } : null;
+}
+
+// Thanh công cụ của các màn thật sự đổi công cụ (sửa ảnh, tách nền): chỉ một công cụ được cầm.
+// Các màn còn lại thao tác trực tiếp trên hình đang chọn. Công cụ nằm ở ctx.cu nên Hoàn tác không làm rơi.
 export function dungBoCu(ctx, ds, macDinh, khiDoi) {
   const loc = ds.filter(Boolean);
   if (!loc.some((c) => c.id === ctx.cu)) ctx.cu = macDinh;
@@ -134,6 +148,47 @@ export function hangKeo(host, ds, khiDoi) {
     });
   }
   return h;
+}
+
+// Mức của một số đo. muc xếp tăng dần, mỗi mức có den (mốc trên), chu và loai: xau, cho (chưa làm, không bắt buộc),
+// dat hoặc dep (đạt cả sao). gom: mức đó tính cả mốc trên; gomMoc: mọi mức đều tính cả mốc trên.
+export const mucDo = (m, v) => m.muc.find((s) => (m.gomMoc || s.gom ? v <= s.den : v < s.den)) || m.muc[m.muc.length - 1];
+
+// Vạch đo sống cho những việc kéo thanh trượt, nơi mắt khó tự biết thế nào là đủ: vùng xanh là đạt, kim là số hiện tại.
+// Vạch do màn khai (man.dongHo) nên mốc nằm cạnh tiêu chí chấm. capNhat trả true khi mọi vạch đã đạt.
+export function dongHo(host, ds) {
+  const bang = document.createElement('div');
+  bang.className = ds.length > 1 ? 'dong-ho dong-ho--luoi' : 'dong-ho';
+  const cac = ds.map((m) => {
+    const dau = m.tu ?? 0, cuoi = m.muc[m.muc.length - 1].den;
+    const o = document.createElement('div');
+    o.className = 'do';
+    o.setAttribute('role', 'meter');
+    o.setAttribute('aria-label', m.ten);
+    o.setAttribute('aria-valuemin', dau);
+    o.setAttribute('aria-valuemax', cuoi);
+    let truoc = dau;
+    const doan = m.muc.map((s) => {
+      const html = `<i class="do-doan do-doan--${s.loai}" style="width:${((s.den - truoc) / (cuoi - dau)) * 100}%"></i>`;
+      truoc = s.den;
+      return html;
+    }).join('');
+    o.innerHTML = `<div class="do-dau"><span>${m.ten}</span><b></b></div><div class="do-ray">${doan}<i class="do-kim"></i></div>`;
+    bang.appendChild(o);
+    const chu = o.querySelector('b'), kim = o.querySelector('.do-kim');
+    return (d) => {
+      const v = m.lay(d), s = mucDo(m, v);
+      kim.style.left = `${Math.max(0, Math.min(100, ((v - dau) / (cuoi - dau)) * 100))}%`;
+      chu.innerHTML = `${s.loai === 'dat' || s.loai === 'dep' ? icon('xong') : ''}${s.chu}`;
+      o.dataset.loai = s.loai;
+      o.setAttribute('aria-valuenow', Math.round(v * 10) / 10);
+      o.setAttribute('aria-valuetext', s.chu);
+      return s.loai !== 'xau';
+    };
+  });
+  host.appendChild(bang);
+  // Không dừng ở vạch đầu chưa đạt: vạch nào cũng phải vẽ lại.
+  return { capNhat: (d) => cac.map((f) => f(d)).every(Boolean) };
 }
 
 export function thanhTruot(host, { nhan, min, max, buoc = 1, gia, dinh = (v) => v, doi, xong, id }) {

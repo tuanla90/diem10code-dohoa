@@ -21,9 +21,8 @@ export default {
       san: { nen: 'poster', vung: { logo: { x: 70, y: 40, w: 220, h: 150, ten: 'Khung đặt logo' } }, cu: ['khoa'] },
       sanNhan: 'Poster có khung vàng và logo nhỏ phía dưới',
       dan: [
-        { txt: 'Chọn công cụ <b>Đổi cỡ</b>.', nhan: 'cu-co', xong: (d, st, cu) => cu === 'co' || d.logo.phu >= 0.85 },
         { txt: 'Bật <b>Khóa tỉ lệ</b> rồi kéo <b>chấm tròn ở góc</b> cho logo to lên. Gần vừa khung nó tự hít.', nhan: 'khoa', xong: (d, st) => st.khoa && d.logo.phu >= 0.85 },
-        { txt: 'Chọn <b>Di chuyển</b>, kéo logo vào giữa khung. Gần tâm nó tự hít, có đường hồng báo hiệu.', nhan: 'cu-chon', xong: (d) => d.logo.lech < 5 },
+        { txt: 'Kéo <b>thân logo</b> vào giữa khung. Gần tâm nó tự hít, có đường hồng báo hiệu.', xong: (d) => d.logo.lech < 5 },
         { txt: 'Xong rồi thì bấm <b>In thử</b>.', xong: () => false },
       ],
       tieuChi: [
@@ -67,9 +66,8 @@ export default {
       },
       sanNhan: 'Poster có logo và tiêu đề đang nghiêng',
       dan: [
-        { txt: 'Chọn công cụ <b>Xoay</b>, chạm từng món rồi kéo chấm xanh trên đỉnh. Gần thẳng nó tự hít.', nhan: 'cu-xoay', xong: (d, st, cu) => cu === 'xoay' || (d.logo.goc <= 2 && d.tieu.goc <= 2) },
-        { txt: 'Kéo <b>chấm xanh</b> của cả hai món cho thẳng. Chạm món kia để đổi sang nó.', xong: (d) => d.logo.goc <= 2 && d.tieu.goc <= 2 },
-        { txt: 'Xong xoay thì dùng <b>Đổi cỡ</b> và <b>Di chuyển</b> đưa từng món vào khung của nó.', xong: (d) => d.logo.phu >= 0.85 && d.tieu.phu >= 0.85 && d.logo.trong && d.tieu.trong },
+        { txt: 'Kéo <b>chấm xanh</b> trên đỉnh cho logo thẳng lại, gần thẳng nó tự hít. Chạm tiêu đề rồi làm tương tự.', xong: (d) => d.logo.goc <= 2 && d.tieu.goc <= 2 },
+        { txt: 'Đưa từng món vào khung của nó: kéo <b>chấm góc</b> để đổi cỡ, kéo <b>thân</b> để dời.', xong: (d) => d.logo.phu >= 0.85 && d.tieu.phu >= 0.85 && d.logo.trong && d.tieu.trong },
         { txt: 'Bấm <b>In thử</b>.', xong: () => false },
       ],
       tieuChi: [
@@ -102,12 +100,12 @@ export default {
       nho: 'Logo nhìn trên máy đẹp lắm, mình gửi tiệm in luôn nha? À năm ngoái cũng đẹp vậy đó.',
       muc: 'Logo cao gần hết băng rôn, đứng sát vẫn phải nét. Khung vàng dài khoảng 80 cm thật.',
       dau: { vat: [{ id: 'logo', loai: 'logo', x: 75, y: 142, w: 48, h: 48, goc: 0 }], chon: 'logo', khoa: true, tep: 'chup' },
-      san: { nen: 'bang-ron', cmMoiDv: 300 / 340, vung: { logo: { x: 28, y: 96, w: 90, h: 90, ten: '' } }, cu: ['khoa', 'soi', 'tep'] },
+      san: { nen: 'bang-ron', cmMoiDv: 300 / 340, canMatDo: 12, vung: { logo: { x: 28, y: 96, w: 90, h: 90, ten: '' } }, cu: ['khoa', 'soi', 'tep'] },
       sanNhan: 'Băng rôn ba mét có khung vàng đặt logo',
       dan: [
-        { txt: 'Chọn công cụ <b>Soi tệp</b>: kính soi cho thấy ô điểm ảnh khi in thật ra.', nhan: 'cu-soi', xong: (_d, st) => st.daSoi },
-        { txt: 'Dùng <b>Đổi cỡ</b> và <b>Di chuyển</b> đưa logo vào khung. Rồi quay lại <b>Soi tệp</b> xem kính soi đã đổi ra sao.', xong: (d) => d.logo.phu >= 0.85 },
-        { txt: 'Chọn được tệp ưng ý thì bấm <b>In thử</b>.', xong: () => false },
+        { txt: 'Bật <b>Kính soi</b> rồi kéo kính đi khắp logo: trong kính là từng điểm ảnh khi in thật ra.', nhan: 'kinh', xong: (_d, st) => st.daSoi },
+        { txt: 'Đưa logo vào khung: kéo <b>chấm góc</b> để đổi cỡ, kéo <b>thân</b> để dời. In càng to thì <b>Mật độ</b> trong bảng càng tụt.', xong: (d) => d.logo.phu >= 0.85 },
+        { txt: 'Đổi sang tệp đạt mức tiệm in cần ở hàng dưới bảng, rồi bấm <b>In thử</b>.', xong: () => false },
       ],
       tieuChi: [
         { id: 'to', ok: (d) => d.logo.phu >= 0.85, ten: 'Đủ to', loi: 'Logo bé tí giữa băng rôn 3 mét, đứng ngoài cổng không thấy gì.', ai: 'sola', matLoi: 'confused' },

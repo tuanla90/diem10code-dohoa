@@ -7,6 +7,7 @@ export const MAU = {
   vang: '#fbbf24', cam: '#f97316', cyan: '#22d3ee', xanh: '#34d399', do: '#e11d48', xam: '#94a3b8',
   xamNhat: '#e2e8f0', tuong: '#f1eefb', san: '#d6d0ee', go: '#a16207', troi: '#e0f2fe', ao: '#6d28d9', aoVien: '#5b21b6',
   teal: '#0d9488', man: '#0f0d2e',
+  vo: '#fbfaff', voToi: '#d9d3f1', voGhep: '#c4bbea', kinhToi: '#14123a', kinhSang: '#262a70', matSang: '#e0fbff', banh: '#3b4266', banhGach: '#6b73a3',
 };
 
 export function saoPath(cx, cy, r, r2 = r * 0.45, n = 5) {
@@ -77,23 +78,54 @@ export function logoKhoi(n) {
 export const BIEU_TUONG = [
   { id: 'hd1', ten: 'Lập trình', ve: () => `<circle cx="50" cy="50" r="46" fill="${MAU.chan}"/><path d="M38 34L22 50l16 16M62 34l16 16-16 16" fill="none" stroke="${MAU.trang}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>` },
   { id: 'hd2', ten: 'Poster', ve: () => `<circle cx="50" cy="50" r="46" fill="${MAU.hong}"/><rect x="30" y="24" width="40" height="52" rx="5" fill="${MAU.trang}"/><circle cx="50" cy="42" r="9" fill="${MAU.vang}"/><path d="M38 64h24" stroke="${MAU.muc}" stroke-width="5" stroke-linecap="round"/>` },
-  { id: 'hd3', ten: 'An toàn mạng', ve: () => `<circle cx="50" cy="50" r="46" fill="#0d9488"/><path d="M50 20l24 9v18c0 16-10 27-24 33-14-6-24-17-24-33V29z" fill="${MAU.trang}"/><path d="M39 50l8 8 15-16" fill="none" stroke="#0d9488" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>` },
+  // Khiên này là đúng hình người chơi dựng lại ở màn DH-3-5: phần chung hai hình tròn, gộp vai khiên, khoét dấu tích.
+  { id: 'hd3', ten: 'An toàn mạng', ve: () => `<circle cx="50" cy="50" r="46" fill="${MAU.teal}"/><path d="M26 20H74V50A30.75 30.75 0 0 1 50 80A30.75 30.75 0 0 1 26 50Z" fill="${MAU.trang}"/><path d="M39 50l8 8 15-16" fill="none" stroke="${MAU.teal}" stroke-width="6"/>` },
   { id: 'hd4', ten: 'Phim ngắn', ve: () => `<circle cx="50" cy="50" r="46" fill="${MAU.cam}"/><rect x="22" y="32" width="56" height="36" rx="6" fill="${MAU.trang}"/><path d="M44 41v18l15-9z" fill="${MAU.cam}"/>` },
-  { id: 'hd5', ten: 'Rô bốt', ve: () => `<circle cx="50" cy="50" r="46" fill="${MAU.giua}"/><rect x="28" y="36" width="44" height="34" rx="8" fill="${MAU.trang}"/><circle cx="41" cy="52" r="5" fill="${MAU.muc}"/><circle cx="59" cy="52" r="5" fill="${MAU.muc}"/><path d="M50 36V24" stroke="${MAU.trang}" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="22" r="5" fill="${MAU.vang}"/>` },
+  { id: 'hd5', ten: 'Rô bốt', ve: () => `<circle cx="50" cy="50" r="46" fill="${MAU.giua}"/><path d="M50 34V22" stroke="${MAU.trang}" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="20" r="5.5" fill="${MAU.cyan}"/><rect x="20" y="30" width="60" height="46" rx="22" fill="${MAU.trang}"/><rect x="28" y="40" width="44" height="26" rx="13" fill="${MAU.kinhToi}"/><rect x="37" y="45" width="7" height="16" rx="3.5" fill="${MAU.cyan}"/><rect x="56" y="45" width="7" height="16" rx="3.5" fill="${MAU.cyan}"/>` },
 ];
 
-// Rô bốt trưng bày, tay phải giơ theo góc. Khung 120x150.
-export function robot(goc = 0, { mat = 'mo', mau = MAU.chan } = {}) {
-  const canh = -goc;
+// Rô bốt duy nhất của game, khung 120x150. Mọi nơi đều vẽ từ hàm này; ảnh chụp ở toan/anh.mjs dùng đúng số đo ROBOT.
+// Dáng lùn mập: đầu tròn to hơn thân, thân rộng và thấp, bánh xích bè hai bên, kính sẫm với hai mắt viên thuốc sáng, tay ngắn có khớp.
+// Hai tay dài bằng nhau. tay 'hong' là hai tay tì lên bánh xích, chừa một ô nền kín mỗi bên; thepTay là tay máy màu thép.
+export const ROBOT = {
+  dau: { x: 15, y: 20, w: 90, h: 62, r: 31 }, dauSang: { x: 17.5, y: 22.5, w: 82, h: 54, r: 27 },
+  tai: [{ x: 9, y: 40, w: 12, h: 24, r: 5 }, { x: 99, y: 40, w: 12, h: 24, r: 5 }],
+  than: { x: 33, y: 74, w: 54, h: 40, r: 14 }, thanSang: { x: 35, y: 76, w: 47, h: 33, r: 11 },
+  nguc: { x: 60, y: 97, r: 10 }, tim: { x: 60, y: 97, r: 5 },
+  kinh: { x: 27, y: 33, w: 66, h: 36, r: 18 }, kinhSang: { x: 31, y: 52, w: 58, h: 13, r: 6.5 },
+  mat: [{ x: 40, y: 40, w: 13, h: 21, r: 6.5 }, { x: 67, y: 40, w: 13, h: 21, r: 6.5 }],
+  matSang: [{ x: 43, y: 43, w: 7, h: 15, r: 3.5 }, { x: 70, y: 43, w: 7, h: 15, r: 3.5 }],
+  ghep: [[[37, 28], [32, 32], [29, 38]], [[83, 28], [88, 32], [91, 38]]],
+  anTen: { x: 60, y1: 24, y2: 9, yCham: 6, r: 5, day: 3.5 }, // một râu duy nhất, chấm tròn cùng màu xanh với mắt
+  chan: [{ x: 7, y: 103, w: 30, h: 29, r: 10 }, { x: 83, y: 103, w: 30, h: 29, r: 10 }], gach: [110, 118, 126],
+  tay: 8, vien: 3, vienChi: 2.5, banTay: 5.5,
+  hong: [[[38, 85], [9, 87], [15, 102]], [[82, 85], [111, 87], [105, 102]]], // điểm đầu nằm khuất sau thân
+  vay: [[82, 85], [106, 88], [113, 74]],
+};
+
+export function robot(goc = 0, { mat = 'mo', mau = MAU.chan, tay = '', thepTay = false } = {}) {
+  const R = ROBOT;
+  const hop = (h) => `x="${h.x}" y="${h.y}" width="${h.w}" height="${h.h}" rx="${h.r || 0}"`;
+  const duong = (d) => `M${d.map((p) => p.join(' ')).join('L')}`;
+  const tron = (x, y, r, to, vien = 0) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${to}"${vien ? ` stroke="${MAU.muc}" stroke-width="${vien}"` : ''}/>`;
   const mt = mat === 'nham'
-    ? `<path d="M40 42h12M68 42h12" stroke="${MAU.muc}" stroke-width="4" stroke-linecap="round"/>`
-    : `<circle cx="46" cy="42" r="6" fill="${MAU.muc}"/><circle cx="74" cy="42" r="6" fill="${MAU.muc}"/>`;
-  return `<path d="M60 24V10" stroke="${MAU.muc}" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="9" r="5" fill="${MAU.vang}"/>
-  <rect x="30" y="22" width="60" height="42" rx="11" fill="${MAU.xamNhat}" stroke="${MAU.muc}" stroke-width="3"/>${mt}
-  <rect x="36" y="68" width="48" height="50" rx="9" fill="${mau}" stroke="${MAU.muc}" stroke-width="3"/><circle cx="60" cy="92" r="9" fill="${MAU.cyan}"/>
-  <path d="M36 80L18 104" stroke="${MAU.muc}" stroke-width="8" stroke-linecap="round"/>
-  <g transform="rotate(${canh} 84 78)"><path d="M84 78L108 58" stroke="${MAU.muc}" stroke-width="8" stroke-linecap="round"/><circle cx="110" cy="56" r="6" fill="${MAU.cam}"/></g>
-  <rect x="42" y="118" width="12" height="20" rx="3" fill="${MAU.muc}"/><rect x="66" y="118" width="12" height="20" rx="3" fill="${MAU.muc}"/>`;
+    ? R.mat.map((m) => `<path d="M${m.x - 1} ${m.y + 9}q${m.w / 2 + 1} 7 ${m.w + 2} 0" fill="none" stroke="${MAU.cyan}" stroke-width="4" stroke-linecap="round"/>`).join('')
+    : mat === 'lim'
+      ? R.mat.map((m) => `<rect x="${m.x}" y="${m.y + m.h * 0.34}" width="${m.w}" height="${m.h * 0.42}" rx="${m.h * 0.21}" fill="${MAU.cyan}"/>`).join('')
+      : R.mat.map((m) => `<rect ${hop(m)} fill="${MAU.cyan}"/>`).join('') + R.matSang.map((m) => `<rect ${hop(m)} fill="${MAU.matSang}"/>`).join('');
+  const veTay = (d, g = 0) => {
+    const net = (mauNet, day, doan) => `<path d="${duong(doan)}" fill="none" stroke="${mauNet}" stroke-width="${day}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const khuc = (doan) => net(thepTay ? MAU.xam : MAU.muc, R.tay, doan) + net(thepTay ? MAU.xamNhat : MAU.vo, R.tay * 0.42, doan);
+    return `${khuc(d.slice(0, 2))}<g transform="rotate(${-g} ${d[1].join(' ')})">${khuc(d.slice(1))}${tron(...d[2], R.banTay, MAU.cyan, R.vienChi)}</g>`;
+  };
+  // tay 'mot' chỉ còn tay trái, dùng ở màn tự vẽ cánh tay vẫy.
+  const hai = tay === 'hong' ? R.hong.map((d) => veTay(d)).join('') : tay === 'mot' ? veTay(R.hong[0]) : veTay(R.hong[0]) + veTay(R.vay, goc);
+  const vo = (khoi, sang) => `<rect ${hop(khoi)} fill="${MAU.voToi}" stroke="${MAU.muc}" stroke-width="${R.vien}"/><rect ${hop(sang)} fill="${MAU.vo}"/>`;
+  return `${R.chan.map((c) => `<rect ${hop(c)} fill="${MAU.banh}" stroke="${MAU.muc}" stroke-width="${R.vienChi}"/>${R.gach.map((y) => `<path d="M${c.x + 5} ${y}h${c.w - 10}" stroke="${MAU.banhGach}" stroke-width="2.4" stroke-linecap="round"/>`).join('')}`).join('')}
+  ${hai}${vo(R.than, R.thanSang)}${tron(R.nguc.x, R.nguc.y, R.nguc.r, mau, 2)}${tron(R.tim.x, R.tim.y, R.tim.r, MAU.cyan)}
+  <path d="M${R.anTen.x} ${R.anTen.y1}V${R.anTen.y2}" stroke="${MAU.muc}" stroke-width="${R.anTen.day}" stroke-linecap="round"/>${tron(R.anTen.x, R.anTen.yCham, R.anTen.r, MAU.cyan, 2)}
+  ${R.tai.map((t) => `<rect ${hop(t)} fill="${MAU.muc}"/>`).join('')}${vo(R.dau, R.dauSang)}${R.ghep.map((d) => `<path d="${duong(d)}" fill="none" stroke="${MAU.voGhep}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
+  <rect ${hop(R.kinh)} fill="${MAU.kinhToi}" stroke="${MAU.muc}" stroke-width="2.5"/><rect ${hop(R.kinhSang)} fill="${MAU.kinhSang}"/>${mt}`;
 }
 
 // Tranh màn đầu: băng rôn trước cổng, có tay nắm chỉnh sửa của phần mềm đồ họa.

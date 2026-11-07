@@ -3,7 +3,7 @@ import { giong } from '../toan/hinh-hoc.mjs';
 import { anhSanTruong, doChoi, tuongPhanWcag } from '../toan/anh.mjs';
 import { MAU } from '../hinh.mjs';
 import { hitTruc } from '../toan/hit.mjs';
-import { taoSvg, batKeo, hangCu, dungBoCu } from './chung.mjs';
+import { taoSvg, batKeo, hangCu, dongHo } from './chung.mjs';
 
 export const W = 360, H = 202;
 const MAU_CHU = {
@@ -79,24 +79,27 @@ export default {
     svg.style.height = '100%';
     svg.setAttribute('preserveAspectRatio', 'none');
     let gion = null;
+    let dh = null;
 
     const ve = () => {
       const st = ctx.st;
       const b = hopChu(st);
-      let s = `<g data-h="chu">${veChu(st)}<rect x="${b.x}" y="${b.y - 6}" width="${b.w}" height="${b.h + 12}" fill="transparent" stroke="${MAU.cyan}" stroke-width="1.5" stroke-dasharray="5 4"/></g>`;
-      if (ctx.cu === 'co') {
-        const hx = Math.min(b.x + b.w, W - 12), hy = b.y + b.h / 2;
-        s += `<g data-h="co"><circle cx="${hx}" cy="${hy}" r="22" fill="transparent"/><circle cx="${hx}" cy="${hy}" r="8" fill="${MAU.trang}" stroke="${MAU.chan}" stroke-width="2.5"/></g>`;
-        s += `<text x="12" y="${H - 10}" font-size="13" font-weight="800" fill="${MAU.muc}" font-family="var(--mono)">cỡ ${st.co}</text>`;
-      }
-      if (gion) s += `<path d="${gion}" stroke="${MAU.hong}" stroke-width="1.8" stroke-dasharray="5 4"/>`;
+      // Chữ nhỏ thì khung cũng mỏng, nên vùng kéo thân luôn đủ cao cho ngón tay.
+      const caoCham = Math.max(b.h + 12, 44), yCham = b.y + b.h / 2 - caoCham / 2;
+      const hx = Math.min(b.x + b.w, W - 12), hy = b.y + b.h / 2;
+      let s = `<g data-h="chu">${veChu(st)}<rect x="${b.x}" y="${yCham}" width="${b.w}" height="${caoCham}" fill="transparent"/><rect x="${b.x}" y="${b.y - 6}" width="${b.w}" height="${b.h + 12}" fill="none" stroke="${MAU.cyan}" stroke-width="1.5" stroke-dasharray="5 4"/></g>`;
+      s += `<g data-h="co"><circle cx="${hx}" cy="${hy}" r="22" fill="transparent"/><circle cx="${hx}" cy="${hy}" r="8" fill="${MAU.trang}" stroke="${MAU.chan}" stroke-width="2.5"/></g>`;
+      // Số cỡ nằm trên ảnh tối lẫn sáng, nên phải có nền riêng mới đọc được.
+      s += `<rect x="8" y="${H - 28}" width="52" height="22" rx="6" fill="${MAU.trang}" fill-opacity=".9" pointer-events="none"/><text x="34" y="${H - 12}" text-anchor="middle" font-size="13" font-weight="800" fill="${MAU.muc}" font-family="var(--mono)" pointer-events="none">cỡ ${st.co}</text>`;
+      if (gion) s += `<path d="${gion}" fill="none" stroke="${MAU.hong}" stroke-width="1.8" stroke-dasharray="5 4"/>`;
       svg.innerHTML = s;
+      // Tương phản đổi theo vùng ảnh sau chữ, nên kéo tới đâu vạch đo phải báo tới đó.
+      dh?.capNhat(doChu(st, man));
     };
 
     const veKhay = () => {
       const st = ctx.st;
       khay.innerHTML = '';
-      if (ctx.cu !== 'mau') return;
       hangCu(khay, [
         ...Object.entries(MAU_CHU).map(([k, m]) => ({
           id: `mau-${k}`, nhan: m.ten, bat: st.mau === k,
@@ -105,31 +108,35 @@ export default {
         })),
         { id: 'dai', nhan: 'Dải nền', ic: 'dai', bat: !!st.dai, bam() { ctx.ghi(); st.dai = !st.dai; ve(); veKhay(); ctx.doi(); } },
       ], { deu: true });
+      dh = dongHo(khay, man.dongHo || []);
+      dh.capNhat(doChu(st, man));
     };
 
     batKeo(svg, W, H, (h, pt) => {
       const st = ctx.st;
       if (h === 'co') {
-        ctx.ghi();
+        // Giữ khoảng lệch lúc đặt ngón tay, để chạm vào vùng quanh chấm tròn không làm chữ giật cỡ.
+        const b = hopChu(st);
+        const lech = b.x + b.w - pt.x;
+        let daGhi = false;
         return {
           di(p) {
+            if (!daGhi && Math.abs(p.x - pt.x) < 3) return;
+            if (!daGhi) { ctx.ghi(); daGhi = true; }
             const dai = NOI_DUNG.length * 0.6;
-            st.co = Math.max(12, Math.min(40, Math.round((Math.abs(p.x - st.x) * 2) / dai)));
+            st.co = Math.max(12, Math.min(40, Math.round((Math.abs(p.x + lech - st.x) * 2) / dai)));
             ve();
           },
-          nha() { ctx.doi(); },
+          nha() { ve(); ctx.doi(); },
         };
       }
       if (h !== 'chu') return null;
-      if (ctx.cu !== 'chon') {
-        ctx.nhac(ctx.cu === 'co' ? 'Đang cầm <b>Cỡ chữ</b>: kéo chấm tròn ở đầu chữ. Muốn dời chữ thì chọn <b>Di chuyển</b>.' : 'Đang cầm <b>Màu</b>. Muốn dời chữ thì chọn <b>Di chuyển</b>.');
-        return null;
-      }
       const dx = pt.x - st.x, dy = pt.y - st.y;
       const LE = 6;
       let daGhi = false;
       return {
         di(p) {
+          if (!daGhi && Math.hypot(p.x - pt.x, p.y - pt.y) < 3) return;
           if (!daGhi) { ctx.ghi(); daGhi = true; }
           st.x = Math.max(0, Math.min(W, Math.round(p.x - dx)));
           st.y = Math.max(0, Math.min(H, Math.round(p.y - dy)));
@@ -147,11 +154,6 @@ export default {
       };
     });
 
-    dungBoCu(ctx, [
-      { id: 'chon', nhan: 'Di chuyển', ic: 'diChuyen' },
-      { id: 'co', nhan: 'Cỡ chữ', ic: 'doiCo' },
-      { id: 'mau', nhan: 'Màu', ic: 'chu' },
-    ], 'chon', () => { ve(); veKhay(); });
     ve();
     veKhay();
   },

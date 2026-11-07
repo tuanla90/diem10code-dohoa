@@ -6,13 +6,19 @@
   <meta name="theme-color" content="#f5f4fc">
   <title>Gương Mặt Ngày Hội</title>
   <meta name="description" content="Game đồ họa của CLB Tin học: tự tay kéo, nắn, ghép, tách nền để logo, poster, phim của Ngày hội ra đúng như mong muốn.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="fonts/font.css">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/khung.css">
   <link rel="stylesheet" href="css/ban-choi.css">
+  <link rel="stylesheet" href="css/man-hinh.css">
   <script>
-    /* Đặt giao diện trước khi vẽ để không chớp màu. */
-    try { var g = localStorage.getItem('dohoa_giao_dien'); if (g === 'dark' || g === 'light') document.documentElement.dataset.theme = g; } catch (e) {}
+    /* Đặt giao diện trước khi vẽ để không chớp màu. Thanh trạng thái của máy đi theo. */
+    try {
+      var g = localStorage.getItem('dohoa_giao_dien');
+      if (g === 'dark' || g === 'light') document.documentElement.dataset.theme = g;
+      if (g === 'dark') document.querySelector('meta[name="theme-color"]').setAttribute('content', '#090d16');
+    } catch (e) {}
   </script>
 </head>
 <body>
@@ -30,6 +36,10 @@
       </linearGradient>
       <pattern id="o-ca-ro" width="16" height="16" patternUnits="userSpaceOnUse">
         <rect width="16" height="16" fill="#ffffff"/><rect width="8" height="8" fill="#dcd9ee"/><rect x="8" y="8" width="8" height="8" fill="#dcd9ee"/>
+      </pattern>
+      <!-- Lưới giấy vẽ của Bản vẽ Ngày hội, theo màu của giao diện sáng hoặc tối. -->
+      <pattern id="o-ban-ve" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M20 0H0V20" fill="none" stroke="var(--ke)" stroke-width=".6" opacity=".55"/>
       </pattern>
     </defs>
   </svg>

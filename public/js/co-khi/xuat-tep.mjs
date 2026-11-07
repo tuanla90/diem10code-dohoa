@@ -1,7 +1,7 @@
 // Cơ khí xuất tệp: ba đơn hàng thật, mỗi đơn chọn định dạng và chất lượng. Không có bảng đáp án (C10-28).
 import { giong } from '../toan/hinh-hoc.mjs';
 import { MAU, datVao, logoLong } from '../hinh.mjs';
-import { hangCu, thanhTruot } from './chung.mjs';
+import { hangCu, thanhTruot, dongHo } from './chung.mjs';
 
 export const DINH_DANG = { jpg: 'JPG', png: 'PNG trong suốt', svg: 'SVG vector' };
 
@@ -70,9 +70,14 @@ export default {
       if (d.dd === 'jpg') {
         thanhTruot(khay, {
           nhan: 'Chất lượng', min: 10, max: 100, buoc: 5, gia: d.cl, dinh: (v) => `${v}%`, id: 'cl',
-          doi(v) { d.cl = v; veDon(); },
-          xong() { ctx.doi(); },
+          doi(v) { d.cl = v; veDon(); ctx.hit(capDo() ? 'du' : ''); },
+          xong() { ctx.hit(); ctx.doi(); },
         });
+        // Chỉ ảnh chụp mới phải cân dung lượng với độ nét, logo thì chất lượng không đổi dung lượng.
+        const don = man.don.find((x) => x.id === st.chon);
+        const dh = don.loai === 'anh' ? dongHo(khay, man.dongHo || []) : null;
+        const capDo = () => (dh ? dh.capNhat({ tin: { mb: coTep(don, d), cl: d.cl } }) : false);
+        capDo();
       }
     };
 

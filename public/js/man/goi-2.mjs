@@ -25,8 +25,7 @@ export default {
       sanNhan: 'Logo năm mảnh, mảnh nền đang đè lên trên',
       phaiTren: [['chu', 'dai'], ['chu', 'nen'], ['dai', 'nen'], ['sao', 'nen'], ['vong', 'nen'], ['dai', 'vong'], ['sao', 'vong']],
       dan: [
-        { txt: 'Chọn công cụ <b>Lớp</b>.', nhan: 'cu-lop', xong: (d, _st, cu) => cu === 'lop' || d.saiThuTu.length === 0 },
-        { txt: 'Kéo thẻ <b>Nền tròn</b> về tận cùng bên trái: đó là lớp dưới cùng.', xong: (d) => d.nenDay },
+        { txt: 'Kéo thẻ <b>Nền tròn</b> về tận cùng bên trái: đó là lớp dưới cùng.', nhan: 'm-nen', xong: (d) => d.nenDay },
         { txt: 'Thẻ bên phải đè thẻ bên trái. Kéo tiếp các thẻ khác cho đủ năm mảnh hiện ra.', xong: (d) => d.saiThuTu.length === 0 },
         { txt: 'Đủ năm mảnh rồi, bấm <b>In thử</b>.', xong: () => false },
       ],
@@ -63,10 +62,10 @@ export default {
       sanNhan: 'Poster có logo năm mảnh, tiêu đề và khung vàng ở góc phải',
       cumLogo: { goc: Object.fromEntries(IDS.map((id) => [id, gocCum])), tieuDe: { x: 55, y: 178 } },
       dan: [
-        { txt: 'Với <b>Chọn, dời</b>, kéo trên nền một khung <b>quét qua cả logo</b> để chọn năm mảnh. Đừng quét trúng Tiêu đề.', nhan: 'cu-chon', xong: (_d, st) => (st.chon || []).filter((k) => k !== 'tieu-de').length === 5 || st.manh.some((m) => m.nhom) },
-        { txt: 'Vẫn ở <b>Chọn, dời</b>, bấm <b>Nhóm</b>.', nhan: 'nhom', xong: (d) => d.cungNhom },
-        { txt: 'Chọn <b>Đổi cỡ</b>, kéo chấm tròn để thu nhỏ cả cụm. Gần vừa khung nó tự hít.', nhan: 'cu-co', xong: (d) => d.phu <= 1.03 },
-        { txt: 'Về lại <b>Chọn, dời</b>, kéo cụm vào khung vàng. Gần mép khung nó tự hít.', nhan: 'cu-chon', xong: (d) => d.trongVung },
+        { txt: 'Kéo trên nền một khung <b>quét qua cả logo</b> để chọn năm mảnh. Đừng quét trúng Tiêu đề.', xong: (_d, st) => (st.chon || []).filter((k) => k !== 'tieu-de').length === 5 || st.manh.some((m) => m.nhom) },
+        { txt: 'Bấm <b>Nhóm</b> để năm mảnh đi cùng nhau.', nhan: 'nhom', xong: (d) => d.cungNhom },
+        { txt: 'Kéo <b>chấm tròn ở góc</b> để thu nhỏ cả cụm. Gần vừa khung nó tự hít.', xong: (d) => d.phu <= 1.03 },
+        { txt: 'Kéo cụm vào khung vàng. Gần mép khung nó tự hít.', xong: (d) => d.trongVung },
         { txt: 'Bấm <b>In thử</b>.', xong: () => false },
       ],
       tieuChi: [
@@ -79,7 +78,7 @@ export default {
       ],
       goiY: [
         'Vector giữ từng mảnh riêng, nên kéo là chỉ một mảnh đi. Phải bảo máy rằng chúng đi cùng nhau.',
-        'Quét khung qua cả logo, hoặc chạm từng mảnh, rồi Nhóm. Sau đó chạm mảnh nào cũng kéo được cả cụm.',
+        'Quét khung trên nền qua cả logo, rồi Nhóm. Sau đó chạm mảnh nào cũng kéo được cả cụm.',
         'Thu nhỏ trước rồi kéo vào khung thì dễ hơn. Nếu lỡ nhóm cả Tiêu đề, bấm Rã nhóm làm lại.',
       ],
       soTay: ['nhom', 'lop'],
@@ -112,8 +111,8 @@ export default {
       sanNhan: 'Bảng tin có năm biểu tượng so le',
       hang: ['hd1', 'hd2', 'hd3', 'hd4', 'hd5'],
       dan: [
-        { txt: 'Dùng <b>Chọn, dời</b> kéo cho đúng thứ tự, hình nào thò ra thì kéo vào khung. Đường hồng hiện là đã hít thẳng hàng hoặc cách đều.', xong: (d) => d.dungThu && d.trongVung },
-        { txt: 'Chỉnh tay bằng <b>Đổi cỡ</b>: cỡ gần bằng hình khác thì tự hít. Hoặc chọn <b>Căn chỉnh</b>, quét chọn cả năm rồi dùng lệnh.', nhan: 'cu-can', xong: (d) => d.lechCo <= 0.03 },
+        { txt: 'Kéo cho đúng thứ tự, hình nào thò ra thì kéo vào khung. Đường hồng hiện là đã hít thẳng hàng hoặc cách đều.', xong: (d) => d.dungThu && d.trongVung },
+        { txt: 'Chạm một hình rồi kéo <b>chấm góc</b>: cỡ gần bằng hình khác thì tự hít. Hoặc quét khung chọn cả năm rồi bấm <b>Cùng cỡ</b>.', nhan: 'cungco', xong: (d) => d.lechCo <= 0.03 },
         { txt: 'Cho thẳng hàng và cách đều bằng tay hoặc bằng lệnh. Lệnh <b>Cách đều</b> giữ yên hai hình ngoài cùng.', xong: (d) => d.lechHang <= 3 && d.lechHo <= 3 && !d.hoAm },
         { txt: 'Bấm <b>Dán thử</b>.', xong: () => false },
       ],

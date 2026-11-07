@@ -31,7 +31,18 @@
   --p-phu-lop: rgba(15, 23, 42, .45);
   --p-bong: rgba(49, 46, 129, .09);
   --p-bong-nut: rgba(79, 70, 229, .2);
+  --p-hong-nhat: #fde7f3;
+  --p-hong-dam: #b23a86;
+  --p-rap: #0f0d2e;
+  --p-rap-2: #1e1b4b;
+  --p-poster-a: #312e81;
+  --p-poster-b: #7c2d92;
+  --p-go: #c2410c;
+  --p-sang-phu: rgba(255, 255, 255, .72);
+  --p-sang-mo: rgba(255, 255, 255, .14);
+  --p-sang-vien: rgba(255, 255, 255, .24);
 
+  --p-t-hong-nhat: #3b1230;
   --p-t-nen: #090d16;
   --p-t-the: #141c2e;
   --p-t-lom: #1e293b;
@@ -77,6 +88,9 @@
   --phu-lop: var(--p-phu-lop);
   --bong: var(--p-bong);
   --bong-nut: var(--p-bong-nut);
+  --hong: var(--p-logo-hong);
+  --hong-dam: var(--p-hong-dam);
+  --hong-nhat: var(--p-hong-nhat);
 }
 
 [data-theme='dark'] {
@@ -102,11 +116,25 @@
   --ok-nhat: var(--p-t-xanh-nhat);
   --bong: var(--p-phu-lop);
   --bong-nut: var(--p-phu-lop);
+  --hong: var(--p-logo-hong);
+  --hong-dam: var(--p-logo-hong);
+  --hong-nhat: var(--p-t-hong-nhat);
 }
 
 :root {
   --dai-logo: linear-gradient(135deg, var(--p-logo-tim), var(--p-logo-giua), var(--p-logo-hong));
   --dai-chu: linear-gradient(135deg, var(--p-chu-tim), var(--p-chu-giua), var(--p-chu-hong));
+  --dai-poster: linear-gradient(150deg, var(--p-poster-a), var(--p-poster-b));
+  --dai-rap: linear-gradient(170deg, var(--p-rap), var(--p-rap-2) 55%, var(--p-poster-b));
+  --rap: var(--p-rap);
+  --sang: var(--p-trang);
+  --sang-phu: var(--p-sang-phu);
+  --sang-mo: var(--p-sang-mo);
+  --sang-vien: var(--p-sang-vien);
+  --vang-sang: var(--p-t-vang);
+  --cyan-sang: var(--p-t-cyan);
+  --em: cubic-bezier(.2, .8, .25, 1);
+  --nay: cubic-bezier(.3, 1.6, .5, 1);
   --font: 'Google Sans Flex', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: 'Google Sans Code', ui-monospace, 'DejaVu Sans Mono', monospace;
   --khung: 430px;

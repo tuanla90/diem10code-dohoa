@@ -30,7 +30,7 @@ export const CO_KHI = {
   'dong-thoi-gian': dongThoiGian,
 };
 
-export const TAT_CA_MAN = GOI.flatMap((g, gi) => g.man.map((m, mi) => ({ ...m, goiId: g.id, goiChiSo: gi, chiSo: mi, baiHoc: g.baiHoc })));
+export const TAT_CA_MAN = GOI.flatMap((g, gi) => g.man.map((m, mi) => ({ ...m, goiId: g.id, goiChiSo: gi, chiSo: mi, baiHoc: m.baiHoc || g.baiHoc })));
 export const timMan = (ma) => TAT_CA_MAN.find((m) => m.ma === ma);
 
 export function cham(man, st) {

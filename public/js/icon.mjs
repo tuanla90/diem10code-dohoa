@@ -53,6 +53,16 @@ const NET = {
   tuongPhan: '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z" fill="currentColor"/>',
   nutNeo: '<path d="M5 19C8 8 16 16 19 5"/><rect x="2.5" y="17" width="5" height="5" rx="1"/><rect x="16.5" y="2" width="5" height="5" rx="1"/>',
   xep: '<rect x="3" y="8" width="7" height="8" rx="1"/><rect x="14" y="8" width="7" height="8" rx="1"/><path d="M8 4h8l-2-2M16 20H8l2 2"/>',
+  banVe: '<path d="M4 20l2-6L16.5 3.5a2.1 2.1 0 013 3L9 17z"/><path d="M14.5 5.5l3 3"/><path d="M13 20h7"/>',
+  tranh: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="M21 16l-5-5-8 9"/>',
+  nguoi: '<circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0115 0"/>',
+  matNhin: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+  cup: '<path d="M8 4h8v6a4 4 0 01-8 0z"/><path d="M8 6H4v1a4 4 0 004 4M16 6h4v1a4 4 0 01-4 4M12 14v4M8 21h8M9.5 18h5"/>',
+  huyHieu: '<circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/>',
+  tai: '<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
+  timKiem: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+  sua: '<path d="M4 20l1.5-5L16 4.5a2 2 0 013 3L8.5 18z"/>',
+  mucTieu: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/>',
 };
 
 export function icon(ten, lop = '') {
