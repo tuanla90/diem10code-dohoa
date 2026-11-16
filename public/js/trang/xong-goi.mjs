@@ -6,6 +6,7 @@ import { icon } from '../icon.mjs';
 import { phat } from '../am-thanh.mjs';
 import { banVe, MON } from '../the-gioi.mjs';
 import { duongMat } from '../bang-truot.mjs';
+import { CAU } from './mat-tinh-cau.mjs';
 import { oHuyHieu } from './vo.mjs';
 
 export function trangXongGoi(root, id) {
@@ -19,6 +20,7 @@ export function trangXongGoi(root, id) {
   const sao = saoGoi(g);
   const toi = g.man.length * 3;
   const so = MON.filter((m) => daQua(m.ma)).length;
+  const cauMoi = CAU.filter((c) => c.goi === gi).length;
   const cuoi = gi === GOI.length - 1;
   const tiep = cuoi || xongHet()
     ? { hash: xongHet() ? '#/khai-mac' : '#/', nhan: xongHet() ? 'Dự lễ khai mạc' : 'Về bản vẽ' }
@@ -32,7 +34,8 @@ export function trangXongGoi(root, id) {
       ${hh ? `<div class="xong-goi-hh">${oHuyHieu(hh, coHuyHieu(hh.id), true)}<b>${hh.ten}</b></div>` : ''}
       <div class="chip-sao chip-sao--to" aria-label="${sao} trên ${toi} sao">${icon('sao')}${sao}/${toi}</div>
       <div class="xong-goi-noi"><img class="mat" src="${duongMat(loi.ai, loi.mat)}" alt="" width="76" height="87"><p class="bong-noi bong-noi--trai"><b>${loi.ai === 'sola' ? 'SOLA' : 'LUNA'}</b>${loi.cau}</p></div>
-      <div class="xong-goi-ve">${banVe({ daXong: daQua })}<small>${so}/${MON.length} món đã có màu</small></div>
+      <div class="xong-goi-ve">${banVe({ daXong: daQua, moi: g.man.map((m) => m.ma) })}<small>${so}/${MON.length} món đã có màu</small></div>
+      ${cauMoi ? `<a class="xong-goi-mat" href="#/mat-tinh">${icon('matNhin')}<span>Mắt Thiết Kế vừa mở thêm <b>${cauMoi} câu</b> mới</span>${icon('tiep')}</a>` : ''}
     </div>
     <div class="xong-goi-duoi">
       ${sao < toi ? `<a class="nut-bo" href="#/goi/${g.id}">Quay lại lấy đủ sao</a>` : ''}

@@ -126,8 +126,9 @@ export default {
             const dai = NOI_DUNG.length * 0.6;
             st.co = Math.max(12, Math.min(40, Math.round((Math.abs(p.x + lech - st.x) * 2) / dai)));
             ve();
+            ctx.hit(dh?.khoaHit(doChu(st, man)) || '');
           },
-          nha() { ve(); ctx.doi(); },
+          nha() { ctx.hit(); ve(); ctx.doi(); },
         };
       }
       if (h !== 'chu') return null;

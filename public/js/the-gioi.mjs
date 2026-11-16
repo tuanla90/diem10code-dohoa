@@ -131,25 +131,45 @@ function tayNam([x, y, w, h]) {
   return `<g class="bv-ke"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${MAU.hong}" stroke-width="1.6" stroke-dasharray="4 3"/>${dinh.map(([a, b]) => `<rect x="${a - o / 2}" y="${b - o / 2}" width="${o}" height="${o}" fill="${MAU.trang}" stroke="${MAU.hong}" stroke-width="1.5"/>`).join('')}</g>`;
 }
 
-// daXong(ma): món đã có màu chưa. ke: món sắp làm. moi: món vừa tô, chạy hiệu ứng.
-export function banVe({ daXong, ke = null, moi = null, nhan = 'Bản vẽ Ngày hội' }) {
+/**
+ * Vẽ toàn bộ Bản vẽ Ngày hội với trạng thái nét/màu và lớp vùng chạm tùy chọn.
+ * @param {object} tuyChon Tùy chọn hiển thị bản vẽ.
+ * @returns {string} Chuỗi SVG của bản vẽ.
+ */
+export function banVe({ daXong, ke = null, moi = null, nhan = 'Bản vẽ Ngày hội', chonDuoc = false }) {
+  const dsMoi = Array.isArray(moi) ? moi : (moi ? [moi] : []);
   const soXong = MON.filter((m) => daXong(m.ma)).length;
   const tile = soXong / MON.length;
   const mo = (tile * 0.9 + (soXong ? 0.1 : 0)).toFixed(2);
   const lop = THU_TU_VE.map((ma) => {
     const m = monCua(ma);
     if (!daXong(ma)) return `<g class="bv-net">${m.ve()}</g>`;
-    const hieuUng = ma === moi ? ' bv-mau--moi' : '';
-    return `<g class="bv-mau${hieuUng}">${m.ve()}</g>`;
+    const viMoi = dsMoi.indexOf(ma);
+    const hieuUng = viMoi >= 0 ? ' bv-moi-nay' : '';
+    const tre = viMoi >= 0 ? ` style="animation-delay:${(0.22 + viMoi * 0.26).toFixed(2)}s"` : '';
+    return `<g class="bv-mau${hieuUng}"${tre}>${m.ve()}</g>`;
   }).join('');
-  const monMoi = moi ? monCua(moi) : null;
-  return `<svg class="ban-ve" viewBox="0 0 ${W_BV} ${H_BV}" role="img" aria-label="${nhan}: ${soXong} trên ${MON.length} món đã có màu">
+  const vongNo = dsMoi.map((ma, idx) => {
+    const monMoi = monCua(ma);
+    if (!monMoi) return '';
+    const tre = (0.28 + idx * 0.26).toFixed(2);
+    return `<circle class="bv-no" style="animation-delay:${tre}s" cx="${monMoi.hop[0] + monMoi.hop[2] / 2}" cy="${monMoi.hop[1] + monMoi.hop[3] / 2}" r="${Math.max(monMoi.hop[2], monMoi.hop[3]) / 2 + 6}" fill="none" stroke="${MAU.hong}" stroke-width="3"/>`;
+  }).join('');
+  const lopCham = chonDuoc ? `<g class="bv-lop-cham">${THU_TU_VE.map((ma) => {
+    const m = monCua(ma);
+    const [hx, hy, hw, hh] = m.hop;
+    const cw = Math.max(hw + 6, 28), ch = Math.max(hh + 6, 28);
+    const cx = hx + hw / 2 - cw / 2, cy = hy + hh / 2 - ch / 2;
+    return `<rect class="bv-cham" data-mon="${ma}" x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" width="${cw.toFixed(1)}" height="${ch.toFixed(1)}" rx="4" fill="transparent"><title>${m.ten} · ${m.noi}</title></rect>`;
+  }).join('')}</g>` : '';
+  return `<svg class="ban-ve${chonDuoc ? ' ban-ve--cham' : ''}" viewBox="0 0 ${W_BV} ${H_BV}" role="img" aria-label="${nhan}: ${soXong} trên ${MON.length} món đã có màu">
     <rect width="${W_BV}" height="${H_BV}" fill="var(--lom)"/><rect width="${W_BV}" height="${H_BV}" fill="url(#o-ban-ve)"/>
     <g class="bv-net">${toaNha()}<path d="M0 140h360"/></g>
     <g class="bv-nen" style="opacity:${mo}">${troi()}${dat()}${toaNha()}</g>
     ${lop}
     ${ke ? tayNam(monCua(ke).hop) : ''}
-    ${monMoi ? `<circle class="bv-no" cx="${monMoi.hop[0] + monMoi.hop[2] / 2}" cy="${monMoi.hop[1] + monMoi.hop[3] / 2}" r="${Math.max(monMoi.hop[2], monMoi.hop[3]) / 2 + 6}" fill="none" stroke="${MAU.hong}" stroke-width="3"/>` : ''}
+    ${vongNo}
+    ${lopCham}
   </svg>`;
 }
 

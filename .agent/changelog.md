@@ -1,5 +1,22 @@
 # Nhật ký Thay đổi (Changelog) — Dự án `diem10code-dohoa`
 
+## [2026-11-16] Nâng cấp Game Design & UI/UX toàn diện (P0 -> P2)
+Triển khai trọn bộ cải tiến trải nghiệm chơi trên điện thoại, nối liền cảm xúc vòng lặp chính, cảm giác tay cơ khí và chiều sâu sư phạm:
+- **P0 — Vòng lặp chính, Chống bấm nhầm, Haptic 2 nấc & Luồng mượt:**
+  - **Hàng đợi tô màu & Bản vẽ tương tác (`kho.mjs`, `the-gioi.mjs`, `trang-chu.mjs`, `tac-pham.mjs`, `xong-goi.mjs`):** `tienDo.moi` giữ danh sách đầy đủ các món vừa hoàn thành (`layMonMoiDs`) để chạy diễn hoạt tô màu nối tiếp kèm nhịp âm khi quay về Trang chủ hoặc màn Xong gói. Từng món trên SVG Bản vẽ Ngày hội nay chạm được trực tiếp để mở chi tiết tác phẩm của người chơi hoặc vào thẳng màn kế tiếp.
+  - **Bảo vệ nút Làm lại & Âm tia quét (`ban-choi.mjs`, `am-thanh.mjs`, `ket-qua.mjs`):** tự khóa `#nut-lai` khi sân khấu đang ở trạng thái khởi tạo; khi bấm Làm lại hiện thông báo nhắc có thể `Hoàn tác`. Thêm âm quét sóng trượt `1.05s` (`quet`) khớp tia in hồng `.rap-quet` ở Rạp kết quả.
+  - **Vạch đo Haptic 2 nấc & Bộ công cụ hiện số (`chung.mjs`, `sua-anh.mjs`, `xuat-tep.mjs`, `khung-hinh.mjs`, `chu-anh.mjs`):** `dongHo.khoaHit` phân biệt nấc đạt chuẩn qua màn (`dat`) và nấc trọn 3 sao (`dep`, phát hai nốt cao `hitDep` + rung kép). Nút công cụ Độ sáng / Tương phản hiển thị trực tiếp chỉ số hiện tại ngay dưới nhãn.
+  - **Luồng Phiếu việc & Sổ tay gọn (`ban-choi.mjs`, `bang-truot.mjs`):** bỏ tự bật modal Phiếu việc khi vào lại màn đã qua hoặc đang có bản nháp dở. Bảng trượt Sổ tay trong bàn chơi giữ mở các mục của màn hiện tại, gom các mục khác vào `<details>` thu gọn kèm ô lọc nhanh.
+- **P1 — Cảm giác tay Mobile & Đỉnh cao cơ khí:**
+  - **Kính lúp góc & Tâm ngắm (`tach-nen.mjs`, `nut-net.mjs`):** nâng độ phân giải hiển thị canvas tách nền lên 2x kèm vòng tròn cỡ cọ và ô kính phóng đại ở góc trên tự tránh ngón tay khi miết Cọ giữ / Cọ xóa. Thêm tia chữ thập mảnh vươn rộng ngoài đầu ngón tay khi kéo nút hoặc tay nắm Bézier.
+  - **Quét chọn trực tiếp & Lịch sử phép ghép (`lop-nhom.mjs`, `ghep-hinh.mjs`):** tô sáng viền xem trước kèm đếm số mảnh ngay trong lúc kéo khung quét chọn và nhắc quy tắc hình mẫu. Thêm dải chip hiển thị chuỗi phép ghép Boolean đã áp dụng, cho phép chạm bước cuối để tháo ra chỉnh lại.
+  - **Trình dựng phim sống động (`dong-thoi-gian.mjs`, `am-thanh.mjs`, `ban-choi.mjs`):** vẽ 5 cảnh SVG thu nhỏ tương ứng 5 đoạn phim trong màn xem trước, hòa mờ trực tiếp tại điểm nối chuyển cảnh, báo màn hình đen khi hết hình mà nhạc còn chạy, cho phép chạm/kéo trên thước để tua kim, và phát WebAudio minh họa nhạc nền/lời nói theo đúng đường âm lượng `heSoAm`.
+- **P2 — Chiều sâu Sư phạm & Phản hồi 3 Sao:**
+  - **Chế độ Tự làm chủ (`ban-choi.mjs`, `goi-1..5.mjs`):** các màn tổng kết cuối gói (`DH-1-3`, `DH-2-3`, `DH-4-4`, `DH-5-3`) mặc định ẩn lời dẫn cầm tay để học sinh tự tư duy, có nút `Hiện lời dẫn` ngay tại chỗ và tự bung lời dẫn khi mở Gợi ý hoặc sau lần chạy chưa đạt đầu tiên.
+  - **Chỉ lỗi trực quan ở Mắt Thiết Kế (`mat-tinh-cau.mjs`, `mat-tinh.mjs`, `xong-goi.mjs`):** bổ sung tọa độ vùng lỗi `chi` cho cả 22 câu hỏi, khoanh khung chỉ đúng vị trí lỗi trên bản sai sau khi chọn đáp án, tự cuộn mượt phần giải thích trên máy thấp và thêm liên kết mời từ màn Xong gói.
+  - **Số đo còn thiếu của tiêu chí Sao (`goi-1..5.mjs`, `ket-qua.mjs`, `tac-pham.mjs`, `man-hinh.css`):** mọi tiêu chí sao báo rõ độ lệch thực tế khi người chơi đạt 1-2 sao; làm dịu độ chói của Bản vẽ ở giao diện tối.
+- **Kiểm thử (`tools/kiem-game.mjs`):** nâng tổng số kiểm tra tự động từ `1673` lên **`1738 đạt, 0 hỏng`**.
+
 ## [2026-11-07] Thêm 3 màn, game lên 21 màn
 Mỗi màn có món riêng trên Bản vẽ, cảnh hậu quả và một câu Mắt Thiết Kế. Mã màn theo thứ tự thêm, không theo vị trí, nên bản lưu cũ vẫn đúng.
 - **DH-4-5 Áo trắng mất nếp (U11-10), sau DH-4-1:** Sola lưu đè ảnh đã cháy. Người chơi thử kéo tối thấy vạch Nếp áo đứng yên, rồi bấm `Mở bản gốc` để sửa lại. `nep` đo trên điểm ảnh thật (`doNep`), bản cháy luôn bằng 0 ở mọi vị trí thanh. Nút nằm trên ảnh, không nằm ở khay, vì màn 375x667 sẽ bị đẩy mất thanh trượt.

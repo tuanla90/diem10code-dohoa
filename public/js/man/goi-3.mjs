@@ -42,8 +42,8 @@ export default {
       ],
       tieuChi: [
         { id: 'hinh', ok: (d) => d.lech <= 12, ten: 'Đúng hình đuôi nheo', loi: 'Cờ kéo lên vẫn không phải đuôi nheo, thầy phụ trách hỏi lại đây là cờ đội nào.', ai: 'sola', matLoi: 'confused' },
-        { id: 'sat', sao: true, ok: (d) => d.lech <= 5, ten: 'Sát đường nét đứt' },
-        { id: 'gon', sao: true, ok: (d) => d.soNut === 5, ten: 'Đúng 5 nút, không thừa' },
+        { id: 'sat', sao: true, ok: (d) => d.lech <= 5, ten: 'Sát đường nét đứt', chiTiet: (d) => `Đang lệch nét đứt ${Math.round(d.lech)} đơn vị (cần từ 5 trở xuống)` },
+        { id: 'gon', sao: true, ok: (d) => d.soNut === 5, ten: 'Đúng 5 nút, không thừa', chiTiet: (d) => `Đang có ${d.soNut} nút (chọn nút thừa rồi bấm Xóa nút để về 5)` },
       ],
       goiY: [
         'Hình chữ nhật có 4 nút. Đuôi nheo có 5. Vậy thiếu một nút ở đâu?',
@@ -74,8 +74,8 @@ export default {
       ],
       tieuChi: [
         { id: 'song', ok: (d) => d.lech <= 10, ten: 'Mép cờ uốn sóng', loi: 'Cờ vẫn cứng đơ một chỗ, đoạn đó không khớp đường sóng. Gió thổi mà cờ không nhúc nhích.', ai: 'sola', matLoi: 'facepalm' },
-        { id: 'gon', sao: true, ok: (d) => d.soNut === 6, ten: 'Vẫn 6 nút' },
-        { id: 'sat', sao: true, ok: (d) => d.lech <= 5, ten: 'Sát đường nét đứt' },
+        { id: 'gon', sao: true, ok: (d) => d.soNut === 6, ten: 'Vẫn 6 nút', chiTiet: (d) => `Đang có ${d.soNut} nút (cần giữ đúng 6 nút)` },
+        { id: 'sat', sao: true, ok: (d) => d.lech <= 5, ten: 'Sát đường nét đứt', chiTiet: (d) => `Đang lệch đường sóng ${Math.round(d.lech)} đơn vị (cần từ 5 trở xuống)` },
       ],
       goiY: [
         'Nút vuông là nút góc: hai đoạn đến và đi đều thẳng. Nút tròn mới có tay nắm uốn cong.',
@@ -121,7 +121,7 @@ export default {
         { id: 'lo', ok: (d) => d.coLo, ten: 'Có lỗ xỏ dây thật', loi: 'Dây đeo không xỏ qua được: chỗ lỗ đang đặc hoặc lỗ hở ra mép.', ai: 'sola', matLoi: 'shocked' },
         { id: 'sao', ok: (d) => d.saoKhoet, ten: 'Sao rỗng ở giữa', loi: 'Giữa huy hiệu chưa có ngôi sao rỗng, đặt lên áo không thấy màu áo xuyên qua.', ai: 'luna', matLoi: 'thinking' },
         { id: 'hinh', ok: (d) => d.trung >= 0.92, ten: 'Đúng hình', loi: 'Hình còn khác bóng mờ nhiều quá, có mảnh chưa đúng chỗ hoặc đã dùng sai phép.', ai: 'luna', matLoi: 'confused' },
-        { id: 'khit', sao: true, ok: (d) => d.trung >= 0.97, ten: 'Khớp bóng mờ gần tuyệt đối' },
+        { id: 'khit', sao: true, ok: (d) => d.trung >= 0.97, ten: 'Khớp bóng mờ gần tuyệt đối', chiTiet: (d) => `Đang khớp ${(d.trung * 100).toFixed(1)}% bóng mờ (cần từ 97%)` },
       ],
       goiY: [
         'Vòng tròn trắng chỉ là tô màu đè lên, vật liệu bên dưới vẫn còn. Khoét mới là bỏ hẳn phần đó đi.',
@@ -187,8 +187,8 @@ export default {
         { id: 'vai', ok: (d) => d.co.vaiTrai && d.co.vaiPhai, ten: 'Khiên có hai vai', loi: 'Khiên mất vai, nhìn như cái lá. Nếu đã gộp vai trước khi Giữ chung thì nó bị cắt rồi, vì Giữ chung bỏ hết mọi thứ ngoài phần trùng.', ai: 'sola', matLoi: 'shocked' },
         { id: 'tich', ok: (d) => d.coLo && !d.co.canhTich, ten: 'Dấu tích rỗng', loi: 'Dấu tích chưa rỗng trọn vẹn. Khoét mà làm trước khi gộp vai thì vai lấp mất một cánh tích, nên việc khoét để sau cùng.', ai: 'sola', matLoi: 'confused' },
         { id: 'hinh', ok: (d) => d.trung >= 0.92, ten: 'Đúng hình', loi: 'Khiên còn khác nét đứt nhiều quá, có hình chưa đúng chỗ.', ai: 'luna', matLoi: 'worried' },
-        { id: 'khit', sao: true, ok: (d) => d.trung >= 0.97, ten: 'Khít nét đứt' },
-        { id: 'sat', sao: true, ok: (d) => d.trung >= 0.995, ten: 'Trùng khít với icon gốc' },
+        { id: 'khit', sao: true, ok: (d) => d.trung >= 0.97, ten: 'Khít nét đứt', chiTiet: (d) => `Đang khớp ${(d.trung * 100).toFixed(1)}% nét đứt (cần từ 97%)` },
+        { id: 'sat', sao: true, ok: (d) => d.trung >= 0.995, ten: 'Trùng khít với icon gốc', chiTiet: (d) => `Đang khớp ${(d.trung * 100).toFixed(1)}% icon gốc (kéo hít đúng vị trí để đạt 99.5%)` },
       ],
       goiY: [
         'Hai hình tròn lệch nhau thì phần trùng nhau có hai mũi nhọn, cong đều hai bên. Lệnh nào chỉ để lại phần trùng?',
@@ -231,8 +231,8 @@ export default {
         { id: 'bang', ok: (d) => d.bang.dd === 'svg', ten: 'Băng rôn nét', loi: 'Băng rôn 3 mét lại vỡ ô y như năm ngoái. Nơi phóng lớn phải dùng loại tệp không có ô điểm ảnh.', ai: 'sola', matLoi: 'facepalm' },
         { id: 'tin', ok: (d) => d.tin.mb <= 5, ten: 'Poster gửi được', loi: 'Nhóm bảng tin từ chối vì tệp quá 5 MB. Poster có ảnh chụp nên PNG và SVG đều nặng.', ai: 'luna', matLoi: 'worried' },
         { id: 'lem', ok: (d) => d.tin.dd !== 'jpg' || d.tin.cl >= 60, ten: 'Chữ poster không lem', loi: 'Tệp nhẹ thật, nhưng ép quá tay làm chữ trên poster nhòe như bị ướt.', ai: 'sola', matLoi: 'confused' },
-        { id: 'nhe', sao: true, ok: (d) => d.tin.mb <= 3, ten: 'Poster dưới 3 MB, tải nhanh trên điện thoại' },
-        { id: 'dep', sao: true, ok: (d) => d.tin.dd === 'jpg' && d.tin.cl >= 70, ten: 'Chất lượng JPG từ 70% trở lên' },
+        { id: 'nhe', sao: true, ok: (d) => d.tin.mb <= 3, ten: 'Poster dưới 3 MB, tải nhanh trên điện thoại', chiTiet: (d) => `Poster đang nặng ${d.tin.mb} MB (kéo chất lượng JPG xuống dưới 3 MB)` },
+        { id: 'dep', sao: true, ok: (d) => d.tin.dd === 'jpg' && d.tin.cl >= 70, ten: 'Chất lượng JPG từ 70% trở lên', chiTiet: (d) => `Poster đang để ${d.tin.dd.toUpperCase()}${d.tin.dd === 'jpg' ? ` ${d.tin.cl}%` : ''} (cần JPG từ 70%)` },
       ],
       goiY: [
         'Ba nơi, ba yêu cầu khác nhau. Không có một định dạng nào hợp cả ba.',

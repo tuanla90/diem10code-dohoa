@@ -102,12 +102,12 @@ export default {
           if (!daGhi) { ctx.ghi(); daGhi = true; }
           cauHinh.dat(v);
           ve();
-          ctx.hit(doVong() ? 'nhip' : '');
+          ctx.hit(doVong());
         },
         xong() { daGhi = false; ctx.hit(); ctx.doi(); },
       });
       const dh = dongHo(khay, man.dongHo || []);
-      const doVong = () => dh.capNhat(doKhung(st));
+      const doVong = () => dh.khoaHit(doKhung(st));
       doVong();
     };
 

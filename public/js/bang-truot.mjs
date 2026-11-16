@@ -1,7 +1,12 @@
 // Bảng trượt từ dưới lên: Sổ tay, Gợi ý, Xác nhận. Dùng chung một khuôn, Esc và chạm nền để đóng.
 import { icon } from './icon.mjs';
 import { SO_TAY } from './so-tay.mjs';
-import { giaoDien, ghiDocTay } from './kho.mjs';
+import { giaoDien, ghiDocTay, daDocTay } from './kho.mjs';
+import { xetHuyHieu } from './tien-trinh.mjs';
+import { phat } from './am-thanh.mjs';
+import { baoNhanh } from './trang/vo.mjs';
+
+const boDau = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
 
 export const duongMat = (ai, mat) => `mat/${giaoDien() === 'dark' ? 'toi/' : ''}${ai}/${mat}.png`;
 
@@ -30,13 +35,33 @@ export function moBang(noi, { nhan, khongDong = false, khiDong } = {}) {
 export function moSoTay(ghim) {
   const dsGhim = ghim.filter((k) => SO_TAY[k]);
   const conLai = Object.keys(SO_TAY).filter((k) => !dsGhim.includes(k));
-  const muc = (k, g) => `<div class="so-tay-muc${g ? ' so-tay-muc--ghim' : ''}"><b>${SO_TAY[k].ten}</b><p>${SO_TAY[k].mo}</p></div>`;
+  const mucGhim = (k) => `<div class="so-tay-muc so-tay-muc--ghim"><b>${SO_TAY[k].ten}</b><p>${SO_TAY[k].mo}</p></div>`;
+  const mucThu = (k) => {
+    const m = SO_TAY[k];
+    const doc = daDocTay(k);
+    return `<details class="muc-tay" data-k="${k}" data-tim="${boDau(m.ten + ' ' + m.mo)}">
+      <summary><span class="muc-tay-ten">${m.ten}</span>${doc ? `<span class="muc-tay-doc">${icon('xong')}</span>` : ''}<span class="muc-tay-mui">${icon('tiep')}</span></summary>
+      <p>${m.mo}</p>
+    </details>`;
+  };
   dsGhim.forEach(ghiDocTay);
-  moBang(`<div class="tam-dau"><h2>Sổ tay đồ họa</h2><button class="nut-icon" type="button" data-dong aria-label="Đóng">${icon('dong')}</button></div>
+  const b = moBang(`<div class="tam-dau"><h2>Sổ tay đồ họa</h2><button class="nut-icon" type="button" data-dong aria-label="Đóng">${icon('dong')}</button></div>
     ${dsGhim.length ? '<p class="muc-ten">Dùng cho màn này</p>' : ''}
-    ${dsGhim.map((k) => muc(k, true)).join('')}
-    ${dsGhim.length ? '<p class="muc-ten muc-ten--xa">Các mục khác</p>' : ''}
-    ${conLai.map((k) => muc(k, false)).join('')}`, { nhan: 'Sổ tay đồ họa' });
+    ${dsGhim.map(mucGhim).join('')}
+    ${conLai.length ? `<p class="muc-ten muc-ten--xa">Tra nhanh mục khác</p>
+      <label class="o-tim o-tim--nho">${icon('timKiem')}<span class="an-a11y">Lọc mục Sổ tay</span><input data-loc type="search" placeholder="Lọc nhanh thuật ngữ..." autocomplete="off"></label>
+      <div class="ds-tay" data-ds-phu>${conLai.map(mucThu).join('')}</div>` : ''}`, { nhan: 'Sổ tay đồ họa' });
+  b.lop.querySelectorAll('.muc-tay').forEach((d) => d.addEventListener('toggle', () => {
+    if (!d.open) return;
+    phat('lat');
+    ghiDocTay(d.dataset.k);
+    for (const h of xetHuyHieu()) { phat('huyHieu'); baoNhanh(`Huy hiệu mới: <b>${h.ten}</b>`); }
+  }));
+  const oLoc = b.lop.querySelector('[data-loc]');
+  oLoc?.addEventListener('input', () => {
+    const q = boDau(oLoc.value.trim());
+    b.lop.querySelectorAll('.muc-tay').forEach((d) => { d.hidden = !!q && !d.dataset.tim.includes(q); });
+  });
 }
 
 export function moSoTayMuc(k) {

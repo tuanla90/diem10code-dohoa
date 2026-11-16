@@ -2,10 +2,12 @@
 
 /* Bản vẽ Ngày hội */
 .ban-ve { display: block; width: 100%; height: auto; }
+.ban-ve--cham .bv-cham { cursor: pointer; }
+[data-theme='dark'] .the-ban-ve .ban-ve, [data-theme='dark'] .xong-goi-ve .ban-ve { filter: brightness(.92) saturate(.95); }
 .bv-net * { fill: none !important; stroke: var(--ke) !important; stroke-width: 1.1px !important; stroke-dasharray: none !important; vector-effect: non-scaling-stroke; opacity: 1 !important; }
 .bv-net text, .bv-net image { display: none; }
 .bv-nen { transition: opacity .6s ease-out; }
-.bv-mau--moi { transform-box: fill-box; transform-origin: center; animation: bv-to .75s var(--nay) .28s backwards; }
+.bv-mau--moi, .bv-moi-nay { transform-box: fill-box; transform-origin: center; animation: bv-to .75s var(--nay) .28s backwards; }
 @keyframes bv-to { from { transform: scale(.55); opacity: 0; } }
 .bv-no { transform-box: fill-box; transform-origin: center; opacity: 0; animation: bv-no .95s ease-out .34s; }
 @keyframes bv-no { 0% { opacity: .9; transform: scale(.5); } 100% { opacity: 0; transform: scale(1.7); } }
@@ -139,6 +141,8 @@ button.khung-tp:active { transform: scale(.975); }
 
 /* Sổ tay */
 .o-tim { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 12px; border-radius: var(--r-vua); background: var(--the); border: 1px solid var(--vien); color: var(--fg-phu); position: sticky; top: 8px; z-index: 3; box-shadow: 0 3px 10px var(--bong); }
+.o-tim--nho { position: static; min-height: 42px; margin: 6px 0 8px; box-shadow: none; background: var(--lom); }
+.o-tim--nho input { height: 40px; font-size: 14.5px; }
 .o-tim input { flex: 1; min-width: 0; height: 46px; border: 0; background: none; font: inherit; font-size: 16px; color: var(--fg); outline: none; }
 .o-tim:focus-within { border-color: var(--brand); }
 .nhom-tay { display: flex; flex-direction: column; gap: 7px; margin-bottom: 10px; }
@@ -257,8 +261,9 @@ button.khung-tp:active { transform: scale(.975); }
 .the-chon-dau .icon { width: 30px; height: 30px; padding: 5px; border-radius: 50%; color: var(--sang); stroke-width: 3; }
 .the-chon--dung { box-shadow: 0 0 0 3.5px var(--ok), 0 6px 18px var(--bong); animation: chon-dung .36s var(--nay); }
 .the-chon--dung .the-chon-dau .icon { background: var(--ok); }
-.the-chon--sai { opacity: .55; box-shadow: 0 0 0 2px var(--err); }
+.the-chon--sai { opacity: .78; box-shadow: 0 0 0 2px var(--err); }
 .the-chon--sai .the-chon-dau .icon { background: var(--err); }
+.mt-chi { transform-box: fill-box; transform-origin: center; animation: nay .34s var(--nay); }
 @keyframes chon-dung { from { transform: scale(.97); } }
 .mat-tinh-vi { display: flex; flex-direction: column; gap: 9px; }
 .mat-tinh-vi:empty { display: none; }
@@ -288,6 +293,9 @@ button.khung-tp:active { transform: scale(.975); }
 .xong-goi-noi .bong-noi { align-self: flex-start; }
 .xong-goi-ve { width: 100%; max-width: 280px; overflow: hidden; border-radius: var(--r-vua); background: var(--the); color: var(--fg-phu); }
 .xong-goi-ve small { display: block; padding: 5px; font-size: 12.5px; font-weight: 650; }
+.xong-goi-mat { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 99px; background: var(--sang-mo); border: 1px solid var(--sang-vien); color: var(--sang); font-size: 13px; font-weight: 650; }
+.xong-goi-mat b { color: var(--vang-sang); font-weight: 800; }
+.xong-goi-mat .icon { width: 17px; height: 17px; }
 .xong-goi-duoi { position: relative; display: flex; flex-direction: column; gap: 2px; margin-top: 10px; }
 
 /* Lễ khai mạc */
@@ -309,6 +317,12 @@ button.khung-tp:active { transform: scale(.975); }
 .danh-dau li + li { border-top: 1px solid var(--sang-mo); }
 .danh-dau .sao-hang { color: var(--vang-sang); }
 
+@media (max-height: 690px) {
+  .mat-tinh { gap: 7px; }
+  .mat-tinh-hoi { font-size: 18px; min-height: 0; }
+  .cap-the { gap: 7px; }
+  .the-chon svg { max-height: 22dvh; }
+}
 @media (max-height: 640px) {
   .mat--lon { width: 72px; height: 83px; }
   .phieu-ten { font-size: 20px; }

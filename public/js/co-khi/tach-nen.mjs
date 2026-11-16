@@ -2,6 +2,7 @@
 // Trạng thái chỉ là danh sách thao tác nên Hoàn tác là chạy lại, không phải lưu cả ảnh.
 import { giong } from '../toan/hinh-hoc.mjs';
 import { anhRobot, duaThan, toCo, KHE_TAY, MAU_THIEU } from '../toan/anh.mjs';
+import { MAU } from '../hinh.mjs';
 import { batKeo, thanhTruot, dungBoCu, dongHo } from './chung.mjs';
 
 const boNho = {};
@@ -94,8 +95,8 @@ export default {
     san.innerHTML = '';
     const cv = document.createElement('canvas');
     cv.className = 'san-canvas';
-    cv.width = a.w;
-    cv.height = a.h;
+    cv.width = a.w * 2;
+    cv.height = a.h * 2;
     cv.setAttribute('role', 'img');
     cv.setAttribute('aria-label', man.sanNhan || 'Ảnh rô bốt đang tách nền');
     san.style.setProperty('--tile', a.w / a.h);
@@ -103,9 +104,64 @@ export default {
     san.style.setProperty('--chua', `${350 + 36 * Math.ceil((man.dongHo || []).length / 2)}px`);
     san.appendChild(cv);
     const c = cv.getContext('2d');
-    const img = c.createImageData(a.w, a.h);
+    const dem = document.createElement('canvas');
+    dem.width = a.w;
+    dem.height = a.h;
+    const dc = dem.getContext('2d');
+    const img = dc.createImageData(a.w, a.h);
     let cho = false;
     let net = null;
+    let conTro = null;
+    let boCu = null;
+
+    // Kính phóng đại ở góc trên khi đang tô cọ: ngón tay che đầu cọ vẫn thấy rõ từng điểm ảnh quanh mép.
+    const veKinhCo = () => {
+      if (!conTro || !net) return;
+      const sx = conTro.x * 2, sy = conTro.y * 2, sr = net.r * 2;
+      const mauVien = net.giu ? MAU.hong : MAU.cyan;
+      c.save();
+      c.beginPath();
+      c.arc(sx, sy, sr, 0, Math.PI * 2);
+      c.strokeStyle = MAU.trang;
+      c.lineWidth = 3.2;
+      c.stroke();
+      c.strokeStyle = mauVien;
+      c.lineWidth = 1.6;
+      c.stroke();
+
+      const R = 52;
+      const lx = sx < 145 && sy < 145 ? cv.width - 62 : 62;
+      const ly = 62;
+      const phong = 4.4;
+      const vung = (R * 2) / phong;
+      c.beginPath();
+      c.arc(lx, ly, R, 0, Math.PI * 2);
+      c.clip();
+      c.fillStyle = MAU.tuong;
+      c.fillRect(lx - R, ly - R, R * 2, R * 2);
+      c.imageSmoothingEnabled = false;
+      c.drawImage(dem, conTro.x - vung / 2, conTro.y - vung / 2, vung, vung, lx - R, ly - R, R * 2, R * 2);
+      c.beginPath();
+      c.arc(lx, ly, net.r * phong, 0, Math.PI * 2);
+      c.strokeStyle = MAU.trang;
+      c.lineWidth = 3;
+      c.stroke();
+      c.strokeStyle = mauVien;
+      c.lineWidth = 1.6;
+      c.stroke();
+      c.restore();
+
+      c.save();
+      c.beginPath();
+      c.arc(lx, ly, R, 0, Math.PI * 2);
+      c.strokeStyle = MAU.trang;
+      c.lineWidth = 5;
+      c.stroke();
+      c.strokeStyle = MAU.muc;
+      c.lineWidth = 2;
+      c.stroke();
+      c.restore();
+    };
 
     const ve = () => {
       if (cho) return;
@@ -116,15 +172,19 @@ export default {
         const m = matNaXoa(st, a);
         if (net) for (const [x, y] of net.pts) toCo(a, x, y, net.r, net.giu ? 0 : 1, m, true);
         veLenData(a, m, img.data, true, ctx.cu === 'giu');
-        c.putImageData(img, 0, 0);
+        dc.putImageData(img, 0, 0);
+        c.imageSmoothingEnabled = false;
+        c.clearRect(0, 0, cv.width, cv.height);
+        c.drawImage(dem, 0, 0, cv.width, cv.height);
+        veKinhCo();
       });
     };
 
     // Phần sót li ti trên nền ca rô rất khó thấy bằng mắt, nên vạch đo báo còn bao nhiêu sau mỗi thao tác.
     let dh = null;
     const capDo = (vuaLam) => {
-      const du = dh.capNhat(doTach(ctx.st, man));
-      if (vuaLam) ctx.hit(du ? 'du' : '');
+      const khoa = dh.khoaHit(doTach(ctx.st, man));
+      if (vuaLam) ctx.hit(khoa);
     };
 
     const veKhay = () => {
@@ -133,9 +193,9 @@ export default {
       dh = dongHo(khay, man.dongHo || []);
       capDo(false);
       if (ctx.cu === 'dua') {
-        thanhTruot(khay, { nhan: 'Ngưỡng', min: 5, max: 120, buoc: 5, gia: st.nguong, id: 'nguong', doi(v) { ctx.st.nguong = v; } });
+        thanhTruot(khay, { nhan: 'Ngưỡng', min: 5, max: 120, buoc: 5, gia: st.nguong, id: 'nguong', doi(v) { ctx.st.nguong = v; boCu?.capNhatSub(); } });
       } else {
-        thanhTruot(khay, { nhan: 'Cỡ cọ', min: 3, max: 16, buoc: 1, gia: st.r, id: 'r', doi(v) { ctx.st.r = v; } });
+        thanhTruot(khay, { nhan: 'Cỡ cọ', min: 3, max: 16, buoc: 1, gia: st.r, id: 'r', doi(v) { ctx.st.r = v; boCu?.capNhatSub(); } });
       }
     };
 
@@ -153,6 +213,7 @@ export default {
         return null;
       }
       net = { k: 'co', giu: ctx.cu === 'giu', r: st.r, bam: true, pts: [[x, y]] };
+      conTro = { x: pt.x, y: pt.y };
       let tay = null;
       // Chèn điểm giữa để nét không đứt khi ngón tay lướt nhanh.
       const noiDen = (nx, ny) => {
@@ -166,7 +227,9 @@ export default {
           const cuoi = net.pts[net.pts.length - 1];
           // Làm mượt nét cho đỡ run tay, như chế độ ổn định nét của các app vẽ.
           tay = p;
-          noiDen(Math.round(cuoi[0] + (p.x - cuoi[0]) * 0.6), Math.round(cuoi[1] + (p.y - cuoi[1]) * 0.6));
+          const mx = cuoi[0] + (p.x - cuoi[0]) * 0.6, my = cuoi[1] + (p.y - cuoi[1]) * 0.6;
+          conTro = { x: Math.max(0, Math.min(a.w, mx)), y: Math.max(0, Math.min(a.h, my)) };
+          noiDen(Math.round(mx), Math.round(my));
           ve();
         },
         nha() {
@@ -174,6 +237,7 @@ export default {
           ctx.ghi();
           st.thao.push(net);
           net = null;
+          conTro = null;
           ve();
           capDo(true);
           ctx.doi();
@@ -181,10 +245,10 @@ export default {
       };
     });
 
-    dungBoCu(ctx, [
-      { id: 'dua', nhan: 'Đũa thần', ic: 'dua' },
-      man.co !== false && { id: 'xoa', nhan: 'Cọ xóa', ic: 'gom' },
-      man.co !== false && { id: 'giu', nhan: 'Cọ giữ', ic: 'giu' },
+    boCu = dungBoCu(ctx, [
+      { id: 'dua', nhan: 'Đũa thần', ic: 'dua', sub: () => `mức ${ctx.st.nguong}` },
+      man.co !== false && { id: 'xoa', nhan: 'Cọ xóa', ic: 'gom', sub: () => `cỡ ${ctx.st.r}` },
+      man.co !== false && { id: 'giu', nhan: 'Cọ giữ', ic: 'giu', sub: () => `cỡ ${ctx.st.r}` },
     ], 'dua', () => { veKhay(); ve(); });
     ve();
     veKhay();

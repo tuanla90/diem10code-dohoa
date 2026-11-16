@@ -29,8 +29,8 @@ export default {
         { id: 'meo', ok: (d) => d.logo.meo <= 0.03, ten: 'Logo còn tròn', loi: 'Logo in ra méo hẳn, vòng tròn thành quả trứng.', ai: 'sola', matLoi: 'shocked' },
         { id: 'trong', ok: (d) => d.logo.trong, ten: 'Nằm trọn trong khung', loi: 'Logo tràn khỏi khung vàng, mép poster sẽ xén mất một phần.', ai: 'luna', matLoi: 'worried' },
         { id: 'to', ok: (d) => d.logo.phu >= 0.85, ten: 'Đủ to', loi: 'Logo còn nhỏ quá, đứng xa không ai thấy. Khung vàng vẫn còn nhiều chỗ.', ai: 'sola', matLoi: 'confused' },
-        { id: 'giua', sao: true, ok: (d) => d.logo.lech <= 4, ten: 'Tâm logo đúng tâm khung' },
-        { id: 'kin', sao: true, ok: (d) => d.logo.phu >= 0.95, ten: 'Chạm kín cạnh ngắn của khung' },
+        { id: 'giua', sao: true, ok: (d) => d.logo.lech <= 4, ten: 'Tâm logo đúng tâm khung', chiTiet: (d) => `Tâm đang lệch ${Math.round(d.logo.lech)} đơn vị (cần từ 4 trở xuống)` },
+        { id: 'kin', sao: true, ok: (d) => d.logo.phu >= 0.95, ten: 'Chạm kín cạnh ngắn của khung', chiTiet: (d) => `Đang phủ ${Math.round(d.logo.phu * 100)}% khung (cần từ 95%)` },
       ],
       goiY: [
         'Khung rộng hơn cao. Hình tròn chỉ vừa được theo cạnh ngắn, hai bên sẽ thừa chỗ. Thừa vẫn đúng.',
@@ -75,8 +75,8 @@ export default {
         { id: 'meo', ok: (d) => d.logo.meo <= 0.03 && d.tieu.meo <= 0.03, ten: 'Không méo', loi: 'Có một món bị kéo méo tỉ lệ. Chữ tiêu đề bè ra trông rất lạ.', ai: 'luna', matLoi: 'worried' },
         { id: 'trong', ok: (d) => d.logo.trong && d.tieu.trong, ten: 'Nằm trong khung', loi: 'Có món còn nằm ngoài khung vàng của nó.', ai: 'luna', matLoi: 'confused' },
         { id: 'to', ok: (d) => d.logo.phu >= 0.85 && d.tieu.phu >= 0.85, ten: 'Đủ to', loi: 'Có món còn nhỏ hơn khung nhiều, poster trông trống trải.', ai: 'luna', matLoi: 'thinking' },
-        { id: 'giua', sao: true, ok: (d) => d.logo.lech <= 4 && d.tieu.lech <= 4, ten: 'Đúng tâm hai khung' },
-        { id: 'kin', sao: true, ok: (d) => d.logo.phu >= 0.95 && d.tieu.phu >= 0.95, ten: 'Vừa khít khung' },
+        { id: 'giua', sao: true, ok: (d) => d.logo.lech <= 4 && d.tieu.lech <= 4, ten: 'Đúng tâm hai khung', chiTiet: (d) => `Đang lệch tối đa ${Math.round(Math.max(d.logo.lech, d.tieu.lech))} đơn vị (cần từ 4 trở xuống)` },
+        { id: 'kin', sao: true, ok: (d) => d.logo.phu >= 0.95 && d.tieu.phu >= 0.95, ten: 'Vừa khít khung', chiTiet: (d) => `Độ phủ thấp nhất đang ${Math.round(Math.min(d.logo.phu, d.tieu.phu) * 100)}% (cần từ 95%)` },
       ],
       goiY: [
         'Làm từng món một. Bấm vào món nào thì tay nắm của món đó hiện ra.',
@@ -95,7 +95,7 @@ export default {
       ],
     },
     {
-      ma: 'DH-1-3', ten: 'Băng rôn ba mét', coKhi: 'bien-doi', chay: 'In thử',
+      ma: 'DH-1-3', ten: 'Băng rôn ba mét', coKhi: 'bien-doi', chay: 'In thử', thuThach: true,
       ai: 'sola', mat: 'confident', vai: 'SOLA NHỜ',
       nho: 'Logo nhìn trên máy đẹp lắm, mình gửi tiệm in luôn nha? À năm ngoái cũng đẹp vậy đó.',
       muc: 'Logo cao gần hết băng rôn, đứng sát vẫn phải nét. Khung vàng dài khoảng 80 cm thật.',
@@ -112,8 +112,8 @@ export default {
         { id: 'net', ok: (d) => d.matDo >= 12, ten: 'Nét khi in', loi: 'Ra tới tiệm in, logo vỡ thành từng ô vuông. Cô bán nước còn hỏi đây là trò chơi gì.', ai: 'sola', matLoi: 'facepalm' },
         { id: 'trong', ok: (d) => d.logo.trong, ten: 'Trong khung', loi: 'Logo chờm khỏi khung vàng, sát mép băng rôn sẽ bị khoen móc đè lên.', ai: 'luna', matLoi: 'worried' },
         { id: 'meo', ok: (d) => d.logo.meo <= 0.03, ten: 'Không méo', loi: 'Logo bị méo tỉ lệ.', ai: 'luna', matLoi: 'worried' },
-        { id: 'giua', sao: true, ok: (d) => d.logo.lech <= 4, ten: 'Đúng tâm khung' },
-        { id: 'kin', sao: true, ok: (d) => d.logo.phu >= 0.95, ten: 'Vừa khít khung' },
+        { id: 'giua', sao: true, ok: (d) => d.logo.lech <= 4, ten: 'Đúng tâm khung', chiTiet: (d) => `Tâm đang lệch ${Math.round(d.logo.lech)} đơn vị (cần từ 4 trở xuống)` },
+        { id: 'kin', sao: true, ok: (d) => d.logo.phu >= 0.95, ten: 'Vừa khít khung', chiTiet: (d) => `Đang phủ ${Math.round(d.logo.phu * 100)}% khung (cần từ 95%)` },
       ],
       goiY: [
         'Màn hình điện thoại rất nhỏ nên ảnh nào cũng trông nét. Đừng tin màn hình, hãy tin kính soi.',

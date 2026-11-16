@@ -1,16 +1,17 @@
 // Màn đầu: Bản vẽ Ngày hội là mục tiêu lớn của cả game. Nhìn một cái biết đã làm được bao nhiêu và việc kế là gì.
-import { GOI, TAT_CA_MAN } from '../man/index.mjs';
-import { saoCua, daQua, tongSao, tenNguoi, layMonMoi, matTinhTot } from '../kho.mjs';
-import { dangMoGoi, manTiepTheo, saoGoi, tongSaoToiDa, danhHieu, xongGoi, SO_CAU_MAT_TINH } from '../tien-trinh.mjs';
+import { GOI, TAT_CA_MAN, timMan } from '../man/index.mjs';
+import { saoCua, daQua, tongSao, tenNguoi, layMonMoiDs, matTinhTot } from '../kho.mjs';
+import { dangMoGoi, dangMoMan, manTiepTheo, saoGoi, tongSaoToiDa, danhHieu, xongGoi, SO_CAU_MAT_TINH } from '../tien-trinh.mjs';
 import { icon } from '../icon.mjs';
 import { biaGoi } from '../hinh.mjs';
 import { banVe, monCua, MON } from '../the-gioi.mjs';
 import { phat } from '../am-thanh.mjs';
-import { thanhTab, thoat, anhTat } from './vo.mjs';
+import { moChiTietTacPham } from './tac-pham.mjs';
+import { thanhTab, thoat, anhTat, baoNhanh } from './vo.mjs';
 
 export function trangChu(root) {
   const tiep = manTiepTheo();
-  const moi = layMonMoi();
+  const dsMoi = layMonMoiDs();
   const coTienDo = tongSao() > 0;
   const soMon = MON.filter((m) => daQua(m.ma)).length;
   const dh = danhHieu();
@@ -35,9 +36,9 @@ export function trangChu(root) {
         <h1>Bản vẽ Ngày hội</h1>
         <span class="the-ban-ve-so"><b>${soMon}</b>/${MON.length} món có màu</span>
       </div>
-      ${banVe({ daXong: daQua, ke: tiep?.man.ma, moi })}
+      ${banVe({ daXong: daQua, ke: tiep?.man.ma, moi: dsMoi, chonDuoc: true })}
       <div class="vach-tien" role="img" aria-label="Hoàn thiện ${soMon} trên ${MON.length} món"><i style="width:${(soMon / MON.length) * 100}%"></i></div>
-      ${monKe ? `<p class="the-ban-ve-ke"><span class="cham-hong"></span>Sắp có màu: <b>${monKe.ten}</b> ở ${monKe.noi.toLowerCase()}</p>` : '<p class="the-ban-ve-ke">Cả sân trường đã rực rỡ. Quay lại lấy đủ sao nếu bạn muốn.</p>'}
+      ${monKe ? `<p class="the-ban-ve-ke"><span class="cham-hong"></span>Sắp có màu: <b>${monKe.ten}</b> ở ${monKe.noi.toLowerCase()}${soMon ? ' · Chạm món trên sân để xem' : ''}</p>` : '<p class="the-ban-ve-ke">Cả sân trường đã rực rỡ. Chạm từng món để ngắm thành phẩm của bạn.</p>'}
     </section>
 
     ${nutChinh}
@@ -71,5 +72,22 @@ export function trangChu(root) {
     </a>
     <p class="chan-trang">${TAT_CA_MAN.length} màn bám Tin 10 và Tin 11. CLB Tin học, THPT Hoa Phượng.</p>
   </main>${thanhTab('ve')}`;
-  if (moi) phat('toMau');
+  root.querySelector('.the-ban-ve svg')?.addEventListener('click', (e) => {
+    const o = e.target.closest?.('[data-mon]');
+    if (!o) return;
+    const ma = o.dataset.mon;
+    if (daQua(ma)) { phat('cham'); moChiTietTacPham(ma); return; }
+    const m = timMan(ma);
+    if (m && dangMoGoi(m.goiChiSo) && dangMoMan(GOI[m.goiChiSo], m.chiSo)) {
+      location.hash = `#/man/${ma}`;
+      return;
+    }
+    const mon = monCua(ma);
+    if (mon && m) baoNhanh(`<b>${mon.ten}</b> (${GOI[m.goiChiSo].ten}): làm các việc trước để mở nhé.`);
+  });
+  if (dsMoi.length) {
+    phat('toMau');
+    dsMoi.slice(1, 5).forEach((_, idx) => setTimeout(() => phat(idx % 2 ? 'sao2' : 'sao1'), (idx + 1) * 260));
+    if (dsMoi.length > 1) baoNhanh(`Vừa tô màu thêm <b>${dsMoi.length} món</b> trên sân trường!`);
+  }
 }

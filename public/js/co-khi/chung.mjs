@@ -82,6 +82,14 @@ export function dungBoCu(ctx, ds, macDinh, khiDoi) {
   const loc = ds.filter(Boolean);
   if (!loc.some((c) => c.id === ctx.cu)) ctx.cu = macDinh;
   const host = ctx.boCu;
+  const laySub = (c) => (typeof c.sub === 'function' ? c.sub() : c.sub);
+  const capNhatSub = () => {
+    for (const c of loc) {
+      if (c.sub === undefined) continue;
+      const el = host.querySelector(`[data-sub="${c.id}"]`);
+      if (el) el.textContent = laySub(c);
+    }
+  };
   const ve = () => {
     host.innerHTML = '';
     for (const c of loc) {
@@ -90,7 +98,8 @@ export function dungBoCu(ctx, ds, macDinh, khiDoi) {
       b.className = 'cong-cu';
       b.dataset.cu = `cu-${c.id}`;
       b.setAttribute('aria-pressed', String(ctx.cu === c.id));
-      b.innerHTML = `${icon(c.ic)}<span>${c.nhan}</span>`;
+      const sub = laySub(c);
+      b.innerHTML = `${icon(c.ic)}<span>${c.nhan}</span>${sub !== undefined ? `<span class="cu-sub" data-sub="${c.id}">${sub}</span>` : ''}`;
       b.addEventListener('click', () => {
         if (ctx.cu === c.id) return;
         ctx.cu = c.id;
@@ -104,6 +113,7 @@ export function dungBoCu(ctx, ds, macDinh, khiDoi) {
     }
   };
   ve();
+  return { capNhatSub };
 }
 
 // Hàng thẻ kéo được để đổi chỗ, như bảng lớp của các app vẽ. Chạm vẫn là chọn.
@@ -183,12 +193,21 @@ export function dongHo(host, ds) {
       o.dataset.loai = s.loai;
       o.setAttribute('aria-valuenow', Math.round(v * 10) / 10);
       o.setAttribute('aria-valuetext', s.chu);
-      return s.loai !== 'xau';
+      return s.loai;
     };
   });
   host.appendChild(bang);
+  const coDep = ds.map((m) => m.muc.some((s) => s.loai === 'dep'));
   // Không dừng ở vạch đầu chưa đạt: vạch nào cũng phải vẽ lại.
-  return { capNhat: (d) => cac.map((f) => f(d)).every(Boolean) };
+  return {
+    capNhat: (d) => cac.map((f) => f(d)).every((l) => l !== 'xau'),
+    khoaHit: (d) => {
+      const loai = cac.map((f) => f(d));
+      if (loai.some((l) => l === 'xau')) return '';
+      if (coDep.some(Boolean) && loai.every((l, i) => (coDep[i] ? l === 'dep' : l === 'dat'))) return 'dep';
+      return 'dat';
+    },
+  };
 }
 
 export function thanhTruot(host, { nhan, min, max, buoc = 1, gia, dinh = (v) => v, doi, xong, id }) {

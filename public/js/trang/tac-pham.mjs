@@ -8,7 +8,11 @@ import { moBang } from '../bang-truot.mjs';
 import { veThanhPham, veTuTu } from '../thanh-pham.mjs';
 import { thanhTab } from './vo.mjs';
 
-function moChiTiet(ma) {
+/**
+ * Mở bảng trượt xem chi tiết thành phẩm của người chơi tại một màn.
+ * @param {string} ma Mã màn chơi.
+ */
+export function moChiTietTacPham(ma) {
   const man = timMan(ma);
   const st = banDaLuu(ma);
   const ho = hoSoMan(ma);
@@ -20,7 +24,7 @@ function moChiTiet(ma) {
     <div class="tp-dong"><span>Màn: <b>${man.ten}</b></span>${hangSao(saoCua(ma))}</div>
     ${ho?.chay ? `<p class="nhan-phu">Đã chạy ${ho.chay} lần trước khi có bản này.</p>` : ''}
     ${st ? '' : '<p class="nhan-phu">Bản lưu từ trước nên chưa có tranh riêng. Chơi lại một lần là tranh của bạn sẽ vào tủ.</p>'}
-    ${ds.length ? `<ul class="ket-ds">${ds.map((t) => `<li class="${t.dat ? 'dat' : 'chua'}">${icon(t.dat ? 'xong' : 'them')}<span>${t.ten}</span></li>`).join('')}</ul>` : ''}
+    ${ds.length ? `<ul class="ket-ds">${ds.map((t) => `<li class="${t.dat ? 'dat' : 'chua'}">${icon(t.dat ? 'xong' : 'them')}<span>${t.ten}${!t.dat && t.chiTiet ? `<small class="ket-ds-phu">${t.chiTiet(ket.d, st)}</small>` : ''}</span></li>`).join('')}</ul>` : ''}
     <div class="ket-nut"><a class="nut-chinh" href="#/man/${ma}">${saoCua(ma) === 3 ? 'Làm lại' : 'Làm đẹp hơn'}${icon('tiep')}</a></div>`, { nhan: man.ten });
 }
 
@@ -51,7 +55,7 @@ export function trangTacPham(root) {
       </section>`;
     }).join('')}
   </main>${thanhTab('tp')}`;
-  root.querySelectorAll('[data-ma]').forEach((b) => b.addEventListener('click', () => moChiTiet(b.dataset.ma)));
+  root.querySelectorAll('[data-ma]').forEach((b) => b.addEventListener('click', () => moChiTietTacPham(b.dataset.ma)));
   const ds = [...root.querySelectorAll('[data-ve]')].map((el) => {
     const ma = el.dataset.ve;
     return { el, man: timMan(ma), st: banDaLuu(ma) };

@@ -13,7 +13,7 @@ function xoa(k) {
   try { localStorage.removeItem(k); } catch { /* như trên */ }
 }
 
-const MAC_DINH = () => ({ man: {}, ten: '', chao: false, huyHieu: {}, docTay: {}, xemGoi: {}, matTinh: 0, moi: null });
+const MAC_DINH = () => ({ man: {}, ten: '', chao: false, huyHieu: {}, docTay: {}, xemGoi: {}, matTinh: 0, moi: [] });
 
 let tienDo = MAC_DINH();
 try {
@@ -61,7 +61,11 @@ export function ghiDat(ma, { sao, st, soGoiY = 0 }) {
   if (sao === 3 && !soGoiY) m.tuLuc = true;
   if (sao === 3 && m.chay === 1) m.motLan = true;
   if ((m.hong || 0) >= 3) m.kienTri = true;
-  if (dauTien) tienDo.moi = ma;
+  if (dauTien) {
+    const ds = Array.isArray(tienDo.moi) ? tienDo.moi : (tienDo.moi ? [tienDo.moi] : []);
+    if (!ds.includes(ma)) ds.push(ma);
+    tienDo.moi = ds;
+  }
   luu();
   return dauTien;
 }
@@ -87,8 +91,24 @@ export function datTen(t) { tienDo.ten = String(t || '').trim().slice(0, 18); lu
 export const daChao = () => tienDo.chao;
 export function ghiDaChao() { tienDo.chao = true; luu(); }
 
-// Món vừa có màu: màn đầu lấy ra một lần để chạy hiệu ứng tô.
-export function layMonMoi() { const m = tienDo.moi; if (m) { tienDo.moi = null; luu(); } return m; }
+/**
+ * Lấy danh sách các món mới vừa hoàn thành kể từ lần cuối mở Bản vẽ, đồng thời dọn hàng đợi.
+ * @returns {string[]} Danh sách mã màn vừa có màu.
+ */
+export function layMonMoiDs() {
+  const ds = Array.isArray(tienDo.moi) ? [...tienDo.moi] : (tienDo.moi ? [tienDo.moi] : []);
+  if (ds.length || tienDo.moi) { tienDo.moi = []; luu(); }
+  return ds;
+}
+
+/**
+ * Lấy món mới gần nhất và dọn hàng đợi (tương thích ngược).
+ * @returns {string|null} Mã màn mới nhất hoặc null.
+ */
+export function layMonMoi() {
+  const ds = layMonMoiDs();
+  return ds.length ? ds[ds.length - 1] : null;
+}
 
 export const coHuyHieu = (id) => !!tienDo.huyHieu[id];
 export function ghiHuyHieu(id) { tienDo.huyHieu[id] = true; luu(); }

@@ -3,7 +3,7 @@ import { CO_KHI, cham, GOI } from './man/index.mjs';
 import { saoCua, luuNhap, docNhap, xoaNhap, banDaLuu, rungBat } from './kho.mjs';
 import { manSau } from './tien-trinh.mjs';
 import { icon, hangSao } from './icon.mjs';
-import { phat } from './am-thanh.mjs';
+import { phat, phatNhipPhim } from './am-thanh.mjs';
 import { moSoTay, moGoiY, duongMat } from './bang-truot.mjs';
 import { moPhieu } from './phieu-viec.mjs';
 import { moRap } from './ket-qua.mjs';
@@ -57,26 +57,51 @@ export function moBan(root, man, { boQuaPhieu = false } = {}) {
   const danBuoc = root.querySelector('#dan-buoc');
   const boCu = root.querySelector('#bo-cu');
   const nutHoan = root.querySelector('#nut-hoan');
+  const nutLai = root.querySelector('#nut-lai');
   const nutChay = root.querySelector('#nut-chay');
   const lichSu = [];
   const stMoi = JSON.stringify(ck.tao(man));
   let donCk = null;
   let soGoiY = 0;
   let soHong = 0;
+  let moDanTay = false;
   let hitTruoc = '';
   let henLuu = 0;
+  let henBao = 0;
   let donRap = null;
+
+  function hienBaoBan(chu) {
+    clearTimeout(henBao);
+    root.querySelectorAll('.ban-bao').forEach((n) => n.remove());
+    const bao = document.createElement('div');
+    bao.className = 'ban-bao';
+    bao.setAttribute('role', 'status');
+    bao.textContent = chu;
+    root.querySelector('.ban')?.appendChild(bao);
+    henBao = setTimeout(() => bao.remove(), 3400);
+  }
+
+  function capNhatNutDau() {
+    nutHoan.disabled = lichSu.length === 0;
+    nutLai.disabled = JSON.stringify(ctx.st) === stMoi;
+  }
 
   const ctx = {
     san, khay, man, boCu,
     cu: null,
     st: stDau,
-    // Báo lúc vừa hít vào một mốc mới: một tiếng nhỏ và rung nhẹ, ngón tay không cần nhìn cũng biết.
+    nhipPhim: phatNhipPhim,
+    // Báo lúc vừa hít vào một mốc mới: một tiếng nhỏ và rung nhẹ, chạm mốc 3 sao (dep) có hai nốt cao hơn.
     hit(khoa) {
       const k = khoa || '';
       if (k && k !== hitTruoc) {
-        phat('hit');
-        if (rungBat()) { try { navigator.vibrate?.(8); } catch { /* máy không rung được */ } }
+        if (k === 'dep') {
+          phat('hitDep');
+          if (rungBat()) { try { navigator.vibrate?.([6, 24, 12]); } catch { /* máy không rung được */ } }
+        } else {
+          phat('hit');
+          if (rungBat()) { try { navigator.vibrate?.(8); } catch { /* máy không rung được */ } }
+        }
       }
       hitTruoc = k;
     },
@@ -87,6 +112,7 @@ export function moBan(root, man, { boQuaPhieu = false } = {}) {
     },
     doi() {
       capNhatDan();
+      capNhatNutDau();
       phat('cham');
       henGhiNhap();
     },
@@ -107,6 +133,14 @@ export function moBan(root, man, { boQuaPhieu = false } = {}) {
     root.querySelectorAll('.cu--nhac').forEach((n) => n.classList.remove('cu--nhac'));
     nutChay.classList.remove('nut-chay--moi');
     if (!man.dan) { dan.textContent = ''; danBuoc.hidden = true; return; }
+    // Màn tổng kết cuối gói: để người chơi tự đọc đề và suy luận trước; cần giúp hoặc chạy chưa ổn thì mở lời dẫn.
+    if (man.thuThach && !moDanTay && !soHong && !soGoiY) {
+      danBuoc.hidden = false;
+      danBuoc.textContent = 'Tự chủ';
+      dan.innerHTML = 'Tự đọc mục tiêu và làm thử. <button type="button" class="nut-mo-dan" id="mo-dan">Hiện lời dẫn</button>';
+      dan.querySelector('#mo-dan')?.addEventListener('click', () => { moDanTay = true; capNhatDan(); });
+      return;
+    }
     const d = ck.do(ctx.st, man);
     const i = man.dan.findIndex((b) => !b.xong(d, ctx.st, ctx.cu));
     const buoc = man.dan[i];
@@ -125,6 +159,7 @@ export function moBan(root, man, { boQuaPhieu = false } = {}) {
     boCu.innerHTML = '';
     donCk = ck.ve(ctx) || null;
     capNhatDan();
+    capNhatNutDau();
   }
 
   nutHoan.addEventListener('click', () => {
@@ -133,12 +168,12 @@ export function moBan(root, man, { boQuaPhieu = false } = {}) {
     // Lần kéo không nhúc nhích cũng ghi lịch sử, bỏ qua để Hoàn tác không bấm hụt.
     while (cu === hien && lichSu.length) cu = lichSu.pop();
     if (cu !== undefined) ctx.st = JSON.parse(cu);
-    nutHoan.disabled = lichSu.length === 0;
     dung();
     henGhiNhap();
   });
 
-  root.querySelector('#nut-lai').addEventListener('click', () => {
+  nutLai.addEventListener('click', () => {
+    if (JSON.stringify(ctx.st) === stMoi) return;
     ctx.ghi();
     ctx.st = ck.tao(man);
     // Làm lại về đúng bước đầu của lời dẫn, nên công cụ và kính cũng về mặc định.
@@ -146,10 +181,12 @@ export function moBan(root, man, { boQuaPhieu = false } = {}) {
     ctx.kinhBat = false;
     dung();
     henGhiNhap();
+    hienBaoBan('Đã đặt lại từ đầu. Bấm Hoàn tác nếu bạn lỡ tay.');
   });
 
   const moGoiYMan = () => {
     soGoiY = Math.max(1, soGoiY);
+    capNhatDan();
     moGoiY(man, soGoiY, (n) => { soGoiY = n; });
   };
   root.querySelector('#nut-goi-y').addEventListener('click', moGoiYMan);
@@ -167,6 +204,7 @@ export function moBan(root, man, { boQuaPhieu = false } = {}) {
       khiDong: () => {
         donRap = null;
         nutChay.disabled = false;
+        capNhatDan();
         nutChay.focus({ preventScroll: true });
       },
       khiGoiY: moGoiYMan,
@@ -177,21 +215,18 @@ export function moBan(root, man, { boQuaPhieu = false } = {}) {
 
   // Báo bản được mở lại, vì sân khấu không còn ở trạng thái đầu màn.
   if (nguon) {
-    const bao = document.createElement('div');
-    bao.className = 'ban-bao';
-    bao.setAttribute('role', 'status');
-    bao.textContent = nguon === 'nhap' ? 'Đã mở lại bản bạn đang làm dở.' : 'Đã mở lại bản bạn từng làm. Muốn làm mới thì bấm nút quay vòng.';
-    root.querySelector('.ban').appendChild(bao);
-    setTimeout(() => bao.remove(), 3400);
+    hienBaoBan(nguon === 'nhap' ? 'Đã mở lại bản bạn đang làm dở.' : 'Đã mở lại bản bạn từng làm. Muốn làm mới thì bấm nút quay vòng.');
   }
 
-  if (!boQuaPhieu) moPhieu(man, { conDo: nguon === 'nhap' });
+  // Màn đã qua hoặc đang làm dở thì vào thẳng sân khấu, tránh bật lại Phiếu việc che mất tranh.
+  if (!boQuaPhieu && !sao && nguon !== 'nhap') moPhieu(man, { conDo: false });
 
   const luuKhiAn = () => { if (document.visibilityState === 'hidden') ghiNhap(); };
   document.addEventListener('visibilitychange', luuKhiAn);
 
   return () => {
     clearTimeout(henLuu);
+    clearTimeout(henBao);
     document.removeEventListener('visibilitychange', luuKhiAn);
     // Đã đạt thì bản nháp vừa xóa không được quay lại; chưa từng Chạy đạt thì giữ công người chơi.
     if (!donRap) ghiNhap();

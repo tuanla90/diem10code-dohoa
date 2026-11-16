@@ -73,8 +73,8 @@ export default {
         { id: 'tieu', ok: (d) => d.tieuDeYen, ten: 'Tiêu đề không xê dịch', loi: 'Tiêu đề bị kéo theo hoặc bị nhóm vào logo. Sola bảo tiêu đề phải ở yên.', ai: 'luna', matLoi: 'worried' },
         { id: 'trong', ok: (d) => d.trongVung, ten: 'Nằm trong khung', loi: 'Logo chưa vào hết khung vàng ở góc.', ai: 'luna', matLoi: 'thinking' },
         { id: 'to', ok: (d) => d.phu >= 0.75, ten: 'Đủ to', loi: 'Logo bị thu nhỏ quá tay, khung vàng còn trống nhiều.', ai: 'luna', matLoi: 'thinking' },
-        { id: 'nhom', sao: true, ok: (d) => d.cungNhom, ten: 'Năm mảnh cùng một nhóm' },
-        { id: 'kin', sao: true, ok: (d) => d.phu >= 0.9, ten: 'Vừa khít khung' },
+        { id: 'nhom', sao: true, ok: (d) => d.cungNhom, ten: 'Năm mảnh cùng một nhóm', chiTiet: () => 'Bạn dời từng mảnh mà chưa bấm lệnh Nhóm cho 5 mảnh logo' },
+        { id: 'kin', sao: true, ok: (d) => d.phu >= 0.9, ten: 'Vừa khít khung', chiTiet: (d) => `Cụm logo đang phủ ${Math.round(d.phu * 100)}% khung (cần từ 90%)` },
       ],
       goiY: [
         'Vector giữ từng mảnh riêng, nên kéo là chỉ một mảnh đi. Phải bảo máy rằng chúng đi cùng nhau.',
@@ -94,7 +94,7 @@ export default {
       ],
     },
     {
-      ma: 'DH-2-3', ten: 'Năm biểu tượng lởm chởm', coKhi: 'lop-nhom', chay: 'Dán thử',
+      ma: 'DH-2-3', ten: 'Năm biểu tượng lởm chởm', coKhi: 'lop-nhom', chay: 'Dán thử', thuThach: true,
       ai: 'luna', mat: 'worried', vai: 'LUNA NHỜ',
       nho: 'Năm biểu tượng nằm lên xuống, to nhỏ đủ kiểu, thi lập trình còn đứng sau poster.',
       muc: 'Cùng cỡ, thẳng hàng, cách đều trong khung vàng. Thứ tự: lập trình, poster, an toàn mạng, phim, rô bốt.',
@@ -121,8 +121,8 @@ export default {
         { id: 'co', ok: (d) => d.lechCo <= 0.03, ten: 'Cùng cỡ', loi: 'Biểu tượng to nhỏ khác nhau, nhìn như hoạt động này quan trọng hơn hoạt động kia.', ai: 'sola', matLoi: 'confused' },
         { id: 'hang', ok: (d) => d.lechHang <= 3, ten: 'Thẳng hàng', loi: 'Năm biểu tượng vẫn nhấp nhô, kẻ thước vào là thấy lệch.', ai: 'sola', matLoi: 'facepalm' },
         { id: 'deu', ok: (d) => d.lechHo <= 3 && !d.hoAm, ten: 'Cách đều', loi: 'Khoảng hở giữa các biểu tượng không đều nhau, có cái còn đè lên cái khác.', ai: 'luna', matLoi: 'thinking' },
-        { id: 'thu', sao: true, ok: (d) => d.dungThu, ten: 'Đúng thứ tự hoạt động' },
-        { id: 'min', sao: true, ok: (d) => d.lechHo <= 0.5 && d.lechHang <= 0.5, ten: 'Căn bằng lệnh, sai số gần bằng không' },
+        { id: 'thu', sao: true, ok: (d) => d.dungThu, ten: 'Đúng thứ tự hoạt động', chiTiet: () => 'Thứ tự trái sang phải cần là: lập trình, poster, an toàn mạng, phim, rô bốt' },
+        { id: 'min', sao: true, ok: (d) => d.lechHo <= 0.5 && d.lechHang <= 0.5, ten: 'Căn bằng lệnh, sai số gần bằng không', chiTiet: (d) => `Sai số tay đang ${Math.max(d.lechHo, d.lechHang).toFixed(1)} đơn vị (dùng lệnh Căn hàng và Cách đều)` },
       ],
       goiY: [
         'Có một biểu tượng đang thò ra ngoài khung. Lệnh căn hàng giữ nguyên hai đầu, nên phải kéo nó vào trước.',

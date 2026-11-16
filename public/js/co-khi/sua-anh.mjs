@@ -52,13 +52,15 @@ export default {
     nut.textContent = man.banChay ? 'Giữ để xem trước khi chỉnh' : 'Giữ để xem ảnh gốc';
     san.appendChild(nut);
     // Mở bản gốc nằm ngay trên ảnh: để dưới khay thì máy thấp bị đẩy mất thanh trượt.
+    let boCu = null;
+    const dinh = (v) => (v > 0 ? `+${v}` : `${v}`);
     if (man.banChay && !ctx.st.goc) {
       const moGoc = document.createElement('button');
       moGoc.type = 'button';
       moGoc.className = 'mo-ban-goc';
       moGoc.dataset.cu = 'ban-goc';
       moGoc.innerHTML = `${icon('tranh')}<span>Mở bản gốc</span>`;
-      moGoc.addEventListener('click', () => { ctx.ghi(); lam.moGoc(ctx.st); moGoc.remove(); ve(); veKhay(); ctx.doi(); });
+      moGoc.addEventListener('click', () => { ctx.ghi(); lam.moGoc(ctx.st); moGoc.remove(); boCu?.capNhatSub(); ve(); veKhay(); ctx.doi(); });
       san.appendChild(moGoc);
     }
     const c = cv.getContext('2d');
@@ -93,9 +95,9 @@ export default {
       t.fillStyle = css.getPropertyValue('--err').trim();
       if (hong('chim', d)) t.fillRect(0, 0, 3, h);
       if (hong('chay', d)) t.fillRect(w - 3, 0, 3, h);
-      const duHet = dh.capNhat(d);
+      const khoa = dh.khoaHit(d);
       // Tiếng và rung chỉ khi người chơi đang kéo, mở lại màn đã đạt thì không kêu.
-      if (dangKeo) ctx.hit(duHet ? 'du' : '');
+      if (dangKeo) ctx.hit(khoa);
     };
 
     const ve = () => {
@@ -126,20 +128,19 @@ export default {
       bd.setAttribute('aria-label', 'Biểu đồ phân bố độ sáng, trái là tối, phải là sáng');
       khay.appendChild(bd);
       dh = dongHo(khay, doSo);
-      const dinh = (v) => (v > 0 ? `+${v}` : `${v}`);
       const k = ctx.cu;
       let daGhi = false;
       thanhTruot(khay, {
         nhan: k === 'sang' ? 'Độ sáng' : 'Tương phản', min: -100, max: 100, buoc: 5, gia: st[k], dinh, id: k,
-        doi(v) { if (!daGhi) { ctx.ghi(); daGhi = true; } dangKeo = true; st[k] = v; ve(); },
+        doi(v) { if (!daGhi) { ctx.ghi(); daGhi = true; } dangKeo = true; st[k] = v; boCu?.capNhatSub(); ve(); },
         xong() { daGhi = false; dangKeo = false; ctx.doi(); },
       });
       veBieuDo();
     };
 
-    dungBoCu(ctx, [
-      { id: 'sang', nhan: 'Độ sáng', ic: 'mat' },
-      { id: 'tp', nhan: 'Tương phản', ic: 'tuongPhan' },
+    boCu = dungBoCu(ctx, [
+      { id: 'sang', nhan: 'Độ sáng', ic: 'mat', sub: () => dinh(ctx.st.sang) },
+      { id: 'tp', nhan: 'Tương phản', ic: 'tuongPhan', sub: () => dinh(ctx.st.tp) },
     ], 'sang', () => veKhay());
     ve();
     veKhay();

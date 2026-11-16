@@ -7,7 +7,7 @@ import { icon } from '../icon.mjs';
 import { phat } from '../am-thanh.mjs';
 import { duongMat, moSoTayMuc } from '../bang-truot.mjs';
 import { lamRieng } from '../thanh-pham.mjs';
-import { CAU } from './mat-tinh-cau.mjs';
+import { CAU, veChiLoi } from './mat-tinh-cau.mjs';
 import { baoNhanh } from './vo.mjs';
 
 const tronLen = (ds) => {
@@ -58,10 +58,11 @@ export function trangMatTinh(root) {
       const laDung = !!n.dataset.dung;
       n.classList.add(laDung ? 'the-chon--dung' : 'the-chon--sai');
       n.querySelector('.the-chon-dau').innerHTML = icon(laDung ? 'xong' : 'dong');
+      if (!laDung && c.chi) n.querySelector('svg')?.insertAdjacentHTML('beforeend', veChiLoi(c.chi));
     });
     const cuoi = i === ds.length - 1;
     const vi = root.querySelector('#vi');
-    vi.innerHTML = `<div class="mat-tinh-vi-than${dung ? ' dung' : ''}"><b>${dung ? 'Đúng rồi' : 'Chưa đúng'}</b><p>${c.vi}</p>
+    vi.innerHTML = `<div class="mat-tinh-vi-than${dung ? ' dung' : ''}"><b>${dung ? 'Đúng rồi' : 'Chưa đúng · Khung đỏ chỉ chỗ lỗi'}</b><p>${c.vi}</p>
       ${SO_TAY[c.k] ? `<button class="chip-so-tay" type="button" data-k="${c.k}">${icon('soTay')}${SO_TAY[c.k].ten}</button>` : ''}</div>
       <button class="nut-chinh" type="button" id="nut-tiep">${cuoi ? 'Xem kết quả' : 'Câu tiếp'}${icon('tiep')}</button>`;
     vi.querySelector('[data-k]')?.addEventListener('click', () => moSoTayMuc(c.k));
@@ -72,6 +73,7 @@ export function trangMatTinh(root) {
       else ket();
     });
     nut.focus({ preventScroll: true });
+    vi.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     root.querySelector('.chip-sao').lastChild.textContent = diem;
   };
 

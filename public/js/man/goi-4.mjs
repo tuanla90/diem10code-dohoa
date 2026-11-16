@@ -74,8 +74,8 @@ export default {
         { id: 'cham', ok: (d) => d.tb <= ANH.sangQua, ten: 'Không quá sáng', loi: 'Cả ảnh trắng bệch, mặt mọi người nhợt đi.', ai: 'sola', matLoi: 'shocked' },
         { id: 'gian', ok: (d) => d.gian >= ANH.trai, ten: 'Có độ tương phản', loi: 'Ảnh sáng rồi mà xám xịt, không có chỗ đậm chỗ nhạt nên trông như bị phủ sương.', ai: 'luna', matLoi: 'thinking' },
         { id: 'chim', ok: (d) => d.chim * 100 <= ANH.chim, ten: 'Vùng tối còn chi tiết', loi: 'Tương phản quá tay, áo và hàng ghế đen kịt, mất hết chi tiết.', ai: 'sola', matLoi: 'facepalm' },
-        { id: 'trai', sao: true, ok: (d) => d.gian >= ANH.traiDep, ten: 'Biểu đồ trải rộng' },
-        { id: 'giu', sao: true, ok: (d) => d.chay * 100 <= ANH.sach && d.chim * 100 <= ANH.sach, ten: 'Hai đầu không mất chi tiết' },
+        { id: 'trai', sao: true, ok: (d) => d.gian >= ANH.traiDep, ten: 'Biểu đồ trải rộng', chiTiet: (d) => `Độ trải biểu đồ đang ${Math.round(d.gian)} (tăng thêm Tương phản lên từ 125)` },
+        { id: 'giu', sao: true, ok: (d) => d.chay * 100 <= ANH.sach && d.chim * 100 <= ANH.sach, ten: 'Hai đầu không mất chi tiết', chiTiet: (d) => `Đầu sáng cháy ${(d.chay * 100).toFixed(1)}%, đầu tối đen ${(d.chim * 100).toFixed(1)}% (cần mỗi đầu dưới 2%)` },
       ],
       goiY: [
         'Nhìn biểu đồ: các cột dồn hết về bên trái. Ảnh đẹp thường có cột trải khắp bề ngang.',
@@ -127,8 +127,8 @@ export default {
         { id: 'toi', ok: (d) => d.tb >= CUU.toi, ten: 'Đủ sáng', loi: 'Áo còn nếp rồi, nhưng ảnh tối thế này chiếu lên không ai nhận ra đội mình.', ai: 'sola', matLoi: 'confused' },
         { id: 'cham', ok: (d) => d.tb <= CUU.sangQua, ten: 'Không quá sáng', loi: 'Ảnh lại trắng bệch, lặp đúng lỗi cũ của mình rồi.', ai: 'sola', matLoi: 'facepalm' },
         { id: 'chay', ok: (d) => d.chay * 100 <= CUU.chay, ten: 'Áo không cháy lại', loi: 'Tương phản đẩy phần vải lên trắng tinh, vạch sát mép phải của biểu đồ đã báo trước.', ai: 'luna', matLoi: 'worried' },
-        { id: 'ro', sao: true, ok: (d) => d.nep >= CUU.nepRo, ten: 'Nếp áo thật rõ' },
-        { id: 'trai', sao: true, ok: (d) => d.gian >= CUU.trai, ten: 'Biểu đồ trải rộng' },
+        { id: 'ro', sao: true, ok: (d) => d.nep >= CUU.nepRo, ten: 'Nếp áo thật rõ', chiTiet: (d) => `Độ rõ nếp áo đang ${Math.round(d.nep)} (cần từ 25, đừng đẩy sáng quá cao)` },
+        { id: 'trai', sao: true, ok: (d) => d.gian >= CUU.trai, ten: 'Biểu đồ trải rộng', chiTiet: (d) => `Độ trải biểu đồ đang ${Math.round(d.gian)} (thêm nhẹ Tương phản để đạt 150)` },
       ],
       goiY: [
         'Giữ nút dưới ảnh rồi thả ra để so. Áo trắng tinh một màu nghĩa là mọi điểm vải và nếp đã bằng nhau.',
@@ -180,8 +180,8 @@ export default {
         { id: 'an', ok: (d) => d.anMat * 100 <= NEN2.an, ten: 'Rô bốt nguyên vẹn', loi: 'Ngưỡng cao quá, đũa thần ăn luôn một phần rô bốt. Lên poster rô bốt mất bánh xích.', ai: 'sola', matLoi: 'shocked' },
         { id: 'khe', ok: (d) => d.kheTrai && d.khePhai, ten: 'Sạch cả khe tay', loi: 'Ô giữa tay, thân và bánh xích vẫn còn nguyên miếng tường kem. Lên nền tím nhìn rõ mồn một.', ai: 'luna', matLoi: 'worried' },
         { id: 'sot', ok: (d) => d.conSot * 100 <= NEN2.sot, ten: 'Nền đã sạch', loi: 'Nền còn sót nhiều mảng, ghép lên poster như có miếng dán chưa bóc.', ai: 'sola', matLoi: 'facepalm' },
-        { id: 'sach', sao: true, ok: (d) => d.conSot * 100 <= NEN2.sach, ten: 'Gần như không còn hạt nền' },
-        { id: 'khit', sao: true, ok: (d) => d.trung >= 0.97, ten: 'Đường viền khít rô bốt' },
+        { id: 'sach', sao: true, ok: (d) => d.conSot * 100 <= NEN2.sach, ten: 'Gần như không còn hạt nền', chiTiet: (d) => `Nền còn sót ${(d.conSot * 100).toFixed(1)}% (tăng nhẹ Ngưỡng để xuống dưới 1%)` },
+        { id: 'khit', sao: true, ok: (d) => d.trung >= 0.97, ten: 'Đường viền khít rô bốt', chiTiet: (d) => `Độ khít viền đang ${(d.trung * 100).toFixed(1)}% (cần từ 97%)` },
       ],
       goiY: [
         'Đũa thần loang từ điểm chạm ra các điểm có màu gần giống, và dừng lại ở vùng khác màu.',
@@ -225,8 +225,8 @@ export default {
       tieuChi: [
         { id: 'tay', ok: (d) => d.anMat * 100 <= NEN3.an, ten: 'Còn đủ hai tay', loi: 'Rô bốt lên poster không có tay, trông như đang xin lỗi cả trường.', ai: 'sola', matLoi: 'facepalm' },
         { id: 'sot', ok: (d) => d.conSot * 100 <= NEN3.sot, ten: 'Nền đã sạch', loi: 'Vẫn còn nhiều mảng tường xám bám quanh rô bốt, nền tím bị thủng từng mảng.', ai: 'luna', matLoi: 'worried' },
-        { id: 'khit', sao: true, ok: (d) => d.trung >= 0.9, ten: 'Đường viền khít rô bốt' },
-        { id: 'du', sao: true, ok: (d) => d.anMat * 100 <= NEN3.anDep, ten: 'Gần như không mất điểm ảnh rô bốt' },
+        { id: 'khit', sao: true, ok: (d) => d.trung >= 0.9, ten: 'Đường viền khít rô bốt', chiTiet: (d) => `Độ khít viền đang ${(d.trung * 100).toFixed(1)}% (cần từ 90%)` },
+        { id: 'du', sao: true, ok: (d) => d.anMat * 100 <= NEN3.anDep, ten: 'Gần như không mất điểm ảnh rô bốt', chiTiet: (d) => `Rô bốt còn thiếu ${(d.anMat * 100).toFixed(1)}% điểm ảnh (dùng Cọ giữ tô kín vùng hồng dưới 0.5%)` },
       ],
       goiY: [
         'Đũa thần chỉ biết màu, không biết đâu là tay. Khi màu trùng nhau thì phải dùng tay người.',
@@ -248,7 +248,7 @@ export default {
       ],
     },
     {
-      ma: 'DH-4-4', ten: 'Chữ chìm vào ảnh', coKhi: 'chu-anh', chay: 'Treo thử',
+      ma: 'DH-4-4', ten: 'Chữ chìm vào ảnh', coKhi: 'chu-anh', chay: 'Treo thử', thuThach: true,
       ai: 'luna', mat: 'worried', vai: 'LUNA NHỜ',
       nho: 'Sola đặt chữ ngay giữa, nhỏ xíu, trắng trên nền lốm đốm. Đứng cách 3 mét thì mình không đọc nổi.',
       muc: 'Chữ tiêu đề đọc được từ xa, không che rô bốt và không chạm mép ảnh.',
@@ -278,8 +278,8 @@ export default {
         { id: 'co', ok: (d) => d.co >= 22, ten: 'Đủ cỡ để đọc xa', loi: 'Cỡ chữ quá nhỏ, cách 3 mét nhìn như một vệt mờ.', ai: 'luna', matLoi: 'thinking' },
         { id: 'le', ok: (d) => d.trongLe, ten: 'Trong lề an toàn', loi: 'Chữ sát hoặc tràn mép ảnh, khi in dễ bị xén mất.', ai: 'luna', matLoi: 'worried' },
         { id: 'tuong', ok: (d) => d.tuongPhan >= 4.5, ten: 'Chữ nổi trên nền', loi: 'Chữ chìm vào nền, có đoạn gần như cùng màu với ảnh phía sau.', ai: 'sola', matLoi: 'confused' },
-        { id: 'to', sao: true, ok: (d) => d.co >= 28, ten: 'Chữ từ cỡ 28 trở lên' },
-        { id: 'ro', sao: true, ok: (d) => d.tuongPhan >= 7, ten: 'Tương phản từ 7:1' },
+        { id: 'to', sao: true, ok: (d) => d.co >= 28, ten: 'Chữ từ cỡ 28 trở lên', chiTiet: (d) => `Chữ đang ở cỡ ${d.co} (kéo chấm tròn lên từ cỡ 28)` },
+        { id: 'ro', sao: true, ok: (d) => d.tuongPhan >= 7, ten: 'Tương phản từ 7:1', chiTiet: (d) => `Tương phản đang ${d.tuongPhan.toFixed(1)}:1 (cần từ 7:1, chọn màu ngược nền hoặc bật Dải nền)` },
       ],
       goiY: [
         'Ảnh có vùng sáng đều, vùng tối đều và vùng lốm đốm. Chữ dễ đọc nhất trên vùng đều.',

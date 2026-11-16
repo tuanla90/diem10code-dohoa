@@ -68,9 +68,14 @@ for (const man of TAT_CA_MAN) {
     kiem(`${man.ma} sai "${s.ten}" vấp ${s.loi}`, kq.loi?.id === s.loi, `vấp ${kq.loi?.id}; ${JSON.stringify(kq.d)}`);
   }
 
-  // Mỗi tiêu chí bắt buộc phải có câu hậu quả và người nói.
+  // Mỗi tiêu chí bắt buộc phải có câu hậu quả và người nói; mỗi tiêu chí sao phải báo được độ lệch còn thiếu.
   for (const t of man.tieuChi) {
-    if (t.sao) { kiem(`${man.ma}/${t.id} có tên tiêu chí sao`, !!t.ten); continue; }
+    if (t.sao) {
+      kiem(`${man.ma}/${t.id} có tên tiêu chí sao`, !!t.ten);
+      const ct = typeof t.chiTiet === 'function' ? t.chiTiet(kqDau.d, dau) : '';
+      kiem(`${man.ma}/${t.id} có chỉ dẫn chi tiết sao sạch`, typeof ct === 'string' && ct.length > 0 && !/undefined|NaN/.test(ct), ct);
+      continue;
+    }
     kiem(`${man.ma}/${t.id} có câu hậu quả`, !!t.loi);
     kiem(`${man.ma}/${t.id} có người nói`, t.ai === 'sola' || t.ai === 'luna');
     const mat = path.join(PUB, 'mat', t.ai || 'sola', `${t.matLoi}.png`);
@@ -378,7 +383,7 @@ for (const m of TAT_CA_MAN) {
   const kho = await import('../public/js/kho.mjs');
   const tt = await import('../public/js/tien-trinh.mjs');
   const { MON, monCua, banVe, tranhMon } = await import('../public/js/the-gioi.mjs');
-  const { CAU } = await import('../public/js/trang/mat-tinh-cau.mjs');
+  const { CAU, veChiLoi } = await import('../public/js/trang/mat-tinh-cau.mjs');
   const { lamRieng } = await import('../public/js/thanh-pham.mjs');
   const { icon } = await import('../public/js/icon.mjs');
   const { thoat } = await import('../public/js/trang/vo.mjs');
@@ -467,6 +472,15 @@ for (const m of TAT_CA_MAN) {
   kho.xoaNhap('DH-1-3');
   kiem('Bản nháp: xóa được', kho.docNhap('DH-1-3') === null);
   kho.xoaHetTienDo();
+  kho.ghiDat('DH-1-1', { sao: 2, st: {} });
+  kho.ghiDat('DH-1-2', { sao: 3, st: {} });
+  kho.ghiDat('DH-1-3', { sao: 3, st: {} });
+  kiem('Hàng đợi tô màu giữ đủ các món vừa xong', kho.layMonMoiDs().join(',') === 'DH-1-1,DH-1-2,DH-1-3');
+  kiem('Hàng đợi tô màu dọn sạch sau khi lấy', kho.layMonMoiDs().length === 0);
+  const veCham = banVe({ daXong: (ma) => ma === 'DH-1-1' || ma === 'DH-1-2', moi: ['DH-1-1', 'DH-1-2'], chonDuoc: true });
+  kiem('Bản vẽ tương tác có đủ vùng chạm và hiệu ứng nối tiếp', (veCham.match(/data-mon="/g) || []).length === MON.length && (veCham.match(/bv-moi-nay/g) || []).length === 2 && (veCham.match(/bv-no/g) || []).length === 2);
+  kiem('Màn cuối gói bật chế độ Tự làm chủ, màn đầu gói vẫn dẫn bước', ['DH-1-3', 'DH-2-3', 'DH-4-4', 'DH-5-3'].every((ma) => TAT_CA_MAN.find((m) => m.ma === ma)?.thuThach) && !TAT_CA_MAN.find((m) => m.ma === 'DH-1-1')?.thuThach);
+  kho.xoaHetTienDo();
 
   // Huy hiệu và tên người chơi
   kiem('Huy hiệu không trùng mã', new Set(tt.HUY_HIEU.map((h) => h.id)).size === tt.HUY_HIEU.length);
@@ -484,6 +498,8 @@ for (const m of TAT_CA_MAN) {
     const a = c.dung(), b = c.sai();
     kiem(`${ten} vẽ được cả hai bản`, sach(a) && sach(b));
     kiem(`${ten} hai bản khác nhau`, a !== b);
+    const hopChi = Array.isArray(c.chi) && c.chi.length === 4 && c.chi[0] >= 0 && c.chi[1] >= 0 && c.chi[2] > 10 && c.chi[3] > 10 && c.chi[0] + c.chi[2] <= 240 && c.chi[1] + c.chi[3] <= 130;
+    kiem(`${ten} có vùng chỉ lỗi hợp lệ trên khung 240x130`, hopChi && sach(veChiLoi(c.chi)), JSON.stringify(c.chi));
   });
   kiem('Làm riêng: mã nội bộ không trùng giữa hai lần vẽ', lamRieng('<a id="x" fill="url(#x)"/>') !== lamRieng('<a id="x" fill="url(#x)"/>'));
   kiem('Làm riêng: giữ mã dùng chung', lamRieng('<a fill="url(#gr-logo)"/>').includes('url(#gr-logo)'));

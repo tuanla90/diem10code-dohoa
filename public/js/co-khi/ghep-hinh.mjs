@@ -1,9 +1,11 @@
 // Cơ khí ghép hình: gộp, khoét, giữ phần chung. Thứ tự phép làm ra hình khác nhau (C10-28).
 import { giong, lapMatNa, tiLeTrung, dinhSao, dinhDaGiac } from '../toan/hinh-hoc.mjs';
 import { MAU, saoPath } from '../hinh.mjs';
+import { icon } from '../icon.mjs';
 import { taoSvg, batKeo, hangCu } from './chung.mjs';
 
 export const W = 360, H = 300;
+const TEN_PHEP = { gop: 'Gộp', khoet: 'Khoét', giao: 'Giữ chung' };
 
 function veHinhCanvas(c, h) {
   c.beginPath();
@@ -127,10 +129,31 @@ export default {
     const veKhay = () => {
       const st = ctx.st;
       khay.innerHTML = '';
+      if (st.buoc.length > 1) {
+        const day = document.createElement('div');
+        day.className = 'day-ghep';
+        day.setAttribute('aria-label', 'Thứ tự các phép ghép đã làm');
+        let html = '<span class="chip-ghep">Hình gốc</span>';
+        st.buoc.slice(1).forEach((b, idx, ds) => {
+          const cuoi = idx === ds.length - 1;
+          const ten = `${TEN_PHEP[b.phep]}: ${b.hinh.ten || 'Hình'}`;
+          html += cuoi
+            ? `<button type="button" class="chip-ghep chip-ghep--cuoi" data-thao-cuoi aria-label="Tháo bước ${ten}">${icon(b.phep)}<span>${ten}</span>${icon('dong')}</button>`
+            : `<span class="chip-ghep">${icon(b.phep)}<span>${ten}</span></span>`;
+        });
+        day.innerHTML = html;
+        day.querySelector('[data-thao-cuoi]')?.addEventListener('click', () => {
+          ctx.ghi();
+          const vua = st.buoc.pop();
+          if (vua?.hinh) { st.hinh.unshift(vua.hinh); st.chon = vua.hinh.id; }
+          ve(); veKhay(); ctx.doi();
+        });
+        khay.appendChild(day);
+      }
       const chon = st.hinh.find((o) => o.id === st.chon);
       const nhan = document.createElement('div');
       nhan.className = 'nhan-phu';
-      nhan.innerHTML = chon ? `Đang chọn: <b>${chon.ten}</b>` : (st.hinh.length ? 'Chạm một hình rời để chọn.' : 'Đã ghép hết các hình.');
+      nhan.innerHTML = chon ? `Đang chọn: <b>${chon.ten}</b>` : (st.hinh.length ? 'Chạm một hình rời để chọn.' : 'Đã ghép hết. Bấm thẻ bước cuối nếu muốn chỉnh lại.');
       khay.appendChild(nhan);
       const lenh = (id, ten, ic) => ({ id, nhan: ten, ic, tat: !chon, bam() { ctx.ghi(); lam.ap(st, chon.id, id); ve(); veKhay(); ctx.doi(); } });
       hangCu(khay, [lenh('gop', 'Gộp vào', 'gop'), lenh('khoet', 'Khoét đi', 'khoet'), lenh('giao', 'Giữ chung', 'giao')], { deu: true });

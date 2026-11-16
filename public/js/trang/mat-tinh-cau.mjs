@@ -50,135 +50,143 @@ const songNhac = (cao, moCuoi) => {
   return s;
 };
 
+export function veChiLoi(chi) {
+  if (!chi) return '';
+  const [x, y, w, h] = chi;
+  const o = 5;
+  const goc = [[x, y], [x + w, y], [x, y + h], [x + w, y + h]];
+  return `<g class="mt-chi" pointer-events="none"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="none" stroke="${MAU.trang}" stroke-width="3.6"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="none" stroke="${MAU.do}" stroke-width="2" stroke-dasharray="5 4"/>${goc.map(([gx, gy]) => `<rect x="${gx - o / 2}" y="${gy - o / 2}" width="${o}" height="${o}" rx="1" fill="${MAU.trang}" stroke="${MAU.do}" stroke-width="1.5"/>`).join('')}</g>`;
+}
+
 export const CAU = [
   {
-    goi: 0, k: 'ti-le', hoi: 'Bản nào giữ đúng tỉ lệ của logo?',
+    goi: 0, k: 'ti-le', hoi: 'Bản nào giữ đúng tỉ lệ của logo?', chi: [16, 16, 208, 98],
     dung: () => `${nenPoster}${datVao(logoLong(), 120, 65, 104, 104)}`,
     sai: () => `${nenPoster}${datVao(logoLong(), 120, 65, 200, 92)}`,
     vi: 'Kéo một chiều làm vòng tròn thành quả trứng. Khóa tỉ lệ rồi kéo góc thì không méo.',
   },
   {
-    goi: 0, k: 'vector', hoi: 'Đứng sát băng rôn 3 mét, bản nào dùng đúng tệp?',
+    goi: 0, k: 'vector', hoi: 'Đứng sát băng rôn 3 mét, bản nào dùng đúng tệp?', chi: [68, 22, 104, 86],
     dung: () => `${nenTrang}<g transform="translate(120 72) scale(2.5) translate(-50 -40)">${logoLong()}</g>`,
     sai: () => `${nenTrang}<g transform="translate(120 72) scale(2.5) translate(-50 -40)">${logoKhoi(18)}</g>`,
     vi: 'Vector lưu bằng công thức nên phóng cỡ nào cũng nét. Ảnh điểm phóng quá cỡ sẽ thấy từng ô.',
   },
   {
-    goi: 0, k: 'tay-nam', hoi: 'Bản nào đem in được?',
+    goi: 0, k: 'tay-nam', hoi: 'Bản nào đem in được?', chi: [52, 74, 156, 50],
     dung: () => `${nenPoster}${datVao(logoLong(), 120, 48, 68, 68)}${datVao(tieuDe(), 120, 104, 150, 37.5, 0, 200, 50)}`,
     sai: () => `${nenPoster}${datVao(logoLong(), 104, 52, 68, 68, 13)}${datVao(tieuDe(), 130, 100, 150, 37.5, -8, 200, 50)}`,
     vi: 'Món nghiêng mỗi cái một hướng thì ai đi qua cũng nghiêng đầu nhìn. Xoay thẳng trước, căn sau.',
   },
   {
-    goi: 0, k: 'ti-le', hoi: 'Logo nào nằm đúng tâm khung vàng?',
+    goi: 0, k: 'ti-le', hoi: 'Logo nào nằm đúng tâm khung vàng?', chi: [140, 18, 48, 94],
     dung: () => `${nenPoster}${khungVang(50, 14, 140, 102)}${datVao(logoLong(), 120, 65, 92, 92)}`,
     sai: () => `${nenPoster}${khungVang(50, 14, 140, 102)}${datVao(logoLong(), 98, 72, 84, 84)}`,
     vi: 'Lệch tâm dù nhỏ vẫn thấy khoảng trống hai bên không bằng nhau.',
   },
   {
-    goi: 0, k: 'mat-do', hoi: 'Khung vàng trống chỗ, bản nào đặt logo đủ to?',
+    goi: 0, k: 'mat-do', hoi: 'Khung vàng trống chỗ, bản nào đặt logo đủ to?', chi: [94, 39, 52, 52],
     dung: () => `${nenPoster}${khungVang(60, 12, 120, 106)}${datVao(logoLong(), 120, 65, 100, 100)}`,
     sai: () => `${nenPoster}${khungVang(60, 12, 120, 106)}${datVao(logoLong(), 120, 65, 40, 40)}`,
     vi: 'Logo bé giữa khung thì đứng xa không ai thấy. Đẩy tới khi chạm cạnh ngắn của khung.',
   },
   {
-    goi: 1, k: 'lop', hoi: 'Bản nào xếp lớp đúng?',
+    goi: 1, k: 'lop', hoi: 'Bản nào xếp lớp đúng?', chi: [62, 18, 116, 88],
     dung: () => `${nenTrang}${datVao(logoLong(), 120, 65, 112, 112)}`,
     sai: () => `${nenTrang}${datVao(['sao', 'chu', 'dai', 'nen', 'vong'].map((k) => MANH_LOGO[k].ve()).join(''), 120, 65, 112, 112)}`,
     vi: 'Mảnh nền nằm trên cùng thì che mất sao và chữ. Nền phải ở lớp dưới cùng.',
   },
   {
-    goi: 1, k: 'can-hang', hoi: 'Hàng biểu tượng nào đã căn hàng và cách đều?',
+    goi: 1, k: 'can-hang', hoi: 'Hàng biểu tượng nào đã căn hàng và cách đều?', chi: [10, 24, 220, 82],
     dung: () => `${nenTrang}${chuoiHinh([[32, 65, 36], [76, 65, 36], [120, 65, 36], [164, 65, 36], [208, 65, 36]])}`,
     sai: () => `${nenTrang}${chuoiHinh([[30, 50, 36], [68, 82, 36], [126, 62, 36], [158, 44, 36], [212, 86, 36]])}`,
     vi: 'Căn hàng đưa về một đường, phân phối chia đều khoảng hở. Mắt người nhận ra lệch rất nhanh.',
   },
   {
-    goi: 1, k: 'can-hang', hoi: 'Bản nào các biểu tượng cùng cỡ?',
+    goi: 1, k: 'can-hang', hoi: 'Bản nào các biểu tượng cùng cỡ?', chi: [138, 38, 52, 54],
     dung: () => `${nenTrang}${chuoiHinh([[32, 65, 36], [76, 65, 36], [120, 65, 36], [164, 65, 36], [208, 65, 36]])}`,
     sai: () => `${nenTrang}${chuoiHinh([[30, 65, 26], [72, 65, 42], [120, 65, 30], [164, 65, 46], [210, 65, 24]])}`,
     vi: 'Cùng là biểu tượng ngang hàng thì phải cùng cỡ, trừ khi bạn thật sự muốn nhấn một món.',
   },
   {
-    goi: 2, k: 'bezier', hoi: 'Lá cờ nào có mép uốn mềm?',
+    goi: 2, k: 'bezier', hoi: 'Lá cờ nào có mép uốn mềm?', chi: [76, 4, 68, 32],
     dung: () => `<rect width="240" height="130" fill="${MAU.troi}"/><rect x="34" y="8" width="5" height="116" rx="2" fill="${MAU.muc}"/><path d="M39 18c40-20 80 18 140 0v68c-60 18-100-20-140 0z" fill="url(#gr-logo)"/>`,
     sai: () => `<rect width="240" height="130" fill="${MAU.troi}"/><rect x="34" y="8" width="5" height="116" rx="2" fill="${MAU.muc}"/><path d="M39 18l50-10 44 22 46-12v68l-46 12-44-22-50 10z" fill="url(#gr-logo)"/>`,
     vi: 'Nút góc chỉ tạo đoạn thẳng. Đổi sang nút trơn thì đường đi qua mềm mại.',
   },
   {
-    goi: 2, k: 'ghep-hinh', hoi: 'Huy hiệu nào xỏ dây được thật?',
+    goi: 2, k: 'ghep-hinh', hoi: 'Huy hiệu nào xỏ dây được thật?', chi: [104, 18, 32, 34],
     dung: () => `${nenCaRo}<path d="M120 0V34" stroke="${MAU.do}" stroke-width="5"/><path fill-rule="evenodd" d="M120 22a50 50 0 110 100 50 50 0 010-100zm0 7a7 7 0 100 14 7 7 0 000-14z" fill="url(#gr-logo)"/><path d="M120 0V36" stroke="${MAU.do}" stroke-width="4" stroke-linecap="round"/>`,
     sai: () => `${nenCaRo}<circle cx="120" cy="72" r="50" fill="url(#gr-logo)"/><circle cx="120" cy="36" r="7" fill="${MAU.trang}"/><path d="M120 0V20" stroke="${MAU.do}" stroke-width="4" stroke-linecap="round"/>`,
     vi: 'Vòng trắng đặt lên chỉ là sơn. Lỗ thật phải dùng phép Khoét để nền lộ qua.',
   },
   {
-    goi: 2, k: 'ghep-hinh', hoi: 'Khiên cần có hai vai. Bản nào làm đúng thứ tự?',
+    goi: 2, k: 'ghep-hinh', hoi: 'Khiên cần có hai vai. Bản nào làm đúng thứ tự?', chi: [74, 8, 92, 42],
     dung: () => `${nenCaRo}<path transform="translate(39 -2.5) scale(.45)" d="M84 30H276V150A123 123 0 0 1 180 270A123 123 0 0 1 84 150Z" fill="${MAU.teal}"/>`,
     sai: () => `${nenCaRo}<path transform="translate(39 -2.5) scale(.45)" d="M180 30A123 123 0 0 1 180 270A123 123 0 0 1 180 30Z" fill="${MAU.teal}"/>`,
     vi: 'Giữ chung bỏ mọi thứ ngoài phần trùng, kể cả vai đã gộp từ trước. Có phần chung rồi mới gộp vai.',
   },
   {
-    goi: 2, k: 'dinh-dang', hoi: 'Logo lên áo tím, tệp nào đúng?',
+    goi: 2, k: 'dinh-dang', hoi: 'Logo lên áo tím, tệp nào đúng?', chi: [62, 8, 116, 114],
     dung: () => `<rect width="240" height="130" fill="${MAU.ao}"/>${datVao(logoLong(), 120, 65, 96, 96)}`,
     sai: () => `<rect width="240" height="130" fill="${MAU.ao}"/><rect x="66" y="11" width="108" height="108" fill="${MAU.trang}"/>${datVao(logoLong(), 120, 65, 96, 96)}`,
     vi: 'JPG không có nền trong suốt nên lộ khung trắng. PNG trong suốt hoặc SVG mới hợp.',
   },
   {
-    goi: 3, k: 'histogram', hoi: 'Ảnh nào chiếu lên màn nhìn rõ?',
+    goi: 3, k: 'histogram', hoi: 'Ảnh nào chiếu lên màn nhìn rõ?', chi: [20, 14, 200, 102],
     dung: () => hoiTruong(),
     sai: () => `${hoiTruong()}<rect width="240" height="130" fill="${MAU.man}" opacity=".76"/>`,
     vi: 'Cột histogram dồn về bên trái là ảnh tối. Tăng sáng rồi giãn tương phản.',
   },
   {
-    goi: 3, k: 'histogram', hoi: 'Ảnh nào còn chi tiết ở cửa sổ?',
+    goi: 3, k: 'histogram', hoi: 'Ảnh nào còn chi tiết ở cửa sổ?', chi: [14, 8, 62, 68],
     dung: () => hoiTruong(),
     sai: () => `${hoiTruong()}<rect width="240" height="130" fill="${MAU.trang}" opacity=".6"/><rect x="18" y="12" width="54" height="60" fill="${MAU.trang}"/>`,
     vi: 'Sáng quá tay thì cửa sổ cháy trắng, mất luôn khung cửa. Vạch đỏ cuối biểu đồ đã báo trước.',
   },
   {
-    goi: 3, k: 'chay-sang', hoi: 'Bản nào còn cứu được nếp áo?',
+    goi: 3, k: 'chay-sang', hoi: 'Bản nào còn cứu được nếp áo?', chi: [34, 68, 172, 56],
     dung: () => doiAoTrang(true),
     sai: () => doiAoTrang(false),
     vi: 'Đã cháy và lưu đè thì vải với nếp cùng một màu trắng, kéo tối lại chỉ ra mảng xám. Phải quay về bản gốc.',
   },
   {
-    goi: 3, k: 'dua-than', hoi: 'Bản nào tách nền sạch?',
+    goi: 3, k: 'dua-than', hoi: 'Bản nào tách nền sạch?', chi: [50, 8, 140, 116],
     dung: () => `${nenPoster}${datVao(robot(0, { tay: 'hong' }), 120, 65, 94, 118, 0, 120, 150)}`,
     sai: () => `${nenPoster}<path d="M60 10h60v20h46v50h20v44H78v-20H54z" fill="${MAU.xam}"/>${datVao(robot(0, { tay: 'hong' }), 120, 65, 94, 118, 0, 120, 150)}`,
     vi: 'Còn sót mảng nền quanh rô bốt thì ghép lên poster nhìn như dán băng keo. Sửa bằng cọ xóa.',
   },
   {
-    goi: 3, k: 'tuong-phan-chu', hoi: 'Chữ nào đọc được từ cách 3 mét?',
+    goi: 3, k: 'tuong-phan-chu', hoi: 'Chữ nào đọc được từ cách 3 mét?', chi: [62, 54, 116, 24],
     dung: () => `${hoiTruong()}<rect y="88" width="240" height="42" fill="${MAU.muc}"/>${chu(120, 118, 'NGÀY HỘI', 28)}`,
     sai: () => `${hoiTruong()}${chu(120, 68, 'NGÀY HỘI TIN HỌC', 10, MAU.tuong, 500)}`,
     vi: 'Chữ nhỏ, sáng trên nền lốm đốm thì chìm. Thêm dải nền, tăng cỡ, đặt tránh chủ thể.',
   },
   {
-    goi: 4, k: 'khung-hinh', hoi: 'Ảnh động nào vẫy tay mượt hơn?',
+    goi: 4, k: 'khung-hinh', hoi: 'Ảnh động nào vẫy tay mượt hơn?', chi: [74, 14, 92, 62],
     dung: () => `${nenTrang}${hinhAnhDong([0, 10, 20, 30, 20, 10])}`,
     sai: () => `${nenTrang}${hinhAnhDong([0, 30, 5, 30, 0, 22], ['mo', 'mo', 'nham', 'mo', 'nham', 'mo'])}`,
     vi: 'Góc tay đổi đều từng chút và trở về khung đầu thì lặp liền mạch. Khung nhắm mắt lọt vào sẽ thấy giật.',
   },
   {
-    goi: 4, k: 'thoi-gian-khung', hoi: 'Rô bốt nào chớp mắt tự nhiên?',
+    goi: 4, k: 'thoi-gian-khung', hoi: 'Rô bốt nào chớp mắt tự nhiên?', chi: [84, 22, 72, 42],
     dung: () => `${nenTrang}${hinhAnhDong([0, 0, 0, 0], ['mo', 'lim', 'nham', 'lim'], [2000, 100, 100, 100])}`,
     sai: () => `${nenTrang}${hinhAnhDong([0, 0, 0, 0], ['mo', 'lim', 'nham', 'lim'], [300, 300, 300, 300])}`,
     vi: 'Khung nào cũng bằng nhau thì mắt nháy liên hồi. Khung mở mắt để lâu, khung chớp để thật ngắn mới giống thật.',
   },
   {
-    goi: 4, k: 'bezier', hoi: 'Cánh tay nào có khuỷu bo mềm?',
+    goi: 4, k: 'bezier', hoi: 'Cánh tay nào có khuỷu bo mềm?', chi: [126, 84, 42, 36],
     dung: () => canhTay('C238 178 228 216 200 220C176 224 140 214 107 208'),
     sai: () => canhTay('L203 220'),
     vi: 'Nút góc chỉ tạo đoạn thẳng nên khuỷu gãy như ê ke. Đổi nút khuỷu thành nút trơn là đường bo theo.',
   },
   {
-    goi: 4, k: 'dong-thoi-gian', hoi: 'Phim nào vừa khung chiếu 30 giây?',
+    goi: 4, k: 'dong-thoi-gian', hoi: 'Phim nào vừa khung chiếu 30 giây?', chi: [192, 34, 34, 64],
     dung: () => dongPhim([6, 8, 7, 6, 3], 'Hết phim đúng vạch vàng'),
     sai: () => dongPhim([8, 9, 8, 6, 3], 'Lố vạch, khung chiếu cắt mất đoạn kết'),
     vi: 'Cắt bớt đầu, cuối từng đoạn không làm hỏng tệp gốc, cứ nới lại được.',
   },
   {
-    goi: 4, k: 'am-nhac', hoi: 'Nhạc nền nào đúng cách?',
+    goi: 4, k: 'am-nhac', hoi: 'Nhạc nền nào đúng cách?', chi: [164, 24, 58, 80],
     dung: () => `<rect width="240" height="130" fill="${MAU.muc}"/>${songNhac(24, true)}${chu(120, 122, 'Nhỏ hơn lời nói, mờ dần ở cuối', 11, MAU.trang, 600)}`,
     sai: () => `<rect width="240" height="130" fill="${MAU.muc}"/>${songNhac(72, false)}${chu(120, 122, 'To hết cỡ, tắt cái rụp', 11, MAU.trang, 600)}`,
     vi: 'Nhạc phải nhỏ hơn lời nói, kết thúc cùng hình và mờ dần chứ không tắt đột ngột.',

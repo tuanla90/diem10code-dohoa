@@ -57,8 +57,8 @@ export default {
       tieuChi: [
         { id: 'hinh', ok: (d) => d.lech <= 10, ten: 'Đúng dáng cánh tay', loi: 'Lắp vào rồi mà tay chưa gập đúng chỗ, rô bốt không giơ lên vẫy được.', ai: 'sola', matLoi: 'confused' },
         { id: 'khuyu', ok: (d) => d.soTron >= 1, ten: 'Khuỷu bo tròn', loi: 'Dáng đúng rồi nhưng khuỷu gãy như cái ê ke. Khuỷu rô bốt mềm mại hơn thế, cần một nút trơn.', ai: 'luna', matLoi: 'thinking' },
-        { id: 'sat', sao: true, ok: (d) => d.lech <= 5, ten: 'Bám sát nét đứt' },
-        { id: 'gon', sao: true, ok: (d) => d.soNut === 6, ten: 'Đúng 6 nút, không thừa' },
+        { id: 'sat', sao: true, ok: (d) => d.lech <= 5, ten: 'Bám sát nét đứt', chiTiet: (d) => `Đang lệch nét đứt ${Math.round(d.lech)} đơn vị (cần từ 5 trở xuống)` },
+        { id: 'gon', sao: true, ok: (d) => d.soNut === 6, ten: 'Đúng 6 nút, không thừa', chiTiet: (d) => `Đang có ${d.soNut} nút (xóa nút thừa để về đúng 6 nút)` },
       ],
       goiY: [
         'Nét đứt có 6 chỗ đổi hướng, hiện mới có 4 nút. Mỗi dấu cộng cho thêm một nút.',
@@ -108,8 +108,8 @@ export default {
         { id: 'loi', ok: (d) => d.loi === 0, ten: 'Bỏ khung lỗi', loi: 'Cứ mỗi vòng rô bốt lại nhắm mắt một cái, như đang ngủ gật.', ai: 'sola', matLoi: 'facepalm' },
         { id: 'giat', ok: (d) => d.giat <= 20, ten: 'Tay chuyển mượt', loi: 'Tay rô bốt vẫn nhảy cóc giữa hai khung. Hai khung kề nhau phải gần giống nhau, kể cả khung cuối với khung đầu.', ai: 'luna', matLoi: 'thinking' },
         { id: 'nhip', ok: (d) => d.chuKy >= 500 && d.chuKy <= 1600, ten: 'Nhịp vừa phải', loi: 'Tốc độ chưa ổn: quá nhanh thì rô bốt như bị giật điện, quá chậm thì như đang buồn ngủ.', ai: 'sola', matLoi: 'confused' },
-        { id: 'motGiay', sao: true, ok: (d) => d.chuKy >= 800 && d.chuKy <= 1200, ten: 'Mỗi vòng khoảng 1 giây' },
-        { id: 'du', sao: true, ok: (d) => d.soKhung === 6, ten: 'Giữ đủ 6 khung tốt' },
+        { id: 'motGiay', sao: true, ok: (d) => d.chuKy >= 800 && d.chuKy <= 1200, ten: 'Mỗi vòng khoảng 1 giây', chiTiet: (d) => `Một vòng đang ${(d.chuKy / 1000).toFixed(2)} giây (cần từ 0.8 đến 1.2 giây)` },
+        { id: 'du', sao: true, ok: (d) => d.soKhung === 6, ten: 'Giữ đủ 6 khung tốt', chiTiet: (d) => `Đang còn ${d.soKhung} khung (chỉ xóa khung lỗi, giữ đủ 6 khung tốt)` },
       ],
       goiY: [
         'Ảnh động lặp lại, nên khung cuối nối tiếp khung đầu. Khoảng nhảy ở đó cũng tính.',
@@ -161,8 +161,8 @@ export default {
         { id: 'thuTu', ok: (d) => d.loi >= 1 && d.matNhay <= 1, ten: 'Mắt khép dần', loi: 'Mắt nhảy thẳng từ mở sang nhắm. Xếp lại: mở, lim dim, nhắm, lim dim, và khung cuối phải nối được về khung đầu.', ai: 'luna', matLoi: 'thinking' },
         { id: 'thuc', ok: (d) => d.giuMo >= 1500, ten: 'Mở mắt đủ lâu', loi: 'Rô bốt nháy liên hồi như bị chói đèn. Khung mở mắt phải giữ ít nhất 1,5 giây.', ai: 'sola', matLoi: 'confused' },
         { id: 'chop', ok: (d) => d.chopMs <= 500, ten: 'Chớp đủ nhanh', loi: 'Mắt khép lâu quá, nhìn như đang ngủ gật. Cả cái chớp chỉ nên dưới nửa giây.', ai: 'luna', matLoi: 'worried' },
-        { id: 'nhanh', sao: true, ok: (d) => d.chopMs <= 300, ten: 'Chớp thật nhanh' },
-        { id: 'vong', sao: true, ok: (d) => d.chuKy >= 2000 && d.chuKy <= 4000, ten: 'Mỗi vòng 2 đến 4 giây' },
+        { id: 'nhanh', sao: true, ok: (d) => d.chopMs <= 300, ten: 'Chớp thật nhanh', chiTiet: (d) => `Cái chớp đang mất ${d.chopMs} ms (kéo các khung khép mắt xuống tổng dưới 300 ms)` },
+        { id: 'vong', sao: true, ok: (d) => d.chuKy >= 2000 && d.chuKy <= 4000, ten: 'Mỗi vòng 2 đến 4 giây', chiTiet: (d) => `Cả vòng đang ${(d.chuKy / 1000).toFixed(2)} giây (cần từ 2 đến 4 giây)` },
       ],
       goiY: [
         'Khác màn trước: thanh trượt chỉ đổi khung đang chọn. Số ghi dưới mỗi khung là thời gian riêng của nó.',
@@ -199,8 +199,8 @@ export default {
         { id: 'ngan', ok: (d) => d.tong >= 29.5, ten: 'Đủ 30 giây', loi: 'Phim ngắn hơn khung chiếu, màn hình đen ngòm mấy giây trước lễ khai mạc.', ai: 'luna', matLoi: 'worried' },
         { id: 'noi', ok: (d) => d.catLoi.length === 0, ten: 'Câu nói còn nguyên', loi: 'Câu phỏng vấn của Luna bị cắt giữa chừng. "Câu lạc bộ của chúng..." rồi hết.', ai: 'luna', matLoi: 'worried' },
         { id: 'chop', ok: (d) => d.ngan >= 2, ten: 'Đoạn nào cũng xem kịp', loi: 'Có đoạn quá ngắn, chưa kịp nhìn đã qua.', ai: 'sola', matLoi: 'confused' },
-        { id: 'dung', sao: true, ok: (d) => Math.abs(d.tong - 30) <= 0.1, ten: 'Vừa khít 30.0 giây' },
-        { id: 'nhip', sao: true, ok: (d) => d.dai <= 10, ten: 'Không đoạn nào quá 10 giây' },
+        { id: 'dung', sao: true, ok: (d) => Math.abs(d.tong - 30) <= 0.1, ten: 'Vừa khít 30.0 giây', chiTiet: (d) => `Phim đang dài ${d.tong.toFixed(1)} giây (kéo thanh vàng hít khít mốc 30.0 giây)` },
+        { id: 'nhip', sao: true, ok: (d) => d.dai <= 10, ten: 'Không đoạn nào quá 10 giây', chiTiet: (d) => `Đoạn dài nhất đang ${d.dai.toFixed(1)} giây (cắt bớt để không đoạn nào quá 10 giây)` },
       ],
       goiY: [
         'Vạch vàng nét đứt trên thước là mốc 30 giây. Đuôi đoạn cuối phải chạm vạch đó.',
@@ -227,7 +227,7 @@ export default {
       ],
     },
     {
-      ma: 'DH-5-3', ten: 'Nhạc và chuyển cảnh', coKhi: 'dong-thoi-gian', chay: 'Chiếu thử',
+      ma: 'DH-5-3', ten: 'Nhạc và chuyển cảnh', coKhi: 'dong-thoi-gian', chay: 'Chiếu thử', thuThach: true,
       ai: 'sola', mat: 'happy', vai: 'SOLA NHỜ',
       nho: 'Phim đủ 30 giây rồi, mình thả bài nhạc 48 giây vào, to hết cỡ. Nghe hào hùng lắm! Mà Luna nói gì không nghe được.',
       muc: 'Chuyển mờ ở chỗ đổi chủ đề, nhạc hết cùng phim và không lấn lời nói. Phim vẫn đúng 30 giây.',
@@ -264,8 +264,8 @@ export default {
         { id: 'noi', ok: (d) => d.catLoi.length === 0, ten: 'Câu nói còn nguyên', loi: 'Câu phỏng vấn của Luna bị cắt mất một đoạn.', ai: 'luna', matLoi: 'worried' },
         { id: 'nhac', ok: (d) => d.lechNhac <= 1, ten: 'Nhạc hết cùng phim', loi: 'Phim hết rồi mà nhạc vẫn chạy tiếp, cả hội trường ngồi nghe nhạc trên màn hình đen.', ai: 'sola', matLoi: 'facepalm' },
         { id: 'am', ok: (d) => d.am <= 50, ten: 'Nhạc không lấn lời', loi: 'Nhạc to hơn tiếng người, không ai nghe được Luna nói gì.', ai: 'luna', matLoi: 'worried' },
-        { id: 'mo', sao: true, ok: (d) => d.moDan, ten: 'Nhạc mờ dần ít nhất 1 giây ở cuối' },
-        { id: 'khit', sao: true, ok: (d) => Math.abs(d.tong - 30) <= 0.1 && d.lechNhac <= 0.1, ten: 'Hình và nhạc khít đến 0.1 giây' },
+        { id: 'mo', sao: true, ok: (d) => d.moDan, ten: 'Nhạc mờ dần ít nhất 1 giây ở cuối', chiTiet: (d) => `Đoạn mờ dần cuối nhạc đang ${d.moGiay.toFixed(1)} giây (kéo chấm tròn góc trên rãnh nhạc từ 1 giây)` },
+        { id: 'khit', sao: true, ok: (d) => Math.abs(d.tong - 30) <= 0.1 && d.lechNhac <= 0.1, ten: 'Hình và nhạc khít đến 0.1 giây', chiTiet: (d) => `Hình ${d.tong.toFixed(1)}s, nhạc lệch ${d.lechNhac.toFixed(1)}s (kéo cả hai hít đúng 30.0 giây)` },
       ],
       goiY: [
         'Bốn chỗ nối thì có một chỗ cùng chủ đề Ngày hội (Thi và Rô bốt), chỗ đó giữ cắt thẳng.',

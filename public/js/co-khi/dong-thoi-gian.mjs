@@ -1,6 +1,6 @@
 // Cơ khí dòng thời gian: cắt đầu cuối từng đoạn, đổi thứ tự, chuyển cảnh ăn mất thời lượng, nhạc nền (U11-14, U11-15).
 import { giong, kep } from '../toan/hinh-hoc.mjs';
-import { MAU } from '../hinh.mjs';
+import { MAU, datVao, logoLong, BIEU_TUONG, robot } from '../hinh.mjs';
 import { taoSvg, batKeo, dongHo } from './chung.mjs';
 
 export const W = 360, H = 262;
@@ -76,7 +76,9 @@ export default {
     const giayHien = man.giayHien || 60;
     const DV_GIAY = (W - X0 - 8) / giayHien;
     let phatTai = null;
+    let dangChay = false;
     let hen = 0;
+    let demTick = 0;
     let dangHit = false;
     let dh = null;
     const yDinh = YA + 6, yDay = YA + CAO_NHAC - 5;
@@ -87,7 +89,62 @@ export default {
     const cuoiNhac = (n) => Math.min(X0 + n.ra * DV_GIAY, W - 6);
     const capDo = () => {
       const n = ctx.st.nhac;
-      return dh ? dh.capNhat({ am: n.am, moGiay: giayMo(n) }) : false;
+      return dh ? dh.khoaHit({ am: n.am, moGiay: giayMo(n) }) : '';
+    };
+
+    const veCanhClip = (c, giay, op = 1) => {
+      const boc = (noi) => (op < 0.99 ? `<g opacity="${op.toFixed(2)}">${noi}</g>` : noi);
+      if (c.id === 'mo') {
+        return boc(`<rect x="70" y="10" width="220" height="112" fill="url(#gr-troi)"/>
+          <circle cx="256" cy="32" r="12" fill="${MAU.vang}"/><rect x="70" y="84" width="220" height="38" fill="${MAU.san}"/>
+          <path d="M116 56l64-22 64 22z" fill="${MAU.chan}"/><rect x="126" y="55" width="108" height="30" fill="${MAU.tuong}" stroke="${MAU.muc}" stroke-width="1.2"/>
+          <rect x="104" y="58" width="5" height="36" fill="${MAU.muc}"/><rect x="251" y="58" width="5" height="36" fill="${MAU.muc}"/>
+          <rect x="109" y="60" width="142" height="16" rx="2" fill="url(#gr-poster)"/><text x="180" y="71.5" text-anchor="middle" font-size="9.5" font-weight="800" fill="${MAU.trang}" font-family="var(--font)">NGÀY HỘI TIN HỌC</text>`);
+      }
+      if (c.id === 'pv') {
+        const noi = c.noi && giay !== null && giay >= c.noi[0] && giay <= c.noi[1];
+        const songLoi = [0, 1, 2, 3, 4].map((k) => {
+          const caoCot = noi ? 6 + Math.round(12 * Math.abs(Math.sin((giay || 0) * 5 + k * 1.3))) : 3;
+          return `<rect x="${198 + k * 9}" y="${54 - caoCot / 2}" width="5" height="${caoCot}" rx="2" fill="${noi ? MAU.vang : MAU.xam}"/>`;
+        }).join('');
+        return boc(`<rect x="70" y="10" width="220" height="112" fill="${MAU.ao}"/>
+          <rect x="84" y="18" width="192" height="72" rx="6" fill="${MAU.man}" fill-opacity=".28"/>
+          <circle cx="144" cy="44" r="13" fill="${MAU.tuong}"/><path d="M122 90v-14a22 20 0 0144 0v14z" fill="${MAU.hong}"/>
+          <rect x="174" y="54" width="6" height="14" rx="3" fill="${MAU.xamNhat}"/><path d="M177 68v22" stroke="${MAU.xamNhat}" stroke-width="2.5"/>
+          ${songLoi}`);
+      }
+      if (c.id === 'hd') {
+        return boc(`<rect x="70" y="10" width="220" height="112" fill="${MAU.teal}"/>
+          ${datVao(BIEU_TUONG[0].ve(), 120, 52, 52, 52)}
+          <rect x="164" y="28" width="46" height="32" rx="4" fill="${MAU.man}" stroke="${MAU.trang}" stroke-width="1.5"/>
+          <path d="M172 38h22M172 45h30M172 52h16" stroke="${MAU.cyan}" stroke-width="2.4" stroke-linecap="round"/>
+          <rect x="220" y="34" width="46" height="32" rx="4" fill="${MAU.man}" stroke="${MAU.trang}" stroke-width="1.5"/>
+          <path d="M228 44h26M228 51h18M228 58h28" stroke="${MAU.vang}" stroke-width="2.4" stroke-linecap="round"/>`);
+      }
+      if (c.id === 'rb') {
+        const gocTay = giay === null ? 32 : Math.round(28 + 24 * Math.sin(giay * 4));
+        return boc(`<rect x="70" y="10" width="220" height="112" fill="${MAU.tuong}"/><rect x="70" y="84" width="220" height="38" fill="${MAU.san}"/>
+          ${datVao(robot(gocTay), 180, 56, 62, 78, 0, 120, 150)}`);
+      }
+      return boc(`<rect x="70" y="10" width="220" height="112" fill="url(#gr-poster)"/>
+        ${datVao(logoLong(), 180, 48, 52, 52)}
+        <text x="180" y="86" text-anchor="middle" font-size="11" font-weight="800" fill="${MAU.vang}" font-family="var(--font)">CLB TIN HỌC</text>`);
+    };
+
+    const khungTai = (st, t) => {
+      let dau = 0;
+      const ds = [];
+      for (let i = 0; i < st.clip.length; i++) {
+        const c = st.clip[i], d = daiClip(c);
+        if (t >= dau && t <= dau + d + 0.001) ds.push({ c, giay: c.vao + (t - dau), dau });
+        dau += d - (st.chuyen?.[i] === 'mo' ? CHONG_MO : 0);
+      }
+      if (!ds.length) return [];
+      if (ds.length >= 2) {
+        const op = kep((t - ds[1].dau) / CHONG_MO, 0, 1);
+        return [{ ...ds[0], op: 1 }, { ...ds[1], op }];
+      }
+      return [{ ...ds[0], op: 1 }];
     };
 
     // Như phần mềm dựng phim: âm lượng là đường ngang nằm ngay trên rãnh nhạc, mờ dần là đoạn dốc cuối đường đó.
@@ -126,27 +183,47 @@ export default {
       const st = ctx.st;
       let s = `<rect width="${W}" height="${cao}" fill="${MAU.muc}"/>`;
       const dayThuoc = st.nhac ? YA + CAO_NHAC : YV + 54;
-      // Màn xem trước
+      const tongHinh = tongDai(st);
+      // Màn xem trước: có cảnh thật và hòa mờ trực tiếp tại chỗ chuyển cảnh.
       let hienTai = st.clip.find((c) => c.id === st.chon) || st.clip[0];
       let giayTrong = null;
+      let hetHinh = false;
+      let lopCanh = '';
       if (phatTai !== null) {
-        let t = phatTai;
-        for (let i = 0; i < st.clip.length; i++) {
-          const d = daiClip(st.clip[i]);
-          if (t < d) { hienTai = st.clip[i]; giayTrong = hienTai.vao + t; break; }
-          t -= d - (st.chuyen?.[i] === 'mo' ? CHONG_MO : 0);
+        if (phatTai > tongHinh + 0.05) {
+          hetHinh = true;
+          lopCanh = `<rect x="70" y="10" width="220" height="112" fill="${MAU.man}"/>
+            <text x="180" y="58" text-anchor="middle" font-size="13.5" font-weight="800" fill="${MAU.vang}" font-family="var(--font)">Hết hình (màn hình đen)</text>
+            <text x="180" y="78" text-anchor="middle" font-size="11.5" fill="${MAU.xamNhat}" font-family="var(--font)">Nhạc nền vẫn đang kêu tiếp...</text>`;
+        } else {
+          const dsKhung = khungTai(st, phatTai);
+          if (dsKhung.length) {
+            const chinh = dsKhung[dsKhung.length - 1];
+            hienTai = chinh.c;
+            giayTrong = chinh.giay;
+            lopCanh = dsKhung.map((k) => veCanhClip(k.c, k.giay, k.op)).join('');
+          }
         }
       }
-      s += `<rect x="70" y="10" width="220" height="112" rx="8" fill="${hienTai.mau}"/>`;
-      s += `<text x="180" y="62" text-anchor="middle" font-size="16" font-weight="800" fill="${MAU.trang}" font-family="var(--font)">${hienTai.ten}</text>`;
-      const noiDang = hienTai.noi && giayTrong !== null && giayTrong >= hienTai.noi[0] && giayTrong <= hienTai.noi[1];
-      if (hienTai.noi) s += `<text x="180" y="84" text-anchor="middle" font-size="12" fill="${MAU.trang}" opacity="${phatTai === null || noiDang ? 1 : 0.4}" font-family="var(--font)">${phatTai === null ? `Lời nói giây ${hienTai.noi[0]} đến ${hienTai.noi[1]}` : hienTai.cau}</text>`;
-      // Đoạn đã cắt ngắn không còn chỗ ghi nhãn trên thước, nên độ dài hiện ở màn xem trước.
-      s += `<text x="180" y="${hienTai.noi ? 104 : 84}" text-anchor="middle" font-size="12" fill="${MAU.trang}" font-family="var(--mono)">giữ ${daiClip(hienTai).toFixed(1)}s trên ${hienTai.goc}s gốc</text>`;
-      // Thước, mốc 30 giây
+      if (!lopCanh) lopCanh = veCanhClip(hienTai, null, 1);
+      s += `<clipPath id="cl-xem-phim"><rect x="70" y="10" width="220" height="112" rx="8"/></clipPath>`;
+      s += `<g clip-path="url(#cl-xem-phim)">${lopCanh}`;
+      if (!hetHinh) {
+        const noiDang = hienTai.noi && giayTrong !== null && giayTrong >= hienTai.noi[0] && giayTrong <= hienTai.noi[1];
+        const dongPhu = hienTai.noi
+          ? (phatTai === null ? `Lời nói giây ${hienTai.noi[0]}..${hienTai.noi[1]} · giữ ${daiClip(hienTai).toFixed(1)}s/${hienTai.goc}s` : (noiDang ? hienTai.cau : `giữ ${daiClip(hienTai).toFixed(1)}s trên ${hienTai.goc}s gốc`))
+          : `giữ ${daiClip(hienTai).toFixed(1)}s trên ${hienTai.goc}s gốc`;
+        s += `<rect x="70" y="88" width="220" height="34" fill="${MAU.man}" fill-opacity=".72"/>`;
+        s += `<text x="180" y="102" text-anchor="middle" font-size="11.5" font-weight="800" fill="${MAU.trang}" font-family="var(--font)">${hienTai.ten}</text>`;
+        s += `<text x="180" y="116" text-anchor="middle" font-size="10.5" fill="${noiDang ? MAU.vang : MAU.xamNhat}" font-family="var(--font)">${dongPhu}</text>`;
+      }
+      s += `</g><rect x="70" y="10" width="220" height="112" rx="8" fill="none" stroke="${MAU.xam}" stroke-opacity=".35"/>`;
+      // Thước, mốc 30 giây (chạm hoặc kéo trên thước để tua kim xem thử)
       const xs = (g) => X0 + g * DV_GIAY;
+      s += `<g data-h="thuoc"><rect x="${X0}" y="122" width="${W - X0 - 8}" height="26" fill="transparent"/>`;
       s += `<path d="M${X0} 138H${W - 8}" stroke="${MAU.xam}" stroke-width="1"/>`;
       for (let g = 0; g <= giayHien; g += 10) s += `<path d="M${xs(g)} 134v8" stroke="${MAU.xam}"/><text x="${xs(g)}" y="130" text-anchor="middle" font-size="9.5" fill="${MAU.xam}" font-family="var(--mono)">${g}</text>`;
+      s += '</g>';
       s += `<path d="M${xs(man.dich)} 126V${dayThuoc}" stroke="${dangHit ? MAU.hong : MAU.vang}" stroke-width="${dangHit ? 3 : 2}" stroke-dasharray="5 4"/>`;
       // Đoạn hình
       let g = 0;
@@ -189,8 +266,11 @@ export default {
       s += cham;
       const t = tongDai(st);
       s += `<text x="16" y="30" font-size="13" font-weight="800" fill="${Math.abs(t - man.dich) <= 0.5 ? MAU.xanh : MAU.vang}" font-family="var(--mono)">${t.toFixed(1)}s</text><text x="16" y="46" font-size="10.5" fill="${MAU.xam}" font-family="var(--font)">đích ${man.dich}s</text>`;
-      if (phatTai !== null) s += `<path d="M${xs(phatTai)} 126V${dayThuoc}" stroke="${MAU.trang}" stroke-width="2"/>`;
-      s += `<g data-h="phat"><circle cx="326" cy="34" r="24" fill="transparent"/><circle cx="326" cy="34" r="17" fill="${MAU.trang}"/>${phatTai === null ? `<path d="M321 26l13 8-13 8z" fill="${MAU.muc}"/>` : `<path d="M320 27h4v14h-4zM328 27h4v14h-4z" fill="${MAU.muc}"/>`}</g>`;
+      if (phatTai !== null) {
+        const kx = xs(Math.min(giayHien, phatTai));
+        s += `<path d="M${kx} 124V${dayThuoc}" stroke="${MAU.trang}" stroke-width="2" pointer-events="none"/><circle cx="${kx}" cy="126" r="4.5" fill="${MAU.trang}" stroke="${MAU.muc}" stroke-width="1.5" pointer-events="none"/>`;
+      }
+      s += `<g data-h="phat"><circle cx="326" cy="34" r="24" fill="transparent"/><circle cx="326" cy="34" r="17" fill="${MAU.trang}"/>${!dangChay ? `<path d="M321 26l13 8-13 8z" fill="${MAU.muc}"/>` : `<path d="M320 27h4v14h-4zM328 27h4v14h-4z" fill="${MAU.muc}"/>`}</g>`;
       svg.innerHTML = s;
     };
 
@@ -202,17 +282,38 @@ export default {
       capDo();
     };
 
-    const dungPhat = () => {
+    const giayCuoiXem = () => {
+      const st = ctx.st;
+      const th = tongDai(st);
+      return st.nhac ? Math.max(th, Math.min(giayHien, Math.min(st.nhac.ra, th + 5))) : th;
+    };
+
+    const phatAmTai = (giay) => {
+      const st = ctx.st;
+      const ds = khungTai(st, giay);
+      const coLoi = ds.some((k) => k.c.noi && k.giay >= k.c.noi[0] && k.giay <= k.c.noi[1]);
+      const amNhac = st.nhac && giay <= st.nhac.ra ? heSoAm(st.nhac, giay) : 0;
+      if (st.nhac || coLoi) ctx.nhipPhim?.({ amNhac, coLoi, buoc: Math.floor(demTick / 3) });
+    };
+
+    const dungPhat = (giuKim = false) => {
       clearInterval(hen);
-      phatTai = null;
+      dangChay = false;
+      if (!giuKim) phatTai = null;
       ve();
     };
     const batDauPhat = () => {
-      phatTai = 0;
+      clearInterval(hen);
+      dangChay = true;
+      demTick = 0;
+      if (phatTai === null || phatTai >= giayCuoiXem() - 0.2) phatTai = 0;
+      phatAmTai(phatTai);
       ve();
       hen = setInterval(() => {
+        demTick++;
         phatTai += 0.4;
-        if (phatTai >= tongDai(ctx.st)) dungPhat();
+        if (demTick % 3 === 0) phatAmTai(phatTai);
+        if (phatTai >= giayCuoiXem()) dungPhat(false);
         else ve();
       }, 60);
     };
@@ -221,10 +322,19 @@ export default {
       const st = ctx.st;
       // Chạm chỗ trống là bỏ chọn: thanh vàng biến mất, đoạn ngắn lại kéo được trọn thân.
       if (!h) {
-        if (st.chon) { st.chon = null; ve(); ctx.doi(); }
+        if (st.chon || phatTai !== null) { st.chon = null; dungPhat(false); ctx.doi(); }
         return null;
       }
-      if (h === 'phat') { if (phatTai === null) batDauPhat(); else dungPhat(); return null; }
+      if (h === 'phat') { if (!dangChay) batDauPhat(); else dungPhat(false); return null; }
+      if (h === 'thuoc') {
+        dungPhat(true);
+        const datKim = (x) => {
+          phatTai = kep(Math.round(((x - X0) / DV_GIAY) * 10) / 10, 0, giayCuoiXem());
+          ve();
+        };
+        datKim(pt.x);
+        return { di(p) { datKim(p.x); } };
+      }
       // Như các app dựng phim: chạm đoạn là chọn và hiện thanh vàng để cắt, kéo thân đoạn là đổi chỗ.
       if (h.startsWith('c:')) {
         const id = h.slice(2);
@@ -273,8 +383,8 @@ export default {
             if (!daGhi) { ctx.ghi(); daGhi = true; }
             n.am = kep(Math.round((am0 + ((pt.y - p.y) / (yDay - yDinh)) * 100) / 5) * 5, 0, 100);
             ve();
-            capDo();
-            ctx.hit(n.am <= mucLoi ? 'am' : '');
+            const khoa = capDo();
+            ctx.hit(khoa || (n.am <= mucLoi ? 'am' : ''));
           },
           nha() { ctx.hit(); ve(); capDo(); ctx.doi(); },
         };
@@ -291,8 +401,8 @@ export default {
             const giay = Math.round(((cuoiNhac(n) - (p.x + lech)) / DV_GIAY) * 2) / 2;
             n.mo = kep(giay, 0, Math.min(MO_TOI_DA, n.ra));
             ve();
-            capDo();
-            ctx.hit(n.mo >= 1 ? 'mo' : '');
+            const khoa = capDo();
+            ctx.hit(khoa || (n.mo >= 1 ? 'mo' : ''));
           },
           nha() { ctx.hit(); ve(); capDo(); ctx.doi(); },
         };

@@ -32,6 +32,7 @@ export default {
     san.innerHTML = '';
     const svg = taoSvg(san, W, H, man.sanNhan || 'Sân nắn đường cong');
     let vong = null;
+    let tamNgam = null;
     // Màn uốn cong phải giữ nguyên số nút, nên không bày dấu cộng ra làm rối mép cờ. Màn nào cần cả hai thì tự khai coThem.
     const coThem = man.san?.coThem ?? !man.san?.coTron;
 
@@ -69,6 +70,11 @@ export default {
           ? `<circle cx="${p.x}" cy="${p.y}" r="8" fill="${mau}" stroke="${MAU.muc}" stroke-width="2.5"/></g>`
           : `<rect x="${p.x - 7}" y="${p.y - 7}" width="14" height="14" rx="2" fill="${mau}" stroke="${MAU.muc}" stroke-width="2.5"/></g>`;
       });
+      if (tamNgam) {
+        const { x: tx, y: ty } = tamNgam;
+        const tia = `M${tx - 40} ${ty}H${tx - 12}M${tx + 12} ${ty}H${tx + 40}M${tx} ${ty - 40}V${ty - 12}M${tx} ${ty + 12}V${ty + 40}`;
+        s += `<path d="${tia}" fill="none" stroke="${MAU.trang}" stroke-width="3.2" pointer-events="none"/><path d="${tia}" fill="none" stroke="${MAU.hong}" stroke-width="1.6" stroke-dasharray="4 3" pointer-events="none"/>`;
+      }
       if (vong) s += `<circle cx="${vong.x}" cy="${vong.y}" r="14" fill="none" stroke="${MAU.hong}" stroke-width="2.5"/>`;
       svg.innerHTML = s;
     };
@@ -105,10 +111,11 @@ export default {
           n.y = Math.max(8, Math.min(H - 8, Math.round(p.y)));
           vong = null;
           for (const g of giu) if (Math.hypot(g.x - n.x, g.y - n.y) < 12) { n.x = g.x; n.y = g.y; vong = g; }
+          tamNgam = { x: n.x, y: n.y };
           ctx.hit(vong ? `${vong.x},${vong.y}` : '');
           ve();
         },
-        nha() { vong = null; ctx.hit(); ve(); veKhay(); ctx.doi(); },
+        nha() { vong = null; tamNgam = null; ctx.hit(); ve(); veKhay(); ctx.doi(); },
       };
     };
 
@@ -144,9 +151,10 @@ export default {
             ctx.hit(vong ? 'tay' : '');
             n.r = [dx, dy];
             n.v = [-dx, -dy];
+            tamNgam = dau === 'v' ? { x: n.x - dx, y: n.y - dy } : { x: n.x + dx, y: n.y + dy };
             ve();
           },
-          nha() { vong = null; ctx.hit(); ve(); ctx.doi(); },
+          nha() { vong = null; tamNgam = null; ctx.hit(); ve(); ctx.doi(); },
         };
       }
       if (h.startsWith('n:')) {

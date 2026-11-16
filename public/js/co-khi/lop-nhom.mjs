@@ -160,6 +160,16 @@ export default {
       return ids.length === chon.length && ids.every((i) => chon.includes(i)) ? ids : null;
     };
 
+    const manhTrongQuet = (st, q) => {
+      const x0 = Math.min(q.x0, q.x1), x1 = Math.max(q.x0, q.x1);
+      const y0 = Math.min(q.y0, q.y1), y1 = Math.max(q.y0, q.y1);
+      if (x1 - x0 < 6 && y1 - y0 < 6) return [];
+      return [...new Set(st.manh.filter((m) => {
+        const b = hop(m);
+        return b.x >= x0 && b.y >= y0 && b.x + b.w <= x1 && b.y + b.h <= y1;
+      }).flatMap((m) => cumCua(st, m.id)))];
+    };
+
     const ve = () => {
       const st = ctx.st;
       const chon = st.chon || [];
@@ -198,7 +208,20 @@ export default {
         s += `<rect x="${b.x - 2}" y="${b.y - 2}" width="${b.w + 4}" height="${b.h + 4}" rx="3" fill="none" stroke="${MAU.hong}" stroke-width="2.5"/>`;
       }
       if (gion) s += `<path d="${gion}" fill="none" stroke="${MAU.hong}" stroke-width="1.8" stroke-dasharray="5 4"/>`;
-      if (quet) s += `<rect x="${Math.min(quet.x0, quet.x1)}" y="${Math.min(quet.y0, quet.y1)}" width="${Math.abs(quet.x1 - quet.x0)}" height="${Math.abs(quet.y1 - quet.y0)}" fill="${MAU.cyan}" fill-opacity=".14" stroke="${MAU.chan}" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+      if (quet) {
+        const qx = Math.min(quet.x0, quet.x1), qy = Math.min(quet.y0, quet.y1);
+        const qw = Math.abs(quet.x1 - quet.x0), qh = Math.abs(quet.y1 - quet.y0);
+        const duKien = manhTrongQuet(st, quet);
+        for (const id of duKien) {
+          const b = hop(st.manh.find((m) => m.id === id));
+          s += `<rect x="${b.x - 2}" y="${b.y - 2}" width="${b.w + 4}" height="${b.h + 4}" rx="3" fill="${MAU.cyan}" fill-opacity=".18" stroke="${MAU.chan}" stroke-width="2.2" pointer-events="none"/>`;
+        }
+        s += `<rect x="${qx}" y="${qy}" width="${qw}" height="${qh}" fill="${MAU.cyan}" fill-opacity=".14" stroke="${MAU.chan}" stroke-width="1.5" stroke-dasharray="4 3" pointer-events="none"/>`;
+        if (duKien.length) {
+          const ly = qy > 24 ? qy - 6 : Math.min(H - 6, qy + qh + 15);
+          s += `<text x="${Math.max(36, Math.min(W - 36, qx + qw / 2))}" y="${ly}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${MAU.chan}" stroke="${MAU.trang}" stroke-width="3" paint-order="stroke" font-family="var(--font)" pointer-events="none">Chọn ${duKien.length} mảnh</text>`;
+        }
+      }
       svg.innerHTML = s;
     };
 
@@ -228,6 +251,12 @@ export default {
         ]);
       }
       if (cu.includes('can')) {
+        if (chon.length > 1) {
+          const goiMau = document.createElement('div');
+          goiMau.className = 'nhan-phu';
+          goiMau.textContent = 'Hình ghi chữ mẫu sẽ đứng yên làm chuẩn. Chạm hình khác trong nhóm chọn để đổi mẫu.';
+          khay.appendChild(goiMau);
+        }
         const voi = (fn) => () => { ctx.ghi(); fn(st, chon, chon[0]); ve(); veKhay(); ctx.doi(); };
         thanhLenh([
           { id: 'cungco', nhan: 'Cùng cỡ', ic: 'cungCo', tat: chon.length < 2, bam: voi(lam.cungCo) },
@@ -327,16 +356,17 @@ export default {
         // Kéo trên nền là quét chọn, chạm nền là bỏ chọn.
         quet = { x0: pt.x, y0: pt.y, x1: pt.x, y1: pt.y };
         return {
-          di(p) { quet.x1 = p.x; quet.y1 = p.y; ve(); },
+          di(p) {
+            quet.x1 = p.x; quet.y1 = p.y;
+            const n = manhTrongQuet(st, quet).length;
+            ctx.hit(n ? `quet-${n}` : '');
+            ve();
+          },
           nha() {
-            const x0 = Math.min(quet.x0, quet.x1), x1 = Math.max(quet.x0, quet.x1);
-            const y0 = Math.min(quet.y0, quet.y1), y1 = Math.max(quet.y0, quet.y1);
-            const nho = x1 - x0 < 6 && y1 - y0 < 6;
+            const duKien = manhTrongQuet(st, quet);
             quet = null;
-            st.chon = nho ? [] : [...new Set(st.manh.filter((m) => {
-              const b = hop(m);
-              return b.x >= x0 && b.y >= y0 && b.x + b.w <= x1 && b.y + b.h <= y1;
-            }).flatMap((m) => cumCua(st, m.id)))];
+            ctx.hit();
+            st.chon = duKien;
             ve(); veKhay(); ctx.doi();
           },
         };

@@ -57,6 +57,7 @@ export function moRap({ man, ket, st, soGoiY, soHong, tiepCua, khiDong, khiGoiY 
   lop.innerHTML = `<div class="rap-san"><div class="rap-tranh">${svg}<span class="rap-quet" aria-hidden="true"></span></div></div>
     <div class="rap-dang"><span class="rap-cham"></span>${man.chay}...</div>`;
   document.body.appendChild(lop);
+  if (!giamChuyenDong()) phat('quet');
   const henCho = setTimeout(hien, giamChuyenDong() ? 150 : 1250);
   const hen = [];
 
@@ -103,7 +104,7 @@ export function moRap({ man, ket, st, soGoiY, soHong, tiepCua, khiDong, khiGoiY 
         <div class="ket-loi"><div class="ket-qua-nguoi">${tenAi(ai)}</div><h2>${CAU_DAT[ai][Math.max(0, ket.sao - 1)]}</h2></div>
         <div class="ket-sao" role="img" aria-label="${ket.sao} trên 3 sao">${hang}</div></div>
       ${truoc > ket.sao ? `<p class="nhan-phu ket-cu">Kỷ lục cũ ${truoc} sao vẫn được giữ.</p>` : ''}
-      ${ds.length ? `<ul class="ket-ds">${ds.map((t) => `<li class="${t.dat ? 'dat' : 'chua'}">${icon(t.dat ? 'xong' : 'them')}<span>${t.ten}</span></li>`).join('')}</ul>` : ''}
+      ${ds.length ? `<ul class="ket-ds">${ds.map((t) => `<li class="${t.dat ? 'dat' : 'chua'}">${icon(t.dat ? 'xong' : 'them')}<span>${t.ten}${!t.dat && t.chiTiet ? `<small class="ket-ds-phu">${t.chiTiet(ket.d, st)}</small>` : ''}</span></li>`).join('')}</ul>` : ''}
       ${hangThuong(man, dauTien, moi)}
       ${(ho?.chay || 0) > 1 ? `<p class="nhan-phu ket-cu">Lần chạy thứ ${ho.chay}. Thử bao nhiêu lần cũng không mất gì.</p>` : ''}
       <div class="ket-nut"><button class="nut-phu" type="button" data-dong>${ket.sao === 3 ? 'Xem lại' : 'Làm đẹp hơn'}</button><a class="nut-chinh" href="${tiep.hash}">${tiep.nhan}${icon('tiep')}</a></div>`;
