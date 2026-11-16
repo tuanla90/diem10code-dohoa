@@ -1,6 +1,6 @@
 // Ngân hàng câu Mắt Thiết Kế. Mỗi câu hai bản vẽ cùng khung 240x130, câu trả lời sai là một lỗi đã gặp trong màn.
 // goi: chỉ hỏi khi đã xong gói đó, để không hỏi điều chưa học. k: mục Sổ tay để đọc thêm.
-import { MAU, datVao, logoLong, logoKhoi, MANH_LOGO, BIEU_TUONG, robot, tieuDe } from '../hinh.mjs';
+import { MAU, datVao, logoLong, logoKhoi, MANH_LOGO, BIEU_TUONG, robot, tieuDe, standeeRobot, muiTenChiDuong } from '../hinh.mjs';
 
 const nenPoster = `<rect width="240" height="130" fill="url(#gr-poster)"/>`;
 const nenTrang = `<rect width="240" height="130" fill="${MAU.trang}"/>`;
@@ -90,6 +90,12 @@ export const CAU = [
     vi: 'Logo bé giữa khung thì đứng xa không ai thấy. Đẩy tới khi chạm cạnh ngắn của khung.',
   },
   {
+    goi: 0, k: 'to-vien', hoi: 'Biển chỉ đường nào đặt nét viền đúng cách?', chi: [42, 24, 156, 82],
+    dung: () => `<rect width="240" height="130" fill="${MAU.tuong}"/>${muiTenChiDuong({ to: MAU.vang, vien: MAU.muc, day: 4, dut: false, d: 'M50 48H146V30L194 65L146 100V82H50Z' })}${chu(114, 70, 'HỘI TRƯỜNG', 13, MAU.muc, 800)}`,
+    sai: () => `<rect width="240" height="130" fill="${MAU.tuong}"/>${muiTenChiDuong({ to: MAU.ao, vien: MAU.do, day: 16, dut: true, d: 'M50 48H146V30L194 65L146 100V82H50Z' })}${chu(114, 70, 'HỘI TRƯỜNG', 13, MAU.muc, 800)}`,
+    vi: 'Viền quá dày phình ra lấp chữ bên trong, màu tô tối làm chữ chìm, nét đứt trông như biển tạm.',
+  },
+  {
     goi: 1, k: 'lop', hoi: 'Bản nào xếp lớp đúng?', chi: [62, 18, 116, 88],
     dung: () => `${nenTrang}${datVao(logoLong(), 120, 65, 112, 112)}`,
     sai: () => `${nenTrang}${datVao(['sao', 'chu', 'dai', 'nen', 'vong'].map((k) => MANH_LOGO[k].ve()).join(''), 120, 65, 112, 112)}`,
@@ -106,6 +112,12 @@ export const CAU = [
     dung: () => `${nenTrang}${chuoiHinh([[32, 65, 36], [76, 65, 36], [120, 65, 36], [164, 65, 36], [208, 65, 36]])}`,
     sai: () => `${nenTrang}${chuoiHinh([[30, 65, 26], [72, 65, 42], [120, 65, 30], [164, 65, 46], [210, 65, 24]])}`,
     vi: 'Cùng là biểu tượng ngang hàng thì phải cùng cỡ, trừ khi bạn thật sự muốn nhấn một món.',
+  },
+  {
+    goi: 1, k: 'nhan-ban-lat', hoi: 'Cổng gian hàng nào dựng đôi standee chào khách đúng cách?', chi: [148, 20, 80, 102],
+    dung: () => `<rect width="240" height="130" fill="${MAU.tuong}"/><rect y="108" width="240" height="22" fill="${MAU.san}"/><rect x="92" y="16" width="56" height="92" rx="4" fill="${MAU.kinhToi}"/><rect x="88" y="12" width="64" height="20" rx="4" fill="url(#gr-poster)"/>${chu(120, 25, 'RÔ BỐT', 9, MAU.vang)}${datVao(standeeRobot(), 52, 68, 66, 95, 0, 90, 130)}<g transform="translate(376 0) scale(-1 1)">${datVao(standeeRobot(), 188, 68, 66, 95, 0, 90, 130)}</g>`,
+    sai: () => `<rect width="240" height="130" fill="${MAU.tuong}"/><rect y="108" width="240" height="22" fill="${MAU.san}"/><rect x="92" y="16" width="56" height="92" rx="4" fill="${MAU.kinhToi}"/><rect x="88" y="12" width="64" height="20" rx="4" fill="url(#gr-poster)"/>${chu(120, 25, 'RÔ BỐT', 9, MAU.vang)}${datVao(standeeRobot(), 52, 68, 66, 95, 0, 90, 130)}${datVao(standeeRobot(), 188, 68, 66, 95, 0, 90, 130)}`,
+    vi: 'Nhân đôi mà quên lật ngang thì standee bên phải chỉ mũi tên ra ngoài thay vì mời khách vào cổng.',
   },
   {
     goi: 2, k: 'bezier', hoi: 'Lá cờ nào có mép uốn mềm?', chi: [76, 4, 68, 32],
@@ -160,6 +172,12 @@ export const CAU = [
     dung: () => `${hoiTruong()}<rect y="88" width="240" height="42" fill="${MAU.muc}"/>${chu(120, 118, 'NGÀY HỘI', 28)}`,
     sai: () => `${hoiTruong()}${chu(120, 68, 'NGÀY HỘI TIN HỌC', 10, MAU.tuong, 500)}`,
     vi: 'Chữ nhỏ, sáng trên nền lốm đốm thì chìm. Thêm dải nền, tăng cỡ, đặt tránh chủ thể.',
+  },
+  {
+    goi: 3, k: 'cat-cup', hoi: 'Ảnh kỷ niệm nào đã xoay thẳng và cắt gọn rìa thừa?', chi: [10, 66, 42, 54],
+    dung: () => `<rect width="240" height="130" fill="${MAU.troi}"/><rect y="78" width="240" height="52" fill="${MAU.san}"/><path d="M0 78h240" stroke="${MAU.chan}" stroke-width="3"/>${datVao(robot(0, { tay: 'hong' }), 120, 74, 48, 60, 0, 120, 150)}<circle cx="80" cy="66" r="9" fill="${MAU.muc}"/><path d="M68 100v-14a12 12 0 0124 0v14z" fill="${MAU.chan}"/><circle cx="160" cy="66" r="9" fill="${MAU.muc}"/><path d="M148 100v-14a12 12 0 0124 0v14z" fill="${MAU.hong}"/>`,
+    sai: () => `<g transform="rotate(-7 120 65)"><rect x="-20" y="-20" width="280" height="170" fill="${MAU.troi}"/><rect x="-20" y="78" width="280" height="72" fill="${MAU.san}"/><path d="M-20 78h280" stroke="${MAU.chan}" stroke-width="3"/>${datVao(robot(0, { tay: 'hong' }), 126, 74, 38, 48, 0, 120, 150)}<rect x="18" y="76" width="22" height="34" rx="2" fill="${MAU.cam}"/><rect x="15" y="71" width="28" height="6" fill="${MAU.go}"/></g>`,
+    vi: 'Ảnh chụp nghiêng và dính thùng rác ở rìa cần xoay thẳng đường sân rồi cắt gọn vào chủ thể.',
   },
   {
     goi: 4, k: 'khung-hinh', hoi: 'Ảnh động nào vẫy tay mượt hơn?', chi: [74, 14, 92, 62],

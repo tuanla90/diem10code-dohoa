@@ -182,15 +182,20 @@ function veRobotAnh(a, that, ox, oy, s, r, { thepTay = false, nhieu = 3 } = {}) 
       return (x - x1 - t * (x2 - x1)) ** 2 + (y - y1 - t * (y2 - y1)) ** 2 <= nua * nua;
     }, c, n);
   };
-  const muc = rgb(MAU.muc), cyan = rgb(MAU.cyan), vo = rgb(MAU.vo);
+  const muc = rgb(MAU.muc), xanhSang = rgb(MAU.manXanhSang), vo = rgb(MAU.vo), trang = rgb(MAU.trang), tai = rgb(MAU.tai);
+  const elip = (cx, cy, rx, ry, c, n) => to(cx - rx, cy - ry, cx + rx, cy + ry, (x, y) => ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1, c, n);
   const hopVien = (h, c, vien) => { hop(h, muc, nhieu, vien / 2); hop(h, c, nhieu, -vien / 2); };
   const duong = (d, rong, c, n) => { for (let i = 0; i + 1 < d.length; i++) net(d[i], d[i + 1], rong, c, n); };
   const chamVien = ([x, y], rr, c) => { tron(x, y, rr + R.vienChi / 2, muc); tron(x, y, rr - R.vienChi / 2, c, 1); };
-  for (const c of R.chan) {
+  for (let idx = 0; idx < R.chan.length; idx++) {
+    const c = R.chan[idx], tr = R.truc[idx], [mx, my] = R.mam[idx];
+    hopVien(tr, rgb(MAU.banh), 2.2);
+    tron(mx, my, 6.2, muc); tron(mx, my, 4.4, tai, 1); tron(mx, my, 1.9, xanhSang, 0);
     hopVien(c, rgb(MAU.banh), R.vienChi);
-    for (const y of R.gach) net([c.x + 5, y], [c.x + c.w - 5, y], 2.4, rgb(MAU.banhGach), 1);
+    for (const y of R.gach) net([c.x + 3, y], [c.x + c.w - 3, y], 2.8, rgb(MAU.banhGach), 1);
   }
   for (const d of R.hong) {
+    tron(d[0][0], d[0][1], 5.4, muc); tron(d[0][0], d[0][1], 3.4, rgb(MAU.banh), 1);
     duong(d, R.tay, thepTay ? THEP : muc);
     if (thepTay) {
       // Hai hàng đinh tán dọc mép tay máy: tay trùng màu tường thì đinh vẫn cho thấy tay nằm đâu, kể cả sau khi lỡ xóa.
@@ -201,32 +206,60 @@ function veRobotAnh(a, that, ox, oy, s, r, { thepTay = false, nhieu = 3 } = {}) 
           for (const b of [-1, 1]) tron(x + b * nx * 2.8, y + b * ny * 2.8, 0.8, DINH, 0);
         }
       }
-    } else duong(d, R.tay * 0.42, vo, 1);
-    chamVien(d[2], R.banTay, cyan);
+      tron(d[1][0], d[1][1], 4.2, THEP, 1); tron(d[1][0], d[1][1], 1.4, DINH, 0);
+    } else {
+      duong(d, R.tay * 0.56, rgb(MAU.voToi), 1);
+      duong(d, R.tay * 0.28, vo, 1);
+      tron(d[1][0], d[1][1], 4.8, muc); tron(d[1][0], d[1][1], 3.1, tai, 1); tron(d[1][0], d[1][1], 1.4, xanhSang, 0);
+    }
+    const g = Math.atan2(d[2][1] - d[1][1], d[2][0] - d[1][0]), cs = Math.cos(g), sn = Math.sin(g);
+    for (const sgn of [-1, 1]) {
+      const jx1 = d[2][0] + 2 * cs - sgn * 4.4 * sn, jy1 = d[2][1] + 2 * sn + sgn * 4.4 * cs;
+      const jx2 = d[2][0] + 6.8 * cs - sgn * 3.2 * sn, jy2 = d[2][1] + 6.8 * sn + sgn * 3.2 * cs;
+      net([jx1, jy1], [jx2, jy2], 3.8, muc, 1);
+      net([jx1, jy1], [jx2, jy2], 1.8, tai, 1);
+    }
+    chamVien(d[2], R.banTay + 0.6, xanhSang);
   }
+  hopVien(R.gam, rgb(MAU.co), 2.2);
   hopVien(R.than, rgb(MAU.voToi), R.vien);
   hop(R.thanSang, vo, 2);
-  tron(R.nguc.x, R.nguc.y, R.nguc.r + 1, muc);
-  tron(R.nguc.x, R.nguc.y, R.nguc.r - 1, rgb(MAU.chan), 1);
-  tron(R.tim.x, R.tim.y, R.tim.r, cyan, 1);
+  hopVien(R.ngucVien, rgb(MAU.ngucVien), 2);
+  hop(R.ngucMan, xanhSang, 1);
+  hopVien(R.co, rgb(MAU.co), 2.2);
   net([R.anTen.x, R.anTen.y1], [R.anTen.x, R.anTen.y2], R.anTen.day, muc);
-  tron(R.anTen.x, R.anTen.yCham, R.anTen.r + 1, muc);
-  tron(R.anTen.x, R.anTen.yCham, R.anTen.r - 1, cyan, 1);
-  for (const t of R.tai) hop(t, muc);
+  tron(R.anTen.x, R.anTen.yCham, R.anTen.r + 1.1, muc);
+  tron(R.anTen.x, R.anTen.yCham, R.anTen.r - 1.1, xanhSang, 1);
+  for (const t of R.tai) hopVien(t, tai, 2.4);
   hopVien(R.dau, rgb(MAU.voToi), R.vien);
   hop(R.dauSang, vo, 2);
-  for (const d of R.ghep) duong(d, 2.4, rgb(MAU.voGhep), 1);
-  hopVien(R.kinh, rgb(MAU.kinhToi), 2.5);
-  hop(R.kinhSang, rgb(MAU.kinhSang), 1);
-  for (const m of R.mat) hop(m, cyan, 0);
-  for (const m of R.matSang) hop(m, rgb(MAU.matSang), 0);
+  hop(R.kinh, muc, nhieu, 1.3);
+  const cDam = rgb(MAU.manXanhDam), cGiua = rgb(MAU.manXanh), kIn = { x: R.kinh.x + 1.3, y: R.kinh.y + 1.3, w: R.kinh.w - 2.6, h: R.kinh.h - 2.6, r: R.kinh.r - 1.3 };
+  for (let j = Math.max(0, Math.floor(oy + kIn.y * s)); j <= Math.min(a.h - 1, Math.ceil(oy + (kIn.y + kIn.h) * s)); j++) {
+    const fy = (j + 0.5 - oy) / s, t = Math.max(0, Math.min(1, (fy - kIn.y) / kIn.h));
+    const tronMau = (p, q, u) => [Math.round(p[0] + (q[0] - p[0]) * u), Math.round(p[1] + (q[1] - p[1]) * u), Math.round(p[2] + (q[2] - p[2]) * u)];
+    const cm = t < 0.55 ? tronMau(cDam, cGiua, t / 0.55) : tronMau(cGiua, xanhSang, (t - 0.55) / 0.45);
+    for (let i = Math.max(0, Math.floor(ox + kIn.x * s)); i <= Math.min(a.w - 1, Math.ceil(ox + (kIn.x + kIn.w) * s)); i++) {
+      const fx = (i + 0.5 - ox) / s;
+      const dx = Math.max(kIn.x + kIn.r - fx, 0, fx - (kIn.x + kIn.w - kIn.r)), dy = Math.max(kIn.y + kIn.r - fy, 0, fy - (kIn.y + kIn.h - kIn.r));
+      if (dx * dx + dy * dy <= kIn.r * kIn.r) { chamDiem(a, i, j, cm, 1, r); if (that) that[j * a.w + i] = 1; }
+    }
+  }
+  for (const [cx, cy] of R.matTam) {
+    elip(cx, cy, R.matRx, R.matRy, trang, 0);
+    elip(cx, cy + 0.3, 6.1, 8, cDam, 0);
+    elip(cx, cy + 0.3, 2.7, 3.7, rgb(MAU.dongTu), 0);
+    tron(cx - 2, cy - 3.1, 1.9, trang, 0);
+    net([cx - 5.4, cy - 13.8], [cx + 5.4, cy - 13.8], 1.8, trang, 0);
+  }
+  net([57, 57.5], [63, 57.5], 1.9, trang, 0);
 }
 
-// Rô bốt trong ảnh 180x180. Khe tay là ô nền bị tay, thân và bánh xích bao kín, đủ to để chạm bằng ngón tay.
+// Rô bốt trong ảnh 180x180. Khe tay là ô nền bị tay, thân và bánh xe bao kín, đủ to để chạm bằng ngón tay.
 export const KHUNG_ANH = { ox: 12, oy: 3, s: 1.3 };
 const raAnh = ([x, y]) => [Math.round(KHUNG_ANH.ox + x * KHUNG_ANH.s), Math.round(KHUNG_ANH.oy + y * KHUNG_ANH.s)];
 export const TAY_ANH = ROBOT.hong.map((d) => d.map(raAnh));
-export const KHE_TAY = [[25, 95], [95, 95]].map(raAnh);
+export const KHE_TAY = [[25, 93], [95, 93]].map(raAnh);
 
 export function anhRobot(kieu) {
   const w = 180, h = 180, a = taoAnh(w, h), that = new Uint8Array(w * h), r = ngauNhien(kieu === 1 ? 21 : 37);
@@ -338,3 +371,64 @@ export function doChoi(r, g, b) {
   return 0.2126 * tuyenTinh(r) + 0.7152 * tuyenTinh(g) + 0.0722 * tuyenTinh(b);
 }
 export const tuongPhanWcag = (l1, l2) => (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+
+/* ---------- Ảnh tập thể chụp nghiêng có vật thừa hai rìa (U11-09) ---------- */
+export const TAP_THE = {
+  w: 240, h: 160, ox: 30, oy: 25, gocChuan: 7,
+  doi: { x: 85, y: 58, w: 70, h: 55 },
+  racTrai: { x: 20, y: 87, w: 26, h: 42 },
+  cotPhai: { x: 194, y: 37, w: 24, h: 94 },
+};
+
+/**
+ * Dựng bức ảnh tập thể CLB bị chụp nghiêng -7 độ, rìa trái dính thùng rác, rìa phải dính cột biển báo.
+ * Khung gốc 300x210 có lề dư để xoay +-15 độ trong khung ngắm 240x160 không lộ góc trống.
+ * @returns {{w: number, h: number, data: Uint8ClampedArray}} Dữ liệu ảnh điểm gốc.
+ */
+export function anhTapThe() {
+  const W = 300, H = 210, thang = taoAnh(W, H), r = ngauNhien(73);
+  for (let j = 0; j < 96; j++) chuNhat(thang, 0, j, W, 1, [190 - j * 0.2, 224 - j * 0.15, 255], 2, r);
+  hinhTron(thang, 82, 38, 12, [255, 255, 255], 0, r);
+  hinhTron(thang, 218, 34, 14, [255, 255, 255], 0, r);
+  // Mái nhà và bậc sân ngang rõ nét để mắt nhìn thấy ngay độ nghiêng đường chân trời.
+  chuNhat(thang, 54, 62, 192, 11, [79, 70, 229], 3, r);
+  chuNhat(thang, 60, 73, 180, 24, [241, 238, 251], 3, r);
+  for (let i = 0; i < 5; i++) chuNhat(thang, 74 + i * 34, 78, 14, 13, [148, 197, 248], 2, r);
+  chuNhat(thang, 0, 97, W, 4, [49, 46, 129], 2, r);
+  chuNhat(thang, 0, 101, W, H - 101, [214, 208, 238], 5, r);
+  // Đội hình ở giữa: hai thành viên đứng cạnh rô bốt CLB.
+  const veNguoi = (cx, ao) => {
+    chuNhat(thang, cx - 7, 108, 14, 29, ao, 3, r);
+    hinhTron(thang, cx, 99, 7, [30, 27, 75], 1, r);
+  };
+  veNguoi(122, [109, 93, 246]);
+  veNguoi(178, [236, 111, 191]);
+  veRobotAnh(thang, null, 128.4, 83, 0.36, r, { nhieu: 2 });
+  // Rìa trái: thùng rác cam đầy giấy vụn.
+  chuNhat(thang, 52, 118, 22, 35, [249, 115, 22], 4, r);
+  chuNhat(thang, 49, 113, 28, 6, [154, 52, 18], 2, r);
+  hinhTron(thang, 58, 111, 5, [241, 245, 249], 2, r);
+  hinhTron(thang, 67, 112, 4, [203, 213, 225], 2, r);
+  // Rìa phải: cột sắt và biển cấm chéo đỏ.
+  chuNhat(thang, 233, 64, 6, 90, [51, 65, 85], 2, r);
+  hinhTron(thang, 236, 74, 11, [225, 29, 72], 2, r);
+  chuNhat(thang, 229, 72, 14, 4, [255, 255, 255], 0, r);
+
+  // Xoay nghiêng -7 độ quanh tâm (150, 105) như lúc người chụp cầm lệch điện thoại.
+  const ra = taoAnh(W, H);
+  const rad = (TAP_THE.gocChuan * Math.PI) / 180; // lấy mẫu ngược +7 độ để ảnh xoay -7 độ
+  const cs = Math.cos(rad), sn = Math.sin(rad), cx = W / 2, cy = H / 2;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const dx = x - cx, dy = y - cy;
+      const sx = Math.min(W - 1, Math.max(0, Math.round(cx + dx * cs - dy * sn)));
+      const sy = Math.min(H - 1, Math.max(0, Math.round(cy + dx * sn + dy * cs)));
+      const k = (y * W + x) * 4, sk = (sy * W + sx) * 4;
+      ra.data[k] = thang.data[sk];
+      ra.data[k + 1] = thang.data[sk + 1];
+      ra.data[k + 2] = thang.data[sk + 2];
+      ra.data[k + 3] = 255;
+    }
+  }
+  return ra;
+}

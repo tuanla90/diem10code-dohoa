@@ -1,5 +1,5 @@
 // Cảnh hậu quả: thành phẩm của người chơi đem ra đời thật. Lỗi nào trong thành phẩm thì hiện đúng lỗi ấy.
-import { MAU, datVao, logoLong, logoKhoi, MANH_LOGO, BIEU_TUONG, robot, tieuDe } from './hinh.mjs';
+import { MAU, datVao, logoLong, logoKhoi, MANH_LOGO, BIEU_TUONG, robot, tieuDe, standeeRobot } from './hinh.mjs';
 import { duongSvg } from './toan/hinh-hoc.mjs';
 import { apChinh } from './toan/anh.mjs';
 import { veKetQua, W as W_GHEP, H as H_GHEP } from './co-khi/ghep-hinh.mjs';
@@ -10,6 +10,8 @@ import { anhGoc as anhSan, veChu } from './co-khi/chu-anh.mjs';
 import { coTep, DINH_DANG } from './co-khi/xuat-tep.mjs';
 import { matDoIn, dungTep } from './co-khi/bien-doi.mjs';
 import { daiClip, tongDai } from './co-khi/dong-thoi-gian.mjs';
+import { veBangMuiTen } from './co-khi/to-vien.mjs';
+import { veAnhXoay } from './co-khi/cat-anh.mjs';
 
 const khung = (noi, nhan) => `<svg class="canh-ro" viewBox="0 0 360 300" role="img" aria-label="${nhan}">${noi}</svg>`;
 const chu = (x, y, t, co = 13, mau = MAU.muc, dam = 700, neo = 'middle') => `<text x="${x}" y="${y}" text-anchor="${neo}" font-size="${co}" font-weight="${dam}" fill="${mau}" font-family="var(--font)">${t}</text>`;
@@ -54,12 +56,54 @@ export function canhBangRon(st, man) {
 
 export function logoTheoLop(st, roi = false) {
   return st.manh.map((m, i) => {
-    const t = m.id === 'tieu-de' ? tieuDe() : (MANH_LOGO[m.id]?.ve() || BIEU_TUONG.find((b) => b.id === m.id).ve());
-    const [r, c] = m.id === 'tieu-de' ? [200, 50] : [100, 100];
-    const g = datVao(t, m.x + (r * m.s) / 2, m.y + (c * m.s) / 2, r * m.s, c * m.s, 0, r, c);
-    if (!roi || m.id === 'tieu-de') return g;
+    const k = m.loai || m.id;
+    const t = k === 'tieu-de' ? tieuDe() : k === 'standee' ? standeeRobot() : (MANH_LOGO[k]?.ve() || BIEU_TUONG.find((b) => b.id === k).ve());
+    const [r, c] = k === 'tieu-de' ? [200, 50] : k === 'standee' ? [90, 130] : [100, 100];
+    const cx = m.x + (r * m.s) / 2, cy = m.y + (c * m.s) / 2;
+    const hinh = datVao(t, cx, cy, r * m.s, c * m.s, 0, r, c);
+    const g = m.lat ? `<g transform="translate(${cx * 2} 0) scale(-1 1)">${hinh}</g>` : hinh;
+    if (!roi || k === 'tieu-de') return g;
     return `<g class="canh-roi" style="--tre:${0.2 + i * 0.12}s;--dx:${(i - 2) * 16}px;--xoay:${(i - 2) * 22}deg">${g}</g>`;
   }).join('');
+}
+
+export function canhBienChiDuong(st, dat) {
+  return khung(`<rect width="360" height="300" fill="url(#gr-troi)"/><rect y="226" width="360" height="74" fill="${MAU.san}"/>
+    <path d="M180 300l42-74h64l46 74z" fill="${MAU.tuong}" opacity=".75"/>
+    <rect x="128" y="168" width="12" height="86" rx="3" fill="${MAU.muc}"/>
+    <g transform="translate(36 22) scale(.74)">${veBangMuiTen(st)}</g>
+    ${nguoi(248, 226, MAU.chan, 0.95)}${nguoi(292, 232, MAU.hong, 0.95)}
+    ${chu(180, 284, dat ? 'Khách nhìn từ cổng là thấy ngay hướng vào hội trường' : 'Biển chỉ đường chưa rõ dáng hoặc chìm chữ', 12.5)}`, 'Biển mũi tên chỉ đường ngoài sân trường');
+}
+
+export function canhStandee(st, dat) {
+  return khung(`<rect width="360" height="300" fill="${MAU.tuong}"/><rect y="236" width="360" height="64" fill="${MAU.san}"/>
+    <path d="M134 236L114 300H246L226 236Z" fill="${MAU.voToi}"/>
+    <rect x="124" y="64" width="6" height="172" rx="2" fill="${MAU.muc}"/>
+    <rect x="230" y="64" width="6" height="172" rx="2" fill="${MAU.muc}"/>
+    <rect x="130" y="86" width="100" height="150" fill="${MAU.kinhToi}"/>
+    <rect x="142" y="184" width="76" height="52" rx="4" fill="${MAU.chan}" stroke="${MAU.muc}" stroke-width="2"/>
+    <rect x="148" y="190" width="64" height="10" rx="2" fill="${MAU.cyan}" opacity=".85"/>
+    <rect x="118" y="28" width="124" height="44" rx="7" fill="url(#gr-poster)" stroke="${MAU.muc}" stroke-width="2.2"/>
+    ${[0, 1, 2, 3, 4, 5].map((i) => `<path d="M${120 + i * 20} 72a10 8 0 0020 0z" fill="${i % 2 ? MAU.vang : MAU.trang}" stroke="${MAU.muc}" stroke-width="1.4"/>`).join('')}
+    ${datVao(logoLong(), 140, 50, 26, 26)}
+    ${chu(191, 48, 'GIAN RÔ BỐT', 11.5, MAU.trang, 800)}${chu(191, 62, 'LỐI VÀO', 10, MAU.vang, 800)}
+    ${logoTheoLop(st)}
+    ${nguoi(164, 240, MAU.hong, 0.88)}${nguoi(198, 242, MAU.xanh, 0.88)}
+    ${chu(180, 287, dat ? 'Đôi standee rô bốt cùng chỉ lối, khách nô nức ghé gian CLB!' : 'Standee hai bên cổng chưa cân xứng hoặc chỉ nhầm hướng', 12)}`, 'Cổng gian Rô bốt với đôi standee chào khách');
+}
+
+export function canhCatAnh(st, d) {
+  const cv = canvas(120, 80);
+  veAnhXoay(cv, st, true);
+  const voHat = d.conLai < 0.44;
+  return khung(`${tuong()}
+    <path d="M148 34l32-18 32 18" fill="none" stroke="${MAU.muc}" stroke-width="2.5"/>
+    <circle cx="180" cy="16" r="4" fill="${MAU.vang}"/>
+    <rect x="52" y="32" width="256" height="172" rx="8" fill="${MAU.go}"/><rect x="62" y="42" width="236" height="152" rx="4" fill="${MAU.trang}"/>
+    <image href="${dataUrl(cv)}" x="68" y="48" width="224" height="140" preserveAspectRatio="none"${voHat ? ' style="filter:blur(1.4px)"' : ''}/>
+    ${nguoi(82, 242, MAU.chan, 0.9)}${nguoi(134, 246, MAU.hong, 0.9)}${nguoi(226, 246, MAU.xanh, 0.9)}${nguoi(278, 242, MAU.vang, 0.9)}
+    ${chu(180, 224, voHat ? 'Cắt nhỏ quá, ảnh phóng lên khung bị nhòe vỡ hạt' : 'Ảnh kỷ niệm đóng khung treo ở sảnh CLB', 12.5)}`, 'Ảnh kỷ niệm đã cắt đóng khung trên tường');
 }
 
 export function canhDuongCo(duong, cung) {

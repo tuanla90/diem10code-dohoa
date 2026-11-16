@@ -63,6 +63,11 @@ const NET = {
   timKiem: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
   sua: '<path d="M4 20l1.5-5L16 4.5a2 2 0 013 3L8.5 18z"/>',
   mucTieu: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/>',
+  nhanDoi: '<rect x="4" y="4" width="11" height="11" rx="2"/><path d="M9 19h9a2 2 0 002-2V9M14.5 11.5v5M12 14h5"/>',
+  latNgang: '<path d="M12 3v18" stroke-dasharray="2.5 2.5"/><path d="M4 16V8l5 4zM20 16V8l-5 4z"/>',
+  catCup: '<path d="M6 2v14a2 2 0 002 2h14"/><path d="M2 6h14a2 2 0 012 2v14"/>',
+  netLien: '<path d="M4 12h16" stroke-width="2.6"/>',
+  netDut: '<path d="M4 12h16" stroke-width="2.6" stroke-dasharray="3.5 3.5"/>',
 };
 
 export function icon(ten, lop = '') {

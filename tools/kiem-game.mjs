@@ -96,6 +96,8 @@ for (const man of TAT_CA_MAN) {
     'DH-5-1': (l) => { const ds = []; for (const n of [7, 6, 5]) for (let ms = 50; ms <= 500; ms += 10) ds.push((st) => { st.khung.length = n; l.ms(st, ms); }); return ds; },
     'DH-3-4': (l) => { const ds = []; for (let c = 10; c <= 100; c += 5) ds.push((st) => { l.dd(st, 'tin', 'jpg'); l.cl(st, 'tin', c); }); return ds; },
     'DH-4-4': (l) => { const ds = []; for (let c = 12; c <= 40; c += 1) for (const mau of ['trang', 'muc', 'vang', 'hong']) ds.push((st) => l.dat(st, { x: 180, y: 30, co: c, mau })); return ds; },
+    'DH-1-4': (l) => { const ds = []; for (const to of ['tim', 'cam', 'vang', 'trang']) for (let day = 0; day <= 24; day += 1) ds.push((st) => { l.to(st, to); l.vien(st, 'muc'); l.dut(st, false); l.day(st, day); }); return ds; },
+    'DH-4-6': (l) => { const ds = []; for (let g = -15; g <= 15; g += 1) for (let w = 60; w <= 200; w += 20) ds.push((st) => { l.goc(st, g); l.khung(st, { x: 40, y: 20, w, h: 100 }); }); return ds; },
   };
   for (const man of TAT_CA_MAN.filter((m) => m.dongHo)) {
     const ck = CO_KHI[man.coKhi];
@@ -117,7 +119,7 @@ for (const man of TAT_CA_MAN) {
     if (man.ma === 'DH-4-1') kiem('DH-4-1 vùng đạt không quá hẹp', soDat >= 30, `chỉ ${soDat} vị trí đạt`);
   }
   // Mọi màn chấm theo mốc số đều phải có vạch đo, để người chơi không phải đoán.
-  for (const ma of ['DH-3-4', 'DH-4-1', 'DH-4-2', 'DH-4-3', 'DH-4-4', 'DH-4-5', 'DH-5-1', 'DH-5-3', 'DH-5-5']) kiem(`${ma} có vạch đo`, !!TAT_CA_MAN.find((m) => m.ma === ma)?.dongHo);
+  for (const ma of ['DH-1-4', 'DH-3-4', 'DH-4-1', 'DH-4-2', 'DH-4-3', 'DH-4-4', 'DH-4-5', 'DH-4-6', 'DH-5-1', 'DH-5-3', 'DH-5-5']) kiem(`${ma} có vạch đo`, !!TAT_CA_MAN.find((m) => m.ma === ma)?.dongHo);
 
   // Ảnh đã cháy: không vị trí thanh nào lấy lại được nếp áo, đó là cả bài học của DH-4-5.
   {
@@ -235,8 +237,8 @@ for (const man of TAT_CA_MAN) {
     // Ăng ten, đầu, kính, ngực và bàn tay nằm đúng chỗ của robot(), đọc qua khung đặt rô bốt lên ảnh.
     const mau = (fx, fy) => { const k = (Math.floor(KHUNG_ANH.oy + fy * KHUNG_ANH.s) * anh.w + Math.floor(KHUNG_ANH.ox + fx * KHUNG_ANH.s)) * 4; return [anh.data[k], anh.data[k + 1], anh.data[k + 2]]; };
     const gan = (a, hex) => Math.hypot(a[0] - parseInt(hex.slice(1, 3), 16), a[1] - parseInt(hex.slice(3, 5), 16), a[2] - parseInt(hex.slice(5, 7), 16)) < 16;
-    kiem(`Ảnh rô bốt ${kieu} cùng màu với robot(): bóng ăng ten, đầu, kính, ngực, tim, bàn tay`,
-      gan(mau(60, 6), MAU.cyan) && gan(mau(45, 27), MAU.vo) && gan(mau(60, 54), MAU.kinhSang) && gan(mau(54, 97), MAU.chan) && gan(mau(60, 97), MAU.cyan) && gan(mau(...ROBOT.hong[0][2]), MAU.cyan));
+    kiem(`Ảnh rô bốt ${kieu} cùng màu với robot(): bóng ăng ten, đầu, màn mặt xanh, mắt ba vòng, màn ngực, bàn tay`,
+      gan(mau(60, 6), MAU.manXanhSang) && gan(mau(45, 21.5), MAU.vo) && gan(mau(60, 48.5), MAU.manXanh) && gan(mau(45, 48.8), MAU.dongTu) && gan(mau(60, 97), MAU.manXanhSang) && gan(mau(...ROBOT.hong[0][2]), MAU.manXanhSang));
     // Tay tì bánh xích không được dài hơn hẳn tay vẫy: cùng một rô bốt thì tay phải bằng nhau.
     const daiTay = (d) => d.slice(1).reduce((t, p, i) => t + Math.hypot(p[0] - d[i][0], p[1] - d[i][1]), 0);
     kiem(`Ảnh rô bốt ${kieu}: tay tì bánh xích dài không quá 1,25 lần tay vẫy`, daiTay(ROBOT.hong[0]) <= daiTay(ROBOT.vay) * 1.25);
@@ -302,6 +304,17 @@ for (const man of TAT_CA_MAN) {
   lop.nhom(s2, ['a', 'b']);
   lop.di(s2, 'a', 10, 0);
   kiem('Đã nhóm: cả cụm đi', s2.manh[0].x === 20 && s2.manh[1].x === 15);
+
+  // Nhân bản và lật đối xứng: bản sao giữ đúng cỡ bản gốc, bản gốc không bị xóa nhầm.
+  const sStandee = { manh: [{ id: 'standee-trai', loai: 'standee', x: 24, y: 104, s: 1.05, lat: false, nhom: 0 }], chon: ['standee-trai'] };
+  const maSao = lop.nhanDoi(sStandee, 'standee-trai');
+  kiem('Nhân đôi: sinh thêm một bản sao bằng cỡ gốc', sStandee.manh.length === 2 && sStandee.manh[1].s === 1.05 && sStandee.manh[1].banSao === true);
+  lop.latNgang(sStandee, maSao);
+  kiem('Lật ngang: chỉ đảo bản được chọn, bản gốc đứng nguyên', sStandee.manh[1].lat === true && sStandee.manh[0].lat === false);
+  lop.xoaBanSao(sStandee, 'standee-trai');
+  kiem('Xóa bản sao: không xóa được hình gốc', sStandee.manh.length === 2);
+  lop.xoaBanSao(sStandee, maSao);
+  kiem('Xóa bản sao: xóa được bản sao dư', sStandee.manh.length === 1);
 }
 
 /* ---------- 3. Trình tự mở khóa và dữ liệu ---------- */

@@ -12,7 +12,7 @@ Game về đồ họa thì giao diện cũng là phần mềm đồ họa:
 
 ## Vòng lặp chính: Bản vẽ Ngày hội
 
-Trang chủ là một sân trường vẽ một lần. 21 màn ứng với 21 món. Qua màn nào, món đó có màu ngay trên trang chủ, kèm nhịp nảy khi quay về. Người chơi luôn thấy mình đang dựng cái gì, và còn thiếu gì. Bản nét và bản màu dùng chung một hình vẽ, khác nhau bằng lớp `.bv-net` và `.bv-mau`.
+Trang chủ là một sân trường vẽ một lần. 24 màn ứng với 24 món. Qua màn nào, món đó có màu ngay trên trang chủ, kèm nhịp nảy khi quay về. Người chơi luôn thấy mình đang dựng cái gì, và còn thiếu gì. Bản nét và bản màu dùng chung một hình vẽ, khác nhau bằng lớp `.bv-net` và `.bv-mau`.
 
 ## Các màn hình
 

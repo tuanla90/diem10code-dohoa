@@ -1,5 +1,5 @@
 // Gói 1, bài C10-09: logo đi in. Biến đổi đúng tỉ lệ và chọn đúng loại ảnh.
-import { canhBanTin, posterLen, canhBangRon } from '../canh.mjs';
+import { canhBanTin, posterLen, canhBangRon, canhBienChiDuong } from '../canh.mjs';
 import { datVao, logoLong, tieuDe } from '../hinh.mjs';
 
 const posterTu = (st) => posterLen(st.vat.map((v) =>
@@ -92,6 +92,56 @@ export default {
       sai: [
         { ten: 'Chưa xoay', loi: 'nghieng', lam(st, l) { l.dat(st, 'logo', { x: 180, y: 86, w: 90, h: 90, goc: 14 }); l.dat(st, 'tieu', { x: 180, y: 206, w: 220, h: 55, goc: -9 }); } },
         { ten: 'Tiêu đề kéo méo', loi: 'meo', lam(st, l) { l.dat(st, 'logo', { x: 180, y: 86, w: 118, h: 118, goc: 0 }); l.dat(st, 'tieu', { x: 180, y: 206, w: 238, h: 40, goc: 0 }); } },
+      ],
+    },
+    {
+      ma: 'DH-1-4', ten: 'Biển chỉ đường béo phì', coKhi: 'to-vien', chay: 'Dựng biển',
+      ai: 'sola', mat: 'confused', vai: 'SOLA NHỜ',
+      nho: 'Mình muốn mũi tên nổi thật rõ nên kéo nét viền lên 20, lại để nét đứt. Giờ viền phình to nuốt mất chữ HỘI TRƯỜNG, nền tím sẫm không ai đọc ra!',
+      muc: 'Chọn màu tô sáng rõ chữ, viền sẫm nét liền và độ dày vừa vặn cho mũi tên.',
+      dau: { to: 'tim', vien: 'do', day: 20, dut: true },
+      dongHo: [
+        { id: 'noi', ten: 'Độ nổi chữ', lay: (d) => d.tuongPhan, tu: 1, tieu: ['noi'], muc: [
+          { den: 4.5, chu: 'Chìm chữ', loai: 'xau' },
+          { den: 8.5, chu: 'Đọc được', loai: 'dat' },
+          { den: 16, gom: true, chu: 'Rất rõ', loai: 'dep' },
+        ] },
+        { id: 'day', ten: 'Độ dày viền', lay: (d) => d.day, den: 24, tieu: ['day'], muc: [
+          { den: 2, chu: 'Mất viền', loai: 'xau' },
+          { den: 3, chu: 'Hơi mảnh', loai: 'dat' },
+          { den: 6, gom: true, chu: 'Sắc gọn', loai: 'dep' },
+          { den: 9, gom: true, chu: 'Hơi dày', loai: 'dat' },
+          { den: 24, chu: 'Nuốt chữ', loai: 'xau' },
+        ] },
+      ],
+      sanNhan: 'Biển chỉ đường có mũi tên viền đỏ nét đứt quá dày',
+      dan: [
+        { txt: 'Chọn <b>màu tô sáng</b> ở hàng đầu (hoặc chạm thẳng vào mũi tên) cho chữ HỘI TRƯỜNG nổi rõ.', xong: (d) => d.tuongPhan >= 4.5 },
+        { txt: 'Chọn <b>Viền chàm</b> hoặc <b>Viền đỏ</b> và chuyển sang <b>Nét liền</b>.', nhan: 'kieu-net', xong: (d) => d.vienRo && !d.dut },
+        { txt: 'Kéo thanh <b>Độ dày viền</b> xuống vùng xanh cho mũi tên gọn lại.', xong: (d) => d.day >= 2 && d.day <= 9 },
+        { txt: 'Hai vạch đã xanh, bấm <b>Dựng biển</b>.', xong: () => false },
+      ],
+      tieuChi: [
+        { id: 'noi', ok: (d) => d.tuongPhan >= 4.5, ten: 'Chữ nổi trên màu tô', loi: 'Màu tô bên trong tối quá làm chữ HỘI TRƯỜNG chìm nghỉm, đứng cách vài bước không đọc nổi.', ai: 'luna', matLoi: 'worried' },
+        { id: 'vienRo', ok: (d) => d.vienRo, ten: 'Viền tách khỏi nền biển', loi: 'Viền trắng tiệp luôn vào nền biển sáng hoặc trùng màu tô, nhìn xa mũi tên nhòe mất ranh giới.', ai: 'luna', matLoi: 'thinking' },
+        { id: 'lien', ok: (d) => !d.dut, ten: 'Viền nét liền', loi: 'Mũi tên còn để nét đứt như hình nháp chờ lấy kéo cắt, khách tưởng biển tạm chưa làm xong.', ai: 'sola', matLoi: 'facepalm' },
+        { id: 'day', ok: (d) => d.day >= 2 && d.day <= 9, ten: 'Độ dày viền vừa phải', loi: 'Nét viền quá dày phình ra chèn lấp chữ bên trong, hoặc kéo về 0 làm mất hẳn đường viền.', ai: 'sola', matLoi: 'shocked' },
+        { id: 'depDay', sao: true, ok: (d) => d.day >= 3 && d.day <= 6, ten: 'Viền sắc gọn từ 3 đến 6 px', chiTiet: (d) => `Độ dày viền đang ${d.day} px (đẹp nhất từ 3 đến 6 px)` },
+        { id: 'sangTo', sao: true, ok: (d) => d.tuongPhan >= 8.5, ten: 'Màu tô thật sáng, đọc xa rõ mồn một', chiTiet: (d) => `Tương phản chữ đang ${d.tuongPhan.toFixed(1)}:1 (chọn Tô vàng hoặc Tô trắng để đạt trên 8.5:1)` },
+      ],
+      goiY: [
+        'Mỗi hình vector có hai phần riêng: màu tô bên trong và nét viền bao quanh.',
+        'Chữ HỘI TRƯỜNG màu chàm tối, nên phần tô bên trong mũi tên cần màu sáng như vàng hoặc trắng.',
+        'Đổi sang Nét liền, chọn Viền chàm và kéo Độ dày viền về khoảng 4 px là sắc gọn nhất.',
+      ],
+      soTay: ['to-vien'],
+      canh: (st, ket) => canhBienChiDuong(st, ket.dat),
+      giai(st, l) { l.to(st, 'vang'); l.vien(st, 'muc'); l.dut(st, false); l.day(st, 4); },
+      sai: [
+        { ten: 'Tô tím tối chìm chữ', loi: 'noi', lam(st, l) { l.vien(st, 'muc'); l.dut(st, false); l.day(st, 4); } },
+        { ten: 'Viền trắng tiệp nền biển', loi: 'vienRo', lam(st, l) { l.to(st, 'vang'); l.vien(st, 'trang'); l.dut(st, false); l.day(st, 4); } },
+        { ten: 'Còn để nét đứt', loi: 'lien', lam(st, l) { l.to(st, 'vang'); l.vien(st, 'muc'); l.day(st, 4); } },
+        { ten: 'Viền quá dày nuốt chữ', loi: 'day', lam(st, l) { l.to(st, 'vang'); l.vien(st, 'muc'); l.dut(st, false); l.day(st, 20); } },
       ],
     },
     {

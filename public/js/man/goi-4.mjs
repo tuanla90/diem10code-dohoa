@@ -1,5 +1,5 @@
 // Gói 4, bài U11-09 đến U11-12: bộ ảnh hội trường. Chấm trên điểm ảnh thật.
-import { canhAnhHoiTruong, canhTachNen, canhChuPoster } from '../canh.mjs';
+import { canhAnhHoiTruong, canhTachNen, canhChuPoster, canhCatAnh } from '../canh.mjs';
 import { KHE_TAY, TAY_ANH } from '../toan/anh.mjs';
 
 const dauTach = { thao: [], cheDo: 'dua', nguong: 10, r: 8 };
@@ -144,6 +144,54 @@ export default {
         { ten: 'Lại kéo sáng hết cỡ', loi: 'cham', lam(st, l) { l.moGoc(st); l.dat(st, 100, 0); } },
         { ten: 'Tương phản quá tay', loi: 'chay', lam(st, l) { l.moGoc(st); l.dat(st, 40, 60); } },
         { ten: 'Cả hai thanh quá tay', loi: 'nep', lam(st, l) { l.moGoc(st); l.dat(st, 100, 40); } },
+      ],
+    },
+    {
+      ma: 'DH-4-6', ten: 'Ảnh tập thể nghiêng ngả', coKhi: 'cat-anh', chay: 'Đóng khung',
+      ai: 'sola', mat: 'facepalm', vai: 'SOLA NHỜ',
+      nho: 'Nhờ người qua đường chụp ảnh cả đội với rô bốt. Bạn ấy cầm nghiêng máy làm sân dốc hẳn đi, rìa trái dính thùng rác cam, rìa phải lọt cột biển cấm!',
+      muc: 'Xoay thẳng đường chân trời và thu khung cắt bỏ rác hai rìa, giữ trọn cả đội mà không cắt vụn vỡ nét.',
+      dau: { goc: 0, x: 14, y: 10, w: 212, h: 140 },
+      dongHo: [
+        { id: 'nghieng', ten: 'Đường chân trời', lay: (d) => d.lechGoc, gomMoc: true, tieu: ['thang'], muc: [
+          { den: 1, chu: 'Thẳng tắp', loai: 'dep' },
+          { den: 2.5, chu: 'Thẳng', loai: 'dat' },
+          { den: 22, chu: 'Còn nghiêng', loai: 'xau' },
+        ] },
+        { id: 'net', ten: 'Điểm ảnh giữ lại', lay: (d) => d.conLai * 100, tieu: ['duNet'], muc: [
+          { den: 44, chu: 'Cắt bé, vỡ hạt', loai: 'xau' },
+          { den: 52, chu: 'Đủ nét', loai: 'dat' },
+          { den: 100, gom: true, chu: 'Rất nét', loai: 'dep' },
+        ] },
+      ],
+      sanNhan: 'Ảnh chụp đội hình bị nghiêng, rìa trái có thùng rác, rìa phải có cột biển báo',
+      dan: [
+        { txt: 'Kéo thanh <b>Xoay ảnh</b> cho mái nhà và bậc sân nằm ngang.', xong: (d) => d.lechGoc <= 2.5 },
+        { txt: 'Kéo <b>cạnh trái và phải của khung cắt trắng</b> vào trong để loại bỏ thùng rác và cột sắt.', xong: (d) => !d.dinhRac },
+        { txt: 'Giữ trọn hai bạn và rô bốt trong khung, đừng bóp khung bé quá làm tụt vạch Điểm ảnh giữ lại.', xong: (d) => !d.matNguoi && d.conLai * 100 >= 44 },
+        { txt: 'Hai vạch đã xanh, bấm <b>Đóng khung</b>.', xong: () => false },
+      ],
+      tieuChi: [
+        { id: 'thang', ok: (d) => d.lechGoc <= 2.5, ten: 'Đường sân nằm ngang', loi: 'Mái nhà và bậc sân vẫn dốc nghiêng sang một bên, đóng khung treo lên nhìn rất chóng mặt.', ai: 'sola', matLoi: 'confused' },
+        { id: 'sachRia', ok: (d) => !d.dinhRac, ten: 'Bỏ sạch vật thừa hai rìa', loi: 'Trong khung cắt vẫn còn lọt thùng rác cam bên trái hoặc cột biển đỏ bên phải.', ai: 'luna', matLoi: 'worried' },
+        { id: 'duDoi', ok: (d) => !d.matNguoi, ten: 'Giữ trọn cả đội và rô bốt', loi: 'Khung cắt lẹm mất một thành viên hoặc cắt cụt ăng ten rô bốt rồi!', ai: 'sola', matLoi: 'shocked' },
+        { id: 'duNet', ok: (d) => d.conLai * 100 >= 44, ten: 'Không cắt vụn làm vỡ hạt', loi: 'Bạn bóp khung cắt sát rạt làm mất quá nhiều điểm ảnh, phóng lên khung lớn bị nhòe vỡ hạt.', ai: 'luna', matLoi: 'thinking' },
+        { id: 'thangTap', sao: true, ok: (d) => d.lechGoc <= 1 && d.conLai * 100 >= 52, ten: 'Thẳng tắp và giữ từ 52% điểm ảnh', chiTiet: (d) => `Độ lệch góc ${d.lechGoc.toFixed(1)} độ, điểm ảnh còn ${Math.round(d.conLai * 100)}% (cần lệch dưới 1 độ và giữ từ 52%)` },
+        { id: 'boCuc', sao: true, ok: (d) => d.lechTam <= 8, ten: 'Đội hình cân đối ngay giữa khung', chiTiet: (d) => `Tâm khung cắt đang lệch tâm đội hình ${Math.round(d.lechTam)} đơn vị (kéo khung cho đường hồng giữa hiện lên)` },
+      ],
+      goiY: [
+        'Nhìn đường bậc thềm và mái nhà phía sau đội hình: kéo thanh Xoay ảnh sang dương khoảng +7 độ là thẳng.',
+        'Kéo mép trái khung trắng qua khỏi thùng rác cam, kéo mép phải vào trước cột biển đỏ.',
+        'Chừa khoảng thở vừa phải quanh đội hình để giữ trên 52% điểm ảnh gốc và căn khung vào trục giữa.',
+      ],
+      soTay: ['cat-cup', 'anh-diem'],
+      canh: (st, _k, d) => canhCatAnh(st, d),
+      giai(st, l) { l.goc(st, 7); l.khung(st, { x: 54, y: 24, w: 132, h: 104 }); },
+      sai: [
+        { ten: 'Cắt gọn mà quên xoay thẳng', loi: 'thang', lam(st, l) { l.khung(st, { x: 54, y: 24, w: 132, h: 104 }); } },
+        { ten: 'Xoay thẳng mà chưa cắt bỏ rìa', loi: 'sachRia', lam(st, l) { l.goc(st, 7); } },
+        { ten: 'Cắt lệch phạm vào người', loi: 'duDoi', lam(st, l) { l.goc(st, 7); l.khung(st, { x: 104, y: 24, w: 84, h: 104 }); } },
+        { ten: 'Cắt chật quá làm thiếu điểm ảnh', loi: 'duNet', lam(st, l) { l.goc(st, 7); l.khung(st, { x: 84, y: 57, w: 72, h: 57 }); } },
       ],
     },
     {

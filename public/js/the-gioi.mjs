@@ -1,6 +1,6 @@
 // Bản vẽ Ngày hội: sân trường ban đầu chỉ là nét vector, mỗi màn qua được lại tô màu một món đồ.
 // Mỗi món chỉ vẽ một lần: bản nét là chính nó bọc trong .bv-net, CSS lột màu đi. Không chạm DOM.
-import { MAU, datVao, logoLong, logoKhoi, BIEU_TUONG, robot, tieuDe } from './hinh.mjs';
+import { MAU, datVao, logoLong, logoKhoi, BIEU_TUONG, robot, tieuDe, standeeRobot } from './hinh.mjs';
 
 export const W_BV = 360;
 export const H_BV = 300;
@@ -23,6 +23,11 @@ export const MON = [
     ve: () => `<rect x="45" y="228" width="25" height="34" rx="1.5" fill="url(#gr-poster)"/>${datVao(logoLong(), 57.5, 240, 13, 13)}${datVao(tieuDe(), 57.5, 254, 21, 5.25, 0, 200, 50)}`,
   },
   {
+    ma: 'DH-1-4', ten: 'Biển mũi tên lối đi', noi: 'Đầu lối đi sân trước', hop: [70, 272, 44, 26],
+    ve: () => `<path d="M92 287v11" stroke="${MAU.muc}" stroke-width="2.6"/><rect x="72" y="273" width="40" height="15" rx="2" fill="${MAU.tuong}" stroke="${MAU.muc}" stroke-width="1.3"/>
+      <path d="M77 278.5h19v-3l9 5-9 5v-3H77z" fill="${MAU.vang}" stroke="${MAU.muc}" stroke-width="1.1" stroke-linejoin="round"/>`,
+  },
+  {
     ma: 'DH-1-3', ten: 'Băng rôn cổng trường', noi: 'Cổng trường', hop: [50, 172, 260, 44],
     ve: () => `<rect x="50" y="170" width="6" height="84" rx="2" fill="${MAU.muc}"/><rect x="304" y="170" width="6" height="84" rx="2" fill="${MAU.muc}"/>
       <rect x="56" y="174" width="248" height="40" rx="3" fill="url(#gr-poster)"/>${datVao(logoLong(), 80, 194, 32, 32)}
@@ -36,6 +41,13 @@ export const MON = [
     ma: 'DH-2-2', ten: 'Tấm dựng sảnh', noi: 'Sân trường', hop: [84, 224, 26, 50],
     ve: () => `<rect x="85" y="224" width="24" height="46" rx="2" fill="url(#gr-poster)"/>${datVao(logoLong(), 101, 233, 11, 11)}${datVao(tieuDe(), 97, 256, 18, 4.5, 0, 200, 50)}
       <path d="M90 270l-4 8M104 270l4 8" stroke="${MAU.muc}" stroke-width="2"/>`,
+  },
+  {
+    ma: 'DH-2-4', ten: 'Đôi standee chào khách', noi: 'Lối vào gian CLB', hop: [274, 138, 56, 32],
+    ve: () => `<rect x="291" y="146" width="22" height="22" rx="1.5" fill="${MAU.kinhToi}" stroke="${MAU.muc}" stroke-width="1.2"/>
+      <rect x="289" y="139" width="26" height="8" rx="2" fill="url(#gr-poster)" stroke="${MAU.muc}" stroke-width="1.2"/>
+      ${datVao(standeeRobot(), 282, 157, 15, 22, 0, 90, 130)}
+      <g transform="translate(644 0) scale(-1 1)">${datVao(standeeRobot(), 322, 157, 15, 22, 0, 90, 130)}</g>`,
   },
   {
     ma: 'DH-2-3', ten: 'Năm gian hoạt động', noi: 'Trước dãy nhà', hop: [88, 145, 184, 24],
@@ -72,6 +84,12 @@ export const MON = [
     ma: 'DH-4-5', ten: 'Ảnh đội rô bốt', noi: 'Dây ảnh bên trái', hop: [20, 88, 46, 36],
     ve: () => `<path d="M17 88q27 7 55 0" fill="none" stroke="${MAU.muc}" stroke-width="1.4"/><g transform="rotate(-3 43 106)"><rect x="24" y="92" width="38" height="29" rx="1.5" fill="${MAU.trang}" stroke="${MAU.muc}" stroke-width="1.4"/><rect x="27" y="95" width="32" height="23" fill="${MAU.giua}"/>
       ${[33, 43, 53].map((x) => `<circle cx="${x}" cy="103" r="2.8" fill="${MAU.muc}"/><path d="M${x - 4} 118v-7a4 4 0 018 0v7z" fill="${MAU.trang}"/><path d="M${x} 110v7" stroke="${MAU.xam}" stroke-width=".8"/>`).join('')}</g><rect x="41" y="88" width="4" height="7" rx="1" fill="${MAU.cam}"/>`,
+  },
+  {
+    ma: 'DH-4-6', ten: 'Ảnh kỷ niệm toàn đội', noi: 'Dây ảnh bên phải', hop: [294, 88, 46, 36],
+    ve: () => `<path d="M288 88q27 7 55 0" fill="none" stroke="${MAU.muc}" stroke-width="1.4"/><g transform="rotate(3 317 106)"><rect x="298" y="92" width="38" height="29" rx="1.5" fill="${MAU.trang}" stroke="${MAU.muc}" stroke-width="1.4"/>
+      <rect x="301" y="95" width="32" height="11" fill="${MAU.troi}"/><rect x="301" y="106" width="32" height="12" fill="${MAU.san}"/>
+      <circle cx="309" cy="108" r="2.4" fill="${MAU.chan}"/><rect x="314" y="103" width="6" height="9" rx="1.5" fill="${MAU.cyan}" stroke="${MAU.muc}" stroke-width=".8"/><circle cx="325" cy="108" r="2.4" fill="${MAU.hong}"/></g><rect x="315" y="88" width="4" height="7" rx="1" fill="${MAU.vang}"/>`,
   },
   {
     ma: 'DH-4-2', ten: 'Rô bốt trưng bày', noi: 'Bục trưng bày', hop: [116, 226, 34, 50],
@@ -123,7 +141,7 @@ const troi = () => `<rect width="360" height="150" fill="url(#gr-troi)"/><circle
   <g fill="${MAU.trang}" opacity=".85"><ellipse cx="70" cy="30" rx="26" ry="7"/><ellipse cx="94" cy="24" rx="18" ry="6"/><ellipse cx="238" cy="20" rx="20" ry="5"/></g>`;
 
 // Thứ tự vẽ: món ở xa trước, người ở gần sau. Huy hiệu phải nằm đè lên áo.
-const THU_TU_VE = ['DH-5-3', 'DH-2-1', 'DH-5-2', 'DH-4-1', 'DH-4-4', 'DH-2-3', 'DH-3-1', 'DH-3-2', 'DH-3-5', 'DH-4-5', 'DH-1-3', 'DH-1-1', 'DH-1-2', 'DH-2-2', 'DH-4-2', 'DH-4-3', 'DH-5-1', 'DH-5-5', 'DH-3-4', 'DH-3-3', 'DH-5-4'];
+const THU_TU_VE = ['DH-5-3', 'DH-2-4', 'DH-2-1', 'DH-5-2', 'DH-4-1', 'DH-4-4', 'DH-2-3', 'DH-3-1', 'DH-3-2', 'DH-3-5', 'DH-4-5', 'DH-4-6', 'DH-1-3', 'DH-1-1', 'DH-1-2', 'DH-2-2', 'DH-4-2', 'DH-4-3', 'DH-5-1', 'DH-5-5', 'DH-3-4', 'DH-3-3', 'DH-1-4', 'DH-5-4'];
 
 function tayNam([x, y, w, h]) {
   const o = 4.5;

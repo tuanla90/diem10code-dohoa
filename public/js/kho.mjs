@@ -25,8 +25,8 @@ const luu = () => ghi(KHOA, JSON.stringify(tienDo));
 
 // Màn đã đổi tranh hoặc đề thì thao tác lưu từ trước không còn vẽ đúng nữa (chạm đũa thần cũ giờ rơi vào đầu rô bốt).
 // Giữ nguyên sao đã có, chỉ bỏ thành phẩm và bản nháp cũ; Tủ tác phẩm tự nhắc chơi lại để có tranh mới. Đổi tranh nữa thì tăng số.
-const DOI_TRANH = { 2: ['DH-3-5', 'DH-4-2', 'DH-4-3'], 3: ['DH-4-2', 'DH-4-3'], 4: ['DH-4-2', 'DH-4-3'], 5: ['DH-4-2', 'DH-4-3'] }; // bản 3, 4, 5: rô bốt đổi dáng nên chỗ chạm cũ trật hết
-const BAN_TRANH = 5;
+const DOI_TRANH = { 2: ['DH-3-5', 'DH-4-2', 'DH-4-3'], 3: ['DH-4-2', 'DH-4-3'], 4: ['DH-4-2', 'DH-4-3'], 5: ['DH-4-2', 'DH-4-3'], 6: ['DH-2-4'], 7: ['DH-2-4'], 8: ['DH-2-4'], 9: ['DH-2-4', 'DH-4-2', 'DH-4-3', 'DH-4-4', 'DH-4-6'], 10: ['DH-2-4', 'DH-4-2', 'DH-4-3', 'DH-4-4', 'DH-4-6'], 11: ['DH-2-4', 'DH-4-2', 'DH-4-3', 'DH-4-4', 'DH-4-6'], 12: ['DH-2-4', 'DH-4-2', 'DH-4-3', 'DH-4-4', 'DH-4-6'] }; // bản 12: thu gọn viền trắng đầu và sửa khung chớp mắt hình liềm
+const BAN_TRANH = 12;
 if ((tienDo.banTranh || 1) < BAN_TRANH) {
   const MAN_DOI_TRANH = [...new Set(Object.keys(DOI_TRANH).filter((b) => b > (tienDo.banTranh || 1)).flatMap((b) => DOI_TRANH[b]))];
   for (const ma of MAN_DOI_TRANH) if (tienDo.man[ma]) delete tienDo.man[ma].st;

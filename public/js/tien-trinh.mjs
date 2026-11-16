@@ -34,10 +34,10 @@ export function manSau(m) {
 
 export const DANH_HIEU = [
   { tu: 0, ten: 'Thành viên mới' },
-  { tu: 6, ten: 'Tay kéo vững' },
-  { tu: 15, ten: 'Thợ nắn nét' },
-  { tu: 27, ten: 'Phó ban Truyền thông' },
-  { tu: 40, ten: 'Trưởng ban Truyền thông' },
+  { tu: 8, ten: 'Tay kéo vững' },
+  { tu: 18, ten: 'Thợ nắn nét' },
+  { tu: 32, ten: 'Phó ban Truyền thông' },
+  { tu: 50, ten: 'Trưởng ban Truyền thông' },
   { tu: tongSaoToiDa, ten: 'Gương mặt Ngày hội' },
 ];
 

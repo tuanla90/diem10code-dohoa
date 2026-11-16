@@ -1,5 +1,13 @@
 # Nhật ký Thay đổi (Changelog) — Dự án `diem10code-dohoa`
 
+## [2026-11-16] Thêm 3 màn mới cân bằng 5 gói lên tròn 24 màn (72 sao)
+Bổ sung đúng 3 thao tác cốt lõi còn khuyết trong SGK Tin 10 (Inkscape) và Tin 11 (GIMP), đưa nhịp 5 gói về tỉ lệ cân đối `4 - 4 - 5 - 6 - 5` mà không khóa lại tiến độ cũ:
+- **DH-1-4 Biển chỉ đường béo phì (Gói 1 · C10-09, cơ khí mới `co-khi/to-vien.mjs`):** dạy sự tách biệt giữa màu tô bên trong (`Fill`) và nét viền bao quanh (`Stroke`: màu viền, kiểu nét liền/đứt, độ dày viền). Viền quá dày phình ra nuốt mất chữ `HỘI TRƯỜNG`, màu tô tối làm chữ chìm, viền trắng tiệp nền bảng sáng. Có 2 vạch đo sống Độ nổi chữ và Độ dày viền. Món trên sân: *Biển mũi tên lối đi*.
+- **DH-2-4 Đôi standee chào khách (Gói 2 · C10-10, mở rộng `co-khi/lop-nhom.mjs`):** dạy lệnh `Nhân đôi` và `Lật ngang` trên cặp standee rô bốt cắt viền trắng (chân đế sắt, giơ biển mũi tên vàng mời khách) đặt hai bên cổng vào gian Rô bốt, kèm đường gióng hít đối xứng qua cổng giữa. Món trên sân: *Đôi standee chào khách*.
+- **DH-4-6 Ảnh tập thể nghiêng ngả (Gói 4 · U11-09, cơ khí mới `co-khi/cat-anh.mjs` + `anhTapThe` trong `toan/anh.mjs`):** dạy cắt cúp bố cục (`Crop` có lưới 1/3) loại bỏ thùng rác và cột biển hai rìa, kết hợp xoay thẳng đường chân trời nghiêng `-7` độ và canh giữ đủ điểm ảnh để không vỡ hạt khi đóng khung. Món trên sân: *Ảnh kỷ niệm toàn đội* ở dây ảnh bên phải.
+- **Đồng bộ diện mạo Robot R1 theo `physicraft` (`hinh.mjs`, `toan/anh.mjs`, `goi-5.mjs`, `kho.mjs`):** cập nhật toàn bộ đầu, thân, bánh xe và cánh tay trong `ROBOT`, `robot()`, `veRobotAnh()`, `standeeRobot()`, `BAN_TAY` và biểu tượng `hd5` sang thiết kế chuẩn của R1 trong `physicraft/video` (đầu bầu trắng ánh băng, màn hình mặt xanh dương `#2a5be8 -> #45c1fb` với mắt ba vòng + lông mày + miệng cười, cổ hình thang, thân bầu quả lê có cản gầm + màn hình ngực 3D, hai bánh lốp đứng cao kèm trục mâm tròn, và cánh tay bọc giáp có khớp khuỷu servo + càng kẹp chữ C).
+- **Đồng bộ hệ thống:** thêm 3 mục Sổ tay (`to-vien`, `nhan-ban-lat`, `cat-cup`), 3 cảnh Rạp hậu quả (`canhBienChiDuong`, `canhStandee`, `canhCatAnh`), 3 câu hỏi mới kèm vùng chỉ lỗi trong `Mắt Thiết Kế` (lên 25 câu), cân lại mốc danh hiệu tới 72 sao, nâng tổng số kiểm tra tự động trong `tools/kiem-game.mjs` lên **`1941 đạt, 0 hỏng`**.
+
 ## [2026-11-16] Nâng cấp Game Design & UI/UX toàn diện (P0 -> P2)
 Triển khai trọn bộ cải tiến trải nghiệm chơi trên điện thoại, nối liền cảm xúc vòng lặp chính, cảm giác tay cơ khí và chiều sâu sư phạm:
 - **P0 — Vòng lặp chính, Chống bấm nhầm, Haptic 2 nấc & Luồng mượt:**

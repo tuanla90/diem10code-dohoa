@@ -1,6 +1,6 @@
 // Cơ khí lớp và nhóm: đổi thứ tự lớp, nhóm mảnh, kéo cả cụm, đổi cỡ cụm, căn hàng và cách đều (C10-10).
 import { giong, kep } from '../toan/hinh-hoc.mjs';
-import { MAU, MANH_LOGO, BIEU_TUONG, datVao, tieuDe } from '../hinh.mjs';
+import { MAU, MANH_LOGO, BIEU_TUONG, logoLong, datVao, tieuDe, standeeRobot } from '../hinh.mjs';
 import { hitTruc, hitMoc, mocCachDeu } from '../toan/hit.mjs';
 import { taoSvg, batKeo, hangCu, hangKeo, vungTay } from './chung.mjs';
 
@@ -8,11 +8,21 @@ export const W = 360, H = 300;
 
 const TRANH = { ...Object.fromEntries(Object.entries(MANH_LOGO).map(([k, m]) => [k, m])) };
 for (const b of BIEU_TUONG) TRANH[b.id] = { ten: b.ten, hop: [4, 4, 92, 92], ve: b.ve };
-TRANH['tieu-de'] = { ten: 'Tiêu đề poster', hop: [0, 0, 200, 50], ve: tieuDe };
+TRANH['tieu-de'] = { ten: 'Tiêu đề poster', rong: 200, cao: 50, hop: [0, 0, 200, 50], ve: tieuDe };
+TRANH.standee = { ten: 'Standee rô bốt', rong: 90, cao: 130, hop: [4, 11, 82, 114], ve: standeeRobot };
+
+export const kieuManh = (m) => m.loai || m.id;
+export const kichThuocGoc = (m) => {
+  const t = TRANH[kieuManh(m)];
+  return [t.rong || 100, t.cao || 100];
+};
 
 const hop = (m) => {
-  const [hx, hy, hw, hh] = TRANH[m.id].hop;
-  return { x: m.x + hx * m.s, y: m.y + hy * m.s, w: hw * m.s, h: hh * m.s };
+  const t = TRANH[kieuManh(m)];
+  const [hx, hy, hw, hh] = t.hop;
+  const rong = t.rong || 100;
+  const dx = m.lat ? rong - hx - hw : hx;
+  return { x: m.x + dx * m.s, y: m.y + hy * m.s, w: hw * m.s, h: hh * m.s };
 };
 export const coChung = (a, b) => {
   const A = hop(a), B = hop(b);
@@ -93,12 +103,35 @@ const lam = {
     let x = dau;
     for (const d of ds) { d.m.x += x - d.b.x; x += d.b.w + ho; }
   },
+  nhanDoi(st, id) {
+    const goc = st.manh.find((m) => m.id === id);
+    if (!goc || st.manh.length >= 4) return null;
+    st.demSao = (st.demSao || 0) + 1;
+    const maMoi = `ban-sao-${st.demSao}`;
+    const [rong, cao] = kichThuocGoc(goc);
+    st.manh.push({
+      ...goc, id: maMoi, loai: kieuManh(goc), banSao: true, nhom: 0,
+      x: Math.min(W - rong * goc.s - 8, goc.x + 28),
+      y: Math.min(H - cao * goc.s - 8, goc.y + 10),
+    });
+    st.chon = [maMoi];
+    return maMoi;
+  },
+  latNgang(st, id) {
+    const m = st.manh.find((o) => o.id === id);
+    if (m) m.lat = !m.lat;
+  },
+  xoaBanSao(st, id) {
+    const i = st.manh.findIndex((o) => o.id === id && o.banSao);
+    if (i >= 0) { st.manh.splice(i, 1); st.chon = []; }
+  },
 };
 
 export default {
   tao: (man) => giong(man.dau),
   lam,
   do(st, man) {
+    if (st.manh.some((m) => !TRANH[kieuManh(m)])) throw new Error('Bản lưu cũ khác loại mảnh');
     const ra = {};
     if (man.phaiTren) {
       const vi = (id) => st.manh.findIndex((m) => m.id === id);
@@ -139,6 +172,22 @@ export default {
       ra.trongVung = ds.every((d) => d.b.x >= z.x - 2 && d.b.x + d.b.w <= z.x + z.w + 2 && d.b.y >= z.y - 2 && d.b.y + d.b.h <= z.y + z.h + 2);
       ra.dungThu = ds.map((d) => d.m.id).join() === man.hang.join();
     }
+    if (man.doiXung) {
+      const ds = st.manh.filter((m) => kieuManh(m) === 'standee');
+      const goc = man.doiXung.trai;
+      const trai = ds.find((m) => !m.banSao);
+      const phai = ds.find((m) => m.banSao);
+      const z = man.san.vung;
+      ra.soStandee = ds.length;
+      ra.traiDung = !!trai && !trai.lat && Math.hypot(trai.x - goc.x, trai.y - goc.y) <= 4 && Math.abs(trai.s - goc.s) < 0.03;
+      const bTrai = trai ? hop(trai) : null;
+      const bPhai = phai ? hop(phai) : null;
+      ra.daLatPhai = !!phai && !!phai.lat;
+      ra.phaiTrong = !!bPhai && bPhai.x >= z.x - 3 && bPhai.y >= z.y - 3 && bPhai.x + bPhai.w <= z.x + z.w + 3 && bPhai.y + bPhai.h <= z.y + z.h + 3;
+      ra.cungCoStandee = !!trai && !!phai && Math.abs(phai.s - trai.s) < 0.04;
+      ra.lechCao = bTrai && bPhai ? Math.abs((bTrai.y + bTrai.h / 2) - (bPhai.y + bPhai.h / 2)) : 99;
+      ra.lechTruc = bTrai && bPhai ? Math.abs(((bTrai.x + bTrai.w / 2) + (bPhai.x + bPhai.w / 2)) / 2 - W / 2) : 99;
+    }
     return ra;
   },
 
@@ -176,13 +225,32 @@ export default {
       let s = `<rect width="${W}" height="${H}" fill="${MAU.tuong}"/>`;
       if (man.san.nen === 'poster') s += `<rect x="20" y="10" width="320" height="280" rx="8" fill="url(#gr-poster)"/>`;
       if (man.san.nen === 'bang') s += `<rect x="8" y="44" width="344" height="212" rx="10" fill="${MAU.trang}" stroke="${MAU.san}" stroke-width="2"/><text x="180" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="${MAU.muc}" font-family="var(--font)">Bảng tin: 5 hoạt động của Ngày hội</text>`;
+      if (man.san.nen === 'sanh-standee') {
+        s += `<rect y="236" width="${W}" height="64" fill="${MAU.san}"/>
+          <path d="M134 236L114 300H246L226 236Z" fill="${MAU.voToi}"/>
+          <path d="M180 18V296" fill="none" stroke="${MAU.chan}" stroke-opacity=".22" stroke-width="1.4" stroke-dasharray="4 4"/>
+          <rect x="124" y="64" width="6" height="172" rx="2" fill="${MAU.muc}"/>
+          <rect x="230" y="64" width="6" height="172" rx="2" fill="${MAU.muc}"/>
+          <rect x="130" y="86" width="100" height="150" fill="${MAU.kinhToi}"/>
+          <rect x="142" y="184" width="76" height="52" rx="4" fill="${MAU.chan}" stroke="${MAU.muc}" stroke-width="2"/>
+          <rect x="148" y="190" width="64" height="10" rx="2" fill="${MAU.cyan}" opacity=".85"/>
+          <rect x="118" y="28" width="124" height="44" rx="7" fill="url(#gr-poster)" stroke="${MAU.muc}" stroke-width="2.2"/>
+          ${[0, 1, 2, 3, 4, 5].map((i) => `<path d="M${120 + i * 20} 72a10 8 0 0020 0z" fill="${i % 2 ? MAU.vang : MAU.trang}" stroke="${MAU.muc}" stroke-width="1.4"/>`).join('')}
+          ${datVao(logoLong(), 140, 50, 26, 26)}
+          <text x="191" y="48" text-anchor="middle" font-size="11.5" font-weight="800" fill="${MAU.trang}" font-family="var(--font)">GIAN RÔ BỐT</text>
+          <text x="191" y="62" text-anchor="middle" font-size="10" font-weight="800" fill="${MAU.vang}" font-family="var(--font)">LỐI VÀO</text>
+          <text x="180" y="288" text-anchor="middle" font-size="11" font-weight="700" fill="${MAU.muc}" font-family="var(--font)">Lối khách bước vào gian hàng</text>`;
+      }
       const z = man.san.vung;
-      if (z) s += `<rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="6" fill="${MAU.trang}" fill-opacity=".08" stroke="${MAU.vang}" stroke-width="2" stroke-dasharray="7 6"/>${z.ten ? `<text x="${z.x + z.w / 2}" y="${z.y + z.h + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="${MAU.vang}" font-family="var(--font)">${z.ten}</text>` : ''}`;
+      const mauVung = man.san.nen === 'sanh-standee' ? MAU.chan : MAU.vang;
+      if (z) s += `<rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="6" fill="${MAU.trang}" fill-opacity=".18" stroke="${mauVung}" stroke-width="2" stroke-dasharray="7 6"/>${z.ten ? `<text x="${z.x + z.w / 2}" y="${z.y + z.h + 15}" text-anchor="middle" font-size="12" font-weight="700" fill="${mauVung}" font-family="var(--font)">${z.ten}</text>` : ''}`;
       for (const m of st.manh) {
-        const t = TRANH[m.id];
+        const t = TRANH[kieuManh(m)];
         const b = hop(m);
-        const rong = m.id === 'tieu-de' ? 200 : 100, cao = m.id === 'tieu-de' ? 50 : 100;
-        s += `<g data-h="m:${m.id}">${datVao(t.ve(), m.x + (rong * m.s) / 2, m.y + (cao * m.s) / 2, rong * m.s, cao * m.s, 0, rong, cao)}<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="transparent"/></g>`;
+        const [rong, cao] = kichThuocGoc(m);
+        const cx = m.x + (rong * m.s) / 2, cy = m.y + (cao * m.s) / 2;
+        const hinh = datVao(t.ve(), cx, cy, rong * m.s, cao * m.s, 0, rong, cao);
+        s += `<g data-h="m:${m.id}">${m.lat ? `<g transform="translate(${cx * 2} 0) scale(-1 1)">${hinh}</g>` : hinh}<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="transparent"/></g>`;
       }
       if (chon.length > 1 && cu.includes('can')) {
         // Chọn nhiều hình để căn: hình đứng đầu là mẫu, các hình kia làm theo nó.
@@ -264,6 +332,14 @@ export default {
           { id: 'cachdeu', nhan: 'Cách đều', ic: 'cachDeu', tat: chon.length < 3, bam: voi(lam.cachDeu) },
         ]);
       }
+      if (cu.includes('lat')) {
+        const mot = chon.length === 1 ? st.manh.find((m) => m.id === chon[0]) : null;
+        thanhLenh([
+          { id: 'nhan-doi', nhan: 'Nhân đôi', ic: 'nhanDoi', tat: !mot || st.manh.length >= 4, bam() { ctx.ghi(); lam.nhanDoi(st, mot.id); ve(); veKhay(); ctx.doi(); } },
+          { id: 'lat-ngang', nhan: 'Lật ngang', ic: 'latNgang', bat: !!mot?.lat, tat: !mot, bam() { ctx.ghi(); lam.latNgang(st, mot.id); ve(); veKhay(); ctx.doi(); } },
+          mot?.banSao && { id: 'xoa-sao', nhan: 'Xóa bản sao', ic: 'xoa', bam() { ctx.ghi(); lam.xoaBanSao(st, mot.id); ve(); veKhay(); ctx.doi(); } },
+        ]);
+      }
     };
 
     // Kéo hình thì dời, có đường gióng và hít vào khung, vào hàng, vào khoảng hở đều.
@@ -279,10 +355,11 @@ export default {
         mocX.push({ t: z.x, neo: 0 }, { t: z.x + z.w / 2, neo: 0.5 }, { t: z.x + z.w, neo: 1 });
         mocY.push({ t: z.y, neo: 0 }, { t: z.y + z.h / 2, neo: 0.5 }, { t: z.y + z.h, neo: 1 });
       }
-      if (man.hang) {
+      if (man.hang || man.doiXung) {
         const khac = st.manh.filter((m) => !ids.includes(m.id)).map(hop);
         for (const b of khac) mocY.push({ t: b.y + b.h / 2, neo: 0.5 });
-        mocX.push(...mocCachDeu(khac, h0.w));
+        if (man.hang) mocX.push(...mocCachDeu(khac, h0.w));
+        if (man.doiXung) for (const b of khac) mocX.push({ t: W - (b.x + b.w / 2), neo: 0.5 });
       }
       return (dx, dy) => {
         const hx = hitTruc(h0.x + dx, h0.w, mocX);

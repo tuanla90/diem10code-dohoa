@@ -1,5 +1,5 @@
 // Gói 2, bài C10-10: logo vector nhiều mảnh. Thứ tự lớp, nhóm, căn hàng.
-import { canhBanTin, logoTheoLop } from '../canh.mjs';
+import { canhBanTin, logoTheoLop, canhStandee } from '../canh.mjs';
 import { MAU } from '../hinh.mjs';
 
 const CHUNG = { x: 60, y: 30, s: 2.4 };
@@ -91,6 +91,51 @@ export default {
       sai: [
         { ten: 'Chỉ kéo ngôi sao', loi: 'roi', lam(st, l) { l.di(st, 'sao', 180, 10); } },
         { ten: 'Nhóm cả tiêu đề', loi: 'tieu', lam(st, l) { l.nhom(st, [...IDS, 'tieu-de']); l.coCum(st, 'nen', 0.4); l.di(st, 'nen', 183, 7); } },
+      ],
+    },
+    {
+      ma: 'DH-2-4', ten: 'Đôi standee chào khách', coKhi: 'lop-nhom', chay: 'Dựng standee',
+      ai: 'sola', mat: 'worried', vai: 'SOLA NHỜ',
+      nho: 'Cổng vào gian Rô bốt cần hai tấm standee đứng hai bên chỉ tay mời khách. Mình làm xong tấm bên trái là hết giờ, chẳng lẽ bên phải lại ngồi vẽ từ đầu?',
+      muc: 'Nhân đôi standee bên trái, lật ngang cho mũi tên chỉ vào giữa rồi đặt khớp khung bên phải.',
+      dau: {
+        manh: [{ id: 'standee-trai', loai: 'standee', x: 24, y: 104, s: 1.05, lat: false, nhom: 0 }],
+        chon: ['standee-trai'],
+      },
+      san: { nen: 'sanh-standee', cu: ['lat', 'coCum'], vung: { x: 241, y: 111, w: 95, h: 129, ten: 'Standee phải' } },
+      doiXung: { trai: { x: 24, y: 104, s: 1.05 } },
+      sanNhan: 'Cổng gian Rô bốt mới có standee chào khách bên trái, bên phải còn trống',
+      dan: [
+        { txt: 'Standee bên trái đang chọn. Bấm <b>Nhân đôi</b> để tạo tấm thứ hai giống hệt bản gốc.', nhan: 'nhan-doi', xong: (d) => d.soStandee >= 2 },
+        { txt: 'Bấm <b>Lật ngang</b> để rô bốt bên phải quay tay cầm mũi tên chỉ vào gian hàng.', nhan: 'lat-ngang', xong: (d) => d.daLatPhai },
+        { txt: 'Kéo standee mới vào khung <b>Standee phải</b>. Gần ngang hàng và đối xứng nó tự hít.', xong: (d) => d.phaiTrong && d.traiDung },
+        { txt: 'Bấm <b>Dựng standee</b>.', xong: () => false },
+      ],
+      tieuChi: [
+        { id: 'duHai', ok: (d) => d.soStandee === 2, ten: 'Đủ hai tấm standee hai bên', loi: 'Cổng gian hàng mới có một standee hoặc còn dư bản sao thừa chưa xóa.', ai: 'sola', matLoi: 'confused' },
+        { id: 'traiYen', ok: (d) => d.traiDung, ten: 'Standee trái giữ đúng chỗ', loi: 'Tấm standee gốc bên trái bị kéo lệch đi hoặc bị lật ngược mũi tên ra ngoài.', ai: 'luna', matLoi: 'worried' },
+        { id: 'doiXung', ok: (d) => d.daLatPhai, ten: 'Hai mũi tên cùng chỉ vào cổng', loi: 'Standee bên phải chưa lật ngang nên rô bốt quay tay chỉ khách đi ra ngoài mất rồi!', ai: 'sola', matLoi: 'facepalm' },
+        { id: 'trongPhai', ok: (d) => d.phaiTrong && d.cungCoStandee, ten: 'Đặt gọn khung phải, bằng cỡ nhau', loi: 'Standee phải chưa vào gọn khung hoặc bị đổi lệch kích cỡ so với tấm bên trái.', ai: 'luna', matLoi: 'thinking' },
+        { id: 'ngangHang', sao: true, ok: (d) => d.lechCao <= 3, ten: 'Hai chân đế ngang hàng nhau', chiTiet: (d) => `Độ cao hai tấm đang lệch ${Math.round(d.lechCao)} đơn vị (kéo cho đường hồng ngang hiện ra)` },
+        { id: 'canTam', sao: true, ok: (d) => d.lechTruc <= 3, ten: 'Đối xứng chuẩn qua cổng gian hàng', chiTiet: (d) => `Độ đối xứng qua cổng đang lệch ${Math.round(d.lechTruc)} đơn vị (kéo hít giữa khung phải)` },
+      ],
+      goiY: [
+        'Đừng vẽ lại hay kéo đổi cỡ bằng tay: lệnh Nhân đôi tạo ra tấm standee bằng hệt bên trái.',
+        'Nhân đôi xong thì hai mũi tên đều chỉ sang phải. Bấm Lật ngang để tấm mới quay mũi tên vào cổng giữa.',
+        'Giữ yên tấm bên trái, kéo tấm đã lật vào khung bên phải tới khi đường hồng hiện lên.',
+      ],
+      soTay: ['nhan-ban-lat', 'can-hang'],
+      canh: (st, ket) => canhStandee(st, ket.dat),
+      giai(st, l) {
+        const m = l.nhanDoi(st, 'standee-trai');
+        l.latNgang(st, m);
+        l.di(st, m, 241.5 - 52, 104 - 114);
+      },
+      sai: [
+        { ten: 'Chưa nhân đôi', loi: 'duHai', lam() {} },
+        { ten: 'Dời mất standee gốc bên trái', loi: 'traiYen', lam(st, l) { const m = l.nhanDoi(st, 'standee-trai'); l.di(st, 'standee-trai', 110, 0); l.latNgang(st, m); } },
+        { ten: 'Nhân đôi mà quên lật ngang', loi: 'doiXung', lam(st, l) { const m = l.nhanDoi(st, 'standee-trai'); l.di(st, m, 189.5, -10); } },
+        { ten: 'Đã lật mà chưa đưa vào khung phải', loi: 'trongPhai', lam(st, l) { const m = l.nhanDoi(st, 'standee-trai'); l.latNgang(st, m); } },
       ],
     },
     {

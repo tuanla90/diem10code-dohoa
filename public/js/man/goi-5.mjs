@@ -5,7 +5,7 @@ import { duongSvg } from '../toan/hinh-hoc.mjs';
 
 // Sân phóng to quanh vai phải của rô bốt: gốc của robot() nhân 4,5 rồi dời, để cánh tay đủ lớn cho ngón tay nắn.
 const ROBOT_TO = () => datVao(robot(0, { tay: 'mot' }), -12, 145.5, 540, 675, 0, 120, 150);
-const BAN_TAY = () => `<circle cx="226.5" cy="141" r="25" fill="${MAU.cyan}" stroke="${MAU.muc}" stroke-width="8"/>`;
+const BAN_TAY = () => `<g transform="translate(226.5 141) rotate(-62) scale(4.5)"><path d="M-1 -4.6C3.2 -7.8 9.2 -6 10 -2L6.5 -1.4C5.9 -3.2 3.4 -3.8 1.6 -2.1V2.1C3.4 3.8 5.9 3.2 6.5 1.4L10 2C9.2 6 3.2 7.8 -1 4.6Z" fill="${MAU.tai}" stroke="${MAU.muc}" stroke-width="2" stroke-linejoin="round"/><circle r="4.2" fill="${MAU.manXanhSang}" stroke="${MAU.muc}" stroke-width="2"/><circle cx="-1" cy="-1" r="1.1" fill="${MAU.trang}"/></g>`;
 const TAY_DICH = [
   { x: 112, y: 173 }, { x: 185, y: 184 }, { x: 210, y: 133 }, { x: 243, y: 149 },
   { x: 203, y: 220, tron: true, r: [-18, 9], v: [18, -9] }, { x: 107, y: 208 },

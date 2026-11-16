@@ -14,6 +14,8 @@ import tachNen from '../co-khi/tach-nen.mjs';
 import chuAnh from '../co-khi/chu-anh.mjs';
 import khungHinh from '../co-khi/khung-hinh.mjs';
 import dongThoiGian from '../co-khi/dong-thoi-gian.mjs';
+import toVien from '../co-khi/to-vien.mjs';
+import catAnh from '../co-khi/cat-anh.mjs';
 
 export const GOI = [goi1, goi2, goi3, goi4, goi5];
 
@@ -28,6 +30,8 @@ export const CO_KHI = {
   'chu-anh': chuAnh,
   'khung-hinh': khungHinh,
   'dong-thoi-gian': dongThoiGian,
+  'to-vien': toVien,
+  'cat-anh': catAnh,
 };
 
 export const TAT_CA_MAN = GOI.flatMap((g, gi) => g.man.map((m, mi) => ({ ...m, goiId: g.id, goiChiSo: gi, chiSo: mi, baiHoc: m.baiHoc || g.baiHoc })));
