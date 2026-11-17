@@ -1,6 +1,6 @@
 # Ngôn ngữ giao diện Gương Mặt Ngày Hội
 
-Cùng chuỗi với Mạch Đèn, Sổ Ngày Hội, Đội Rô Bốt: nền lavender, mực chàm, nút indigo, Google Sans Flex, Sola và Luna. Bảng màu chỉ khai ở `public/css/tokens.css`, màu trong tranh chỉ khai ở `public/js/hinh.mjs`.
+Cùng chuỗi với Mạch Đèn, Sổ Ngày Hội, Mật Lệnh Robot, Trạm Web Ngày Hội, Đố Vui Ngày Hội. Tên trường, nhân vật, logo, rô bốt chung của cả chuỗi chốt ở `../VU-TRU-DIEM10CODE.html`. Giao diện: nền lavender, mực chàm, nút indigo, Google Sans Flex, Sola và Luna. Bảng màu chỉ khai ở `public/css/tokens.css`, màu trong tranh chỉ khai ở `public/js/hinh.mjs`.
 
 ## Dấu hiệu riêng
 
@@ -39,6 +39,7 @@ Trang chủ là một sân trường vẽ một lần. 24 màn ứng với 24 m�
 - **Bền bỉ được khen như giỏi.** Huy hiệu Không bỏ cuộc và Tự lực đứng cạnh Một phát ăn ngay.
 - **Hậu quả trước, điểm sau.** Bấm Chạy, thành phẩm quét ra như đang in rồi kết quả mới trồi lên, không che tranh.
 - **Chỉ hỏi điều đã học.** Câu Mắt Thiết Kế của gói nào mở khi xong gói đó.
+- **Bộ năm biểu tượng gian cùng một kiểu.** Hình trắng đặc trên nền tròn màu, chi tiết khoét bằng chính màu nền, không viền mực, không chuyển màu (`BIEU_TUONG`).
 - **Một nhân vật, một bộ đồ nghề.** Rô bốt chỉ có một bản vẽ, ảnh chụp cũng vẽ từ đúng số đo đó (`ROBOT` trong `hinh.mjs`). Việc người chơi làm phải dùng cho chính Ngày hội, như dựng lại khiên trong bộ icon, không vẽ món không liên quan.
 
 ## Kỹ thuật
