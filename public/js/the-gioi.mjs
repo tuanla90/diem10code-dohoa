@@ -39,7 +39,7 @@ export const MON = [
   },
   {
     ma: 'DH-2-2', ten: 'Tấm dựng sảnh', noi: 'Sân trường', hop: [84, 224, 26, 50],
-    ve: () => `<rect x="85" y="224" width="24" height="46" rx="2" fill="url(#gr-poster)"/>${datVao(logoLong(), 101, 233, 11, 11)}${datVao(tieuDe(), 97, 256, 18, 4.5, 0, 200, 50)}
+    ve: () => `<rect x="85" y="224" width="24" height="46" rx="2" fill="url(#gr-poster)"/>${datVao(logoLong(), 97, 236, 14, 14)}${datVao(tieuDe(), 97, 256, 18, 4.5, 0, 200, 50)}
       <path d="M90 270l-4 8M104 270l4 8" stroke="${MAU.muc}" stroke-width="2"/>`,
   },
   {
@@ -59,9 +59,11 @@ export const MON = [
       <path d="M17 18l48 4-13 13 13 13-48 3z" fill="url(#gr-logo)"/>`,
   },
   {
-    ma: 'DH-3-2', ten: 'Cờ sóng', noi: 'Cột cờ phải', hop: [296, 18, 50, 34],
-    ve: () => `<rect x="343" y="12" width="4" height="164" rx="2" fill="${MAU.muc}"/><circle cx="345" cy="12" r="3.5" fill="${MAU.vang}"/>
-      <path d="M343 18c-14-7-30 7-46 0v32c16 7 32-7 46 0z" fill="url(#gr-logo)"/>`,
+    ma: 'DH-3-2', ten: 'Cờ sóng', noi: 'Cột cờ trên cổng gian CLB', hop: [302, 16, 50, 36],
+    // Cờ bay sang phải từ cán như trong màn DH-3-2: mép trên và dưới cùng võng ở nửa trái, phồng ở nửa phải.
+    // Cán cắm trên biển cổng gian CLB (giữa biển x 302) để cờ có chỗ bay sang phải mà không ra khỏi tranh.
+    ve: () => `<rect x="300" y="12" width="4" height="127" rx="2" fill="${MAU.muc}"/><circle cx="302" cy="12" r="3.5" fill="${MAU.vang}"/>
+      <path d="M304 18C304 18 314.7 28.2 326.8 18C338.9 7.8 350 18 350 18V50C350 50 338.9 39.8 326.8 50C314.7 60.2 304 50 304 50Z" fill="url(#gr-logo)"/>`,
   },
   {
     ma: 'DH-3-3', ten: 'Huy hiệu đeo dây', noi: 'Trên áo đội', hop: [262, 232, 72, 46],
@@ -96,8 +98,8 @@ export const MON = [
     ve: () => `${datVao(robot(0, { tay: 'hong' }), 133, 252, 30, 38, 0, 120, 150)}<rect x="118" y="266" width="30" height="8" rx="2" fill="${MAU.muc}"/>`,
   },
   {
-    ma: 'DH-4-3', ten: 'Rô bốt tay thép', noi: 'Bục trưng bày', hop: [156, 226, 34, 50],
-    ve: () => `${datVao(robot(0, { tay: 'hong', thepTay: true }), 173, 252, 30, 38, 0, 120, 150)}<rect x="158" y="266" width="30" height="8" rx="2" fill="${MAU.muc}"/>`,
+    ma: 'DH-4-3', ten: 'Rô bốt tường trắng', noi: 'Bục trưng bày', hop: [156, 226, 34, 50],
+    ve: () => `${datVao(robot(0, { tay: 'hong' }), 173, 252, 30, 38, 0, 120, 150)}<rect x="158" y="266" width="30" height="8" rx="2" fill="${MAU.muc}"/>`,
   },
   {
     ma: 'DH-4-4', ten: 'Poster rô bốt', noi: 'Cánh phải', hop: [234, 88, 38, 50],

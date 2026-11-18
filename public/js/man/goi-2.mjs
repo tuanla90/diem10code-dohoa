@@ -157,7 +157,7 @@ export default {
       hang: ['hd1', 'hd2', 'hd3', 'hd4', 'hd5'],
       dan: [
         { txt: 'Kéo cho đúng thứ tự, hình nào thò ra thì kéo vào khung. Đường hồng hiện là đã hít thẳng hàng hoặc cách đều.', xong: (d) => d.dungThu && d.trongVung },
-        { txt: 'Chạm một hình rồi kéo <b>chấm góc</b>: cỡ gần bằng hình khác thì tự hít. Hoặc quét khung chọn cả năm rồi bấm <b>Cùng cỡ</b>.', nhan: 'cungco', xong: (d) => d.lechCo <= 0.03 },
+        { txt: 'Chạm một hình rồi kéo <b>chấm góc</b>: cỡ gần bằng hình khác thì tự hít. Hoặc quét khung (trên máy tính: giữ Shift hay Ctrl rồi bấm từng hình) chọn cả năm rồi bấm <b>Cùng cỡ</b>.', nhan: 'cungco', xong: (d) => d.lechCo <= 0.03 },
         { txt: 'Cho thẳng hàng và cách đều bằng tay hoặc bằng lệnh. Lệnh <b>Cách đều</b> giữ yên hai hình ngoài cùng.', xong: (d) => d.lechHang <= 3 && d.lechHo <= 3 && !d.hoAm },
         { txt: 'Bấm <b>Dán thử</b>.', xong: () => false },
       ],

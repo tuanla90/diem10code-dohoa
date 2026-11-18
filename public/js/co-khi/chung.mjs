@@ -55,7 +55,7 @@ export function hangCu(host, ds, { deu = false } = {}) {
     if (c.bat !== undefined) b.setAttribute('aria-pressed', String(!!c.bat));
     if (c.tat) b.disabled = true;
     b.innerHTML = `${c.tranh || (c.ic ? icon(c.ic) : '')}<span>${c.nhan}</span>${c.sub ? `<span class="cu-sub">${c.sub}</span>` : ''}`;
-    b.addEventListener('click', () => c.bam?.());
+    b.addEventListener('click', (e) => c.bam?.(e));
     h.appendChild(b);
   }
   host.appendChild(h);

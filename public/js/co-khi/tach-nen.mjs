@@ -216,10 +216,17 @@ export default {
       conTro = { x: pt.x, y: pt.y };
       let tay = null;
       // Chèn điểm giữa để nét không đứt khi ngón tay lướt nhanh.
+      // Không thêm điểm trùng: chuột đứng yên vẫn bắn pointermove, mỗi điểm thừa làm mọi lần vẽ lại và Hoàn tác nặng thêm.
       const noiDen = (nx, ny) => {
         const cuoi = net.pts[net.pts.length - 1];
-        const buoc = Math.max(1, Math.floor(Math.hypot(nx - cuoi[0], ny - cuoi[1]) / 2));
-        for (let i = 1; i <= buoc; i++) net.pts.push([Math.round(cuoi[0] + ((nx - cuoi[0]) * i) / buoc), Math.round(cuoi[1] + ((ny - cuoi[1]) * i) / buoc)]);
+        const dai = Math.hypot(nx - cuoi[0], ny - cuoi[1]);
+        if (dai < 1) return;
+        const buoc = Math.max(1, Math.floor(dai / 2));
+        for (let i = 1; i <= buoc; i++) {
+          const p = [Math.round(cuoi[0] + ((nx - cuoi[0]) * i) / buoc), Math.round(cuoi[1] + ((ny - cuoi[1]) * i) / buoc)];
+          const truoc = net.pts[net.pts.length - 1];
+          if (p[0] !== truoc[0] || p[1] !== truoc[1]) net.pts.push(p);
+        }
       };
       ve();
       return {
@@ -235,6 +242,9 @@ export default {
         nha() {
           if (tay) noiDen(Math.round(tay.x), Math.round(tay.y));
           ctx.ghi();
+          // Nét cọ đè lại đúng chỗ cũ thì một điểm là đủ: bỏ điểm lặp lại trong cùng nét.
+          const daCo = new Set();
+          net.pts = net.pts.filter(([x, y]) => { const k = y * a.w + x; if (daCo.has(k)) return false; daCo.add(k); return true; });
           st.thao.push(net);
           net = null;
           conTro = null;

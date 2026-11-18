@@ -1,5 +1,6 @@
 // Gói 3, bài C10-28: nắn nét, ghép hình, chọn định dạng.
 import { canhDuongCo, duongCua, canhHuyHieu, canhKhien, canhXuatTep } from '../canh.mjs';
+import { MAU } from '../hinh.mjs';
 
 const goc = (x, y) => ({ x, y, tron: false });
 const tron = (x, y, r) => ({ x, y, tron: true, r, v: [-r[0], -r[1]] });
@@ -153,7 +154,7 @@ export default {
     },
     // Mã DH-3-5 đứng trước DH-3-4 vì màn được thêm sau: tiến độ đã lưu theo mã nên không đổi mã cũ.
     {
-      ma: 'DH-3-5', ten: 'Khiên An toàn mạng', coKhi: 'ghep-hinh', chay: 'Gắn biển',
+      ma: 'DH-3-5', ten: 'Khiên An toàn mạng', coKhi: 'ghep-hinh', chay: 'Gắn biển', mauHinh: MAU.teal,
       ai: 'luna', mat: 'thinking', vai: 'LUNA NHỜ',
       nho: 'Icon An toàn mạng phải in to làm biển gian hàng. Mình nắn nút mãi mà mũi khiên hai bên vẫn lệch. Thợ in bảo dùng hai hình tròn là cong đều ngay.',
       muc: 'Vẽ lại khiên trong icon An toàn mạng, khớp đúng nét đứt.',

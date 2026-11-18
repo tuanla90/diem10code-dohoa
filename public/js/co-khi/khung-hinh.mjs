@@ -75,7 +75,9 @@ export default {
         const x = dau + i * (rong + 6), y = 174;
         const chon = st.chon === i;
         s += `<g data-h="k:${i}"><rect x="${x}" y="${y}" width="${rong}" height="82" rx="8" fill="${chon ? MAU.chan : MAU.trang}" stroke="${bat % n === i && phat ? MAU.hong : MAU.san}" stroke-width="3"/>`;
-        s += `<g transform="translate(${x + 3} ${y + 6})">${datVao(robot(k.goc, { mat: k.mat }), (rong - 6) / 2, 30, rong - 6, 60, 0, 120, 150)}</g>`;
+        // Giữ đúng tỉ lệ 120:150 của rô bốt: khung hẹp thì thu cả hai chiều, không bóp dẹt.
+        const tw = Math.min(rong - 6, 48), th = tw * 1.25;
+        s += `<g transform="translate(${x + 3} ${y + 4})">${datVao(robot(k.goc, { mat: k.mat }), (rong - 6) / 2, 31, tw, th, 0, 120, 150)}</g>`;
         // Màn msRieng ghi thời gian ngay trên khung, nhìn dải là biết khung nào lâu khung nào nhanh.
         s += `<text x="${x + rong / 2}" y="${y + 76}" text-anchor="middle" font-size="${man.msRieng ? 10.5 : 12}" font-weight="700" fill="${chon ? MAU.trang : MAU.muc}" font-family="var(--mono)">${man.msRieng ? `${msCua(st, k)}ms` : i + 1}</text></g>`;
       });
@@ -126,6 +128,8 @@ export default {
           const rong = Math.min(48, (W - 16) / Math.max(1, n) - 6);
           const dau = (W - n * (rong + 6) + 6) / 2;
           const dich = Math.max(0, Math.min(n - 1, Math.round((p.x - dau - rong / 2) / (rong + 6))));
+          // Sân vừa bị ẩn hay vẽ lại giữa lúc kéo thì tọa độ thành NaN: không có ô đích thì thôi, kẻo vòng lặp chạy mãi làm treo trang.
+          if (!Number.isInteger(dich) || !Number.isInteger(i) || i < 0 || i >= n) return;
           while (i !== dich) {
             const j = i + Math.sign(dich - i);
             if (!daGhi) { ctx.ghi(); daGhi = true; }

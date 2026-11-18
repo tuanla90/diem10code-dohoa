@@ -63,6 +63,21 @@ export function anhHoiTruong(w = 240, h = 150) {
 }
 
 /* ---------- Ảnh đội rô bốt: bản gốc tối và bản đã cháy sáng (U11-10) ---------- */
+// Nếp gấp như áo thật: hai nếp xiên từ nách chụm vào giữa ngực, một nếp lượn ngắn ở vạt áo. Không kẻ dọc suốt thân,
+// kẻo áo thành sọc như áo tù. dx tính từ giữa thân, dy từ cổ áo xuống, nguoi lệch nếp mỗi bạn một chút.
+function nepAo(dx, dy, nguoi) {
+  const lech = (nguoi % 3) - 1;
+  if (dy >= 6 && dy <= 28) {
+    const t = (dy - 6) / 22, cach = 12 - t * 7 + lech * 0.6;
+    if (Math.abs(Math.abs(dx) - cach) < 0.75) return true;
+  }
+  if (dy >= 30 && dy <= 44) {
+    const giua = lech * 2.5 + Math.sin((dy - 30) / 4) * 2.2;
+    if (Math.abs(dx - giua) < 0.75) return true;
+  }
+  return false;
+}
+
 // ao ghi chỉ số điểm ảnh vải áo và nếp gấp, để đo trên điểm ảnh thật xem nếp áo còn hay đã mất.
 export function anhDoiRobot(w = 240, h = 150) {
   const a = taoAnh(w, h), r = ngauNhien(29);
@@ -79,7 +94,7 @@ export function anhDoiRobot(w = 240, h = 150) {
       // Vai thuôn từ cổ ra, để áo không thành tấm bìa chữ nhật.
       const vai = Math.min(16, 7 + Math.floor((j - y - 12) * 1.5));
       for (let k = x - vai; k <= x + vai; k++) {
-        const laNep = [5, 6, 13, 14, 24, 25].includes(k - x + 16); // cách không đều, để giống nếp vải chứ không thành áo sọc
+        const laNep = nepAo(k - x, j - y - 12, i);
         chamDiem(a, k, j, laNep ? [146, 146, 156] : [186, 186, 192], 2, r);
         (laNep ? a.ao.nep : a.ao.vai).push((j * w + k) * 4);
       }
@@ -153,10 +168,12 @@ export function doAnh(a, sang, tuongPhan) {
 // that[i] = 1 ở điểm thuộc rô bốt. Dùng để chấm, người chơi không thấy.
 const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 export const MAU_THIEU = rgb(MAU.hong); // phần rô bốt lỡ xóa khi cầm Cọ giữ, như mặt nạ hồng của app xóa nền
-const THEP = [180, 182, 188], DINH = [70, 72, 90]; // tay thép nhạt hơn tường thép một chút: mắt thấy nhưng đũa thần ngưỡng 25 vẫn loang qua
+// Ảnh tường trắng: tay rô bốt vẫn trắng như mọi màn, chỉ là ảnh chụp sát tường nên viền tay nhạt gần trùng màu tường.
+// Mắt còn thấy vệt tay, nhưng mọi tông của tay đều cách màu tường dưới 25 nên đũa thần ngưỡng 25 vẫn loang qua.
+const TUONG_TRANG = [238, 240, 248], TAY_VIEN = [226, 230, 244], TAY_GIUA = [240, 242, 250], TAY_LOI = [252, 253, 255];
 
 // Vẽ đúng rô bốt của robot() ở hinh.mjs, cùng số đo và màu, hai tay tì lên bánh xích. (ox, oy, s) đặt khung 120x150 lên ảnh.
-function veRobotAnh(a, that, ox, oy, s, r, { thepTay = false, nhieu = 3 } = {}) {
+function veRobotAnh(a, that, ox, oy, s, r, { tayNhat = false, nhieu = 3 } = {}) {
   const R = ROBOT;
   const to = (x0, y0, x1, y1, trong, c, n = nhieu) => {
     for (let j = Math.max(0, Math.floor(oy + y0 * s)); j <= Math.min(a.h - 1, Math.ceil(oy + y1 * s)); j++) {
@@ -196,22 +213,17 @@ function veRobotAnh(a, that, ox, oy, s, r, { thepTay = false, nhieu = 3 } = {}) 
   }
   for (const d of R.hong) {
     tron(d[0][0], d[0][1], 5.4, muc); tron(d[0][0], d[0][1], 3.4, rgb(MAU.banh), 1);
-    duong(d, R.tay, thepTay ? THEP : muc);
-    if (thepTay) {
-      // Hai hàng đinh tán dọc mép tay máy: tay trùng màu tường thì đinh vẫn cho thấy tay nằm đâu, kể cả sau khi lỡ xóa.
-      for (let k = 0; k + 1 < d.length; k++) {
-        const p = d[k], q = d[k + 1], dai = Math.hypot(q[0] - p[0], q[1] - p[1]), nx = (q[1] - p[1]) / dai, ny = (p[0] - q[0]) / dai;
-        for (let t = 5; t < dai; t += 5) {
-          const x = p[0] + ((q[0] - p[0]) * t) / dai, y = p[1] + ((q[1] - p[1]) * t) / dai;
-          for (const b of [-1, 1]) tron(x + b * nx * 2.8, y + b * ny * 2.8, 0.8, DINH, 0);
-        }
-      }
-      tron(d[1][0], d[1][1], 4.2, THEP, 1); tron(d[1][0], d[1][1], 1.4, DINH, 0);
+    if (tayNhat) {
+      // Cùng ba lớp như tay thường (viền, giữa, lõi trắng), chỉ là viền nhạt thay vì viền mực.
+      duong(d, R.tay, TAY_VIEN, 1);
+      duong(d, R.tay * 0.56, TAY_GIUA, 1);
+      duong(d, R.tay * 0.28, TAY_LOI, 1);
     } else {
+      duong(d, R.tay, muc);
       duong(d, R.tay * 0.56, rgb(MAU.voToi), 1);
       duong(d, R.tay * 0.28, vo, 1);
-      tron(d[1][0], d[1][1], 4.8, muc); tron(d[1][0], d[1][1], 3.1, tai, 1); tron(d[1][0], d[1][1], 1.4, xanhSang, 0);
     }
+    tron(d[1][0], d[1][1], 4.8, muc); tron(d[1][0], d[1][1], 3.1, tai, 1); tron(d[1][0], d[1][1], 1.4, xanhSang, 0);
     const g = Math.atan2(d[2][1] - d[1][1], d[2][0] - d[1][0]), cs = Math.cos(g), sn = Math.sin(g);
     for (const sgn of [-1, 1]) {
       const jx1 = d[2][0] + 2 * cs - sgn * 4.4 * sn, jy1 = d[2][1] + 2 * sn + sgn * 4.4 * cs;
@@ -271,10 +283,10 @@ export function anhRobot(kieu) {
     chuNhat(a, 0, 40, 16, 34, [146, 206, 176], 6, r); // bảng xanh nhỏ, chừa lối tường liền mạch quanh đầu rô bốt
     veRobotAnh(a, that, KHUNG_ANH.ox, KHUNG_ANH.oy, KHUNG_ANH.s, r);
   } else {
-    // Tường thép gần trùng màu tay máy: đũa thần ăn mất tay, phải dùng cọ giữ lại.
-    chuNhat(a, 0, 0, w, h, [172, 174, 180], 5, r);
+    // Tường trắng gần trùng màu tay: đũa thần ăn mất tay, phải dùng cọ giữ lại.
+    chuNhat(a, 0, 0, w, h, TUONG_TRANG, 5, r);
     chuNhat(a, 0, 150, w, 30, [150, 152, 160], 5, r);
-    veRobotAnh(a, that, KHUNG_ANH.ox, KHUNG_ANH.oy, KHUNG_ANH.s, r, { thepTay: true });
+    veRobotAnh(a, that, KHUNG_ANH.ox, KHUNG_ANH.oy, KHUNG_ANH.s, r, { tayNhat: true });
   }
   return { ...a, that };
 }

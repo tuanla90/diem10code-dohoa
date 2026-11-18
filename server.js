@@ -43,16 +43,34 @@ const server = http.createServer((req, res) => {
     traVe(res, 403, 'Không được phép');
     return;
   }
-  fs.readFile(tep, (loi, du) => {
-    if (loi) {
+  fs.stat(tep, (loiStat, tt) => {
+    if (loiStat || !tt.isFile()) {
       traVe(res, 404, 'Không tìm thấy');
       return;
     }
-    res.writeHead(200, {
-      'Content-Type': LOAI[path.extname(tep).toLowerCase()] || 'application/octet-stream',
-      'Cache-Control': 'no-cache',
+    // Mã, giao diện: luôn hỏi lại máy chủ nhưng có ETag nên tệp chưa đổi chỉ trả 304 rỗng, không tải lại cả trăm KB.
+    // Phông, ảnh mặt nhân vật gần như không đổi: giữ một ngày.
+    const duoi = path.extname(tep).toLowerCase();
+    const etag = `W/"${tt.size.toString(16)}-${Math.floor(tt.mtimeMs).toString(16)}"`;
+    const dau = {
+      'Content-Type': LOAI[duoi] || 'application/octet-stream',
+      'Cache-Control': ['.woff2', '.png', '.webp'].includes(duoi) ? 'public, max-age=86400' : 'no-cache',
+      ETag: etag,
+      'Last-Modified': tt.mtime.toUTCString(),
+    };
+    if (req.headers['if-none-match'] === etag) {
+      res.writeHead(304, dau);
+      res.end();
+      return;
+    }
+    fs.readFile(tep, (loi, du) => {
+      if (loi) {
+        traVe(res, 404, 'Không tìm thấy');
+        return;
+      }
+      res.writeHead(200, dau);
+      res.end(du);
     });
-    res.end(du);
   });
 });
 
