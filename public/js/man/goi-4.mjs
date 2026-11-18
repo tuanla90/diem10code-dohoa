@@ -248,7 +248,7 @@ export default {
     {
       ma: 'DH-4-3', ten: 'Đũa thần ăn mất tay', coKhi: 'tach-nen', chay: 'Ghép poster',
       ai: 'sola', mat: 'shocked', vai: 'SOLA NHỜ',
-      nho: 'Tay rô bốt màu thép, tường cũng màu thép. Mình chạm đũa thần cái là mất cả hai tay!',
+      nho: 'Mình chụp rô bốt sát bức tường trắng, tay rô bốt cũng trắng gần y hệt. Chạm đũa thần cái là mất cả hai tay!',
       muc: 'Xóa sạch nền mà vẫn giữ hai tay rô bốt.',
       kieuAnh: 2,
       dau: { ...dauTach, nguong: 25, r: 12 },
@@ -272,7 +272,7 @@ export default {
       ],
       tieuChi: [
         { id: 'tay', ok: (d) => d.anMat * 100 <= NEN3.an, ten: 'Còn đủ hai tay', loi: 'Rô bốt lên poster không có tay, trông như đang xin lỗi cả trường.', ai: 'sola', matLoi: 'facepalm' },
-        { id: 'sot', ok: (d) => d.conSot * 100 <= NEN3.sot, ten: 'Nền đã sạch', loi: 'Vẫn còn nhiều mảng tường xám bám quanh rô bốt, nền tím bị thủng từng mảng.', ai: 'luna', matLoi: 'worried' },
+        { id: 'sot', ok: (d) => d.conSot * 100 <= NEN3.sot, ten: 'Nền đã sạch', loi: 'Vẫn còn nhiều mảng tường trắng bám quanh rô bốt, nền tím bị thủng từng mảng.', ai: 'luna', matLoi: 'worried' },
         { id: 'khit', sao: true, ok: (d) => d.trung >= 0.9, ten: 'Đường viền khít rô bốt', chiTiet: (d) => `Độ khít viền đang ${(d.trung * 100).toFixed(1)}% (cần từ 90%)` },
         { id: 'du', sao: true, ok: (d) => d.anMat * 100 <= NEN3.anDep, ten: 'Gần như không mất điểm ảnh rô bốt', chiTiet: (d) => `Rô bốt còn thiếu ${(d.anMat * 100).toFixed(1)}% điểm ảnh (dùng Cọ giữ tô kín vùng hồng dưới 0.5%)` },
       ],
@@ -286,7 +286,7 @@ export default {
       giai(st, l) {
         l.dua(st, 12, 12, 25);
         l.dua(st, 12, 170, 25);
-        // Miết dọc hai cánh tay tì lên bánh xích, đúng đường đinh tán trong ảnh.
+        // Miết dọc hai cánh tay tì lên bánh xích, đúng đường tay trong ảnh.
         for (const tay of TAY_ANH) mietTay(st, l, tay);
       },
       sai: [

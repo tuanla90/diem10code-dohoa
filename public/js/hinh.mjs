@@ -144,7 +144,7 @@ export const ROBOT = {
   vay: [[84, 82], [104, 86], [112, 71]],
 };
 
-export function robot(goc = 0, { mat = 'mo', tay = '', thepTay = false, liec = 0 } = {}) {
+export function robot(goc = 0, { mat = 'mo', tay = '', liec = 0 } = {}) {
   const R = ROBOT;
   const hop = (h) => `x="${h.x}" y="${h.y}" width="${h.w}" height="${h.h}" rx="${h.r || 0}"`;
   const duong = (d) => `M${d.map((p) => p.join(' ')).join('L')}`;
@@ -167,13 +167,13 @@ export function robot(goc = 0, { mat = 'mo', tay = '', thepTay = false, liec = 0
         : R.matTam.map((p) => veMatMo(p) + `<path d="M${p[0] - 6} ${p[1] - 13.8}q6-2.8 12 0" fill="none" stroke="${MAU.trang}" stroke-width="2" stroke-linecap="round"/>`).join('') + mieng;
   const veTay = (d, g = 0) => {
     const net = (mauNet, day, doan) => `<path d="${duong(doan)}" fill="none" stroke="${mauNet}" stroke-width="${day}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    const khuc = (doan) => net(thepTay ? MAU.xam : MAU.muc, R.tay, doan) + net(thepTay ? MAU.xamNhat : MAU.voToi, R.tay * 0.56, doan) + net(thepTay ? MAU.trang : MAU.vo, R.tay * 0.28, doan);
+    const khuc = (doan) => net(MAU.muc, R.tay, doan) + net(MAU.voToi, R.tay * 0.56, doan) + net(MAU.vo, R.tay * 0.28, doan);
     const gocCang = (Math.atan2(d[2][1] - d[1][1], d[2][0] - d[1][0]) * 180) / Math.PI;
     const kep = `<g transform="translate(${d[2][0]} ${d[2][1]}) rotate(${gocCang.toFixed(1)})">
       <path d="M-1 -4.4C3 -7.4 8.8 -5.8 9.6 -1.9L6.2 -1.3C5.6 -3 3.2 -3.6 1.5 -2V2C3.2 3.6 5.6 3 6.2 1.3L9.6 1.9C8.8 5.8 3 7.4 -1 4.4Z" fill="${MAU.tai}" stroke="${MAU.muc}" stroke-width="2" stroke-linejoin="round"/>
       ${tron(0, 0, R.banTay, MAU.manXanhSang, 2)}<circle cx="-1" cy="-1" r="1.1" fill="${MAU.trang}"/>
     </g>`;
-    const khuyu = tron(d[1][0], d[1][1], 4.2, thepTay ? MAU.xamNhat : MAU.tai, thepTay ? 0 : 2) + tron(d[1][0], d[1][1], 1.5, thepTay ? MAU.xam : MAU.manXanhSang);
+    const khuyu = tron(d[1][0], d[1][1], 4.2, MAU.tai, 2) + tron(d[1][0], d[1][1], 1.5, MAU.manXanhSang);
     return [`${tron(d[0][0], d[0][1], 4.8, MAU.banh, 2.2)}${khuc(d.slice(0, 2))}`, `<g transform="rotate(${-g} ${d[1].join(' ')})">${khuc(d.slice(1))}${khuyu}${kep}</g>`];
   };
   // tay 'mot' chỉ còn tay trái (dùng ở màn tự vẽ cánh tay vẫy); cẳng tay vẽ sau đầu để lúc giơ vẫy không bị lấp sau tai.

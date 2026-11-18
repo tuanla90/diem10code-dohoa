@@ -96,7 +96,8 @@ export default {
 
     const ve = () => {
       const st = ctx.st;
-      veKetQua(lop, st.buoc);
+      // Màn dựng lại một icon có màu riêng (khiên xanh của An toàn mạng) thì tô đúng màu đó ngay lúc làm, xong không đổi màu.
+      veKetQua(lop, st.buoc, man.mauHinh);
       const c = nen.getContext('2d');
       c.setTransform(1, 0, 0, 1, 0, 0);
       c.clearRect(0, 0, nen.width, nen.height);

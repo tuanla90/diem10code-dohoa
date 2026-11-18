@@ -23,10 +23,10 @@ const nguoi = (x, y, mau, k = 1) => `<g transform="translate(${x} ${y}) scale(${
 
 const tuong = () => `<rect width="360" height="300" fill="${MAU.tuong}"/><rect y="250" width="360" height="50" fill="${MAU.san}"/>`;
 
-// Bảng tin trường, poster treo giữa. noi vẽ theo hệ 360x300 của sân.
+// Bảng tin trường, poster treo giữa. noi vẽ theo hệ 360x300 của sân, tâm (180, 150) đặt đúng tâm mặt bảng (180, 125).
 export function canhBanTin(noi, nhan = 'Poster treo trên bảng tin') {
   return khung(`${tuong()}<rect x="30" y="16" width="300" height="218" rx="8" fill="${MAU.go}"/><rect x="38" y="24" width="284" height="202" rx="4" fill="${MAU.xamNhat}"/>
-    <g transform="translate(92 28) scale(.54)">${noi}</g>
+    <g transform="translate(${180 - 180 * 0.54} ${125 - 150 * 0.54}) scale(.54)">${noi}</g>
     ${nguoi(70, 244, MAU.chan, 0.9)}${nguoi(290, 246, MAU.hong, 0.9)}`, nhan);
 }
 

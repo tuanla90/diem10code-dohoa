@@ -423,8 +423,10 @@ export default {
       };
     };
 
-    batKeo(svg, W, H, (h, pt) => {
+    batKeo(svg, W, H, (h, pt, e) => {
       const st = ctx.st;
+      // Giữ Shift, Ctrl (hoặc Cmd) như phần mềm vẽ trên máy tính: chạm là thêm hoặc bớt một hình, quét là cộng thêm vào vùng đang chọn.
+      const giuPhim = !!(e && (e.shiftKey || e.ctrlKey || e.metaKey));
       if (h?.startsWith('co:')) {
         const [, a, b] = h.split(':');
         return batDauCo(+a, +b, pt);
@@ -443,7 +445,7 @@ export default {
             const duKien = manhTrongQuet(st, quet);
             quet = null;
             ctx.hit();
-            st.chon = duKien;
+            st.chon = giuPhim ? [...new Set([...(st.chon || []), ...duKien])] : duKien;
             ve(); veKhay(); ctx.doi();
           },
         };
@@ -456,7 +458,12 @@ export default {
           if (man.san.khoaKeo) return;
           const dx = p.x - pt.x, dy = p.y - pt.y;
           if (!daDoi && Math.hypot(dx, dy) < 4) return;
-          if (!daDoi) { ctx.ghi(); doi = batDauDoi(id); daDoi = true; }
+          if (!daDoi) {
+            ctx.ghi();
+            if (giuPhim && !(st.chon || []).includes(id)) st.chon = [...(st.chon || []), ...cumCua(st, id)];
+            doi = batDauDoi(id);
+            daDoi = true;
+          }
           doi(dx, dy);
           ve();
         },
@@ -465,7 +472,11 @@ export default {
           // Chạm là chọn đúng hình đó, như mọi phần mềm vẽ. Muốn chọn nhiều thì quét khung trên nền.
           // Đang chọn nhiều hình để căn thì chạm một hình trong số đó là đặt nó làm mẫu.
           const chon = st.chon || [];
-          if (cu.includes('can') && chon.length > 1 && chon.includes(id)) st.chon = [id, ...chon.filter((k) => k !== id)];
+          if (giuPhim) {
+            // Hình đầu tiên được chọn vẫn là mẫu để căn, nên thêm vào cuối và bớt thì giữ nguyên thứ tự còn lại.
+            const cum = cumCua(st, id);
+            st.chon = chon.includes(id) ? chon.filter((k) => !cum.includes(k)) : [...chon, ...cum.filter((k) => !chon.includes(k))];
+          } else if (cu.includes('can') && chon.length > 1 && chon.includes(id)) st.chon = [id, ...chon.filter((k) => k !== id)];
           else st.chon = cumCua(st, id);
           ve(); veKhay(); ctx.doi();
         },
