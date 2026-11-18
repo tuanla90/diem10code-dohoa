@@ -50,7 +50,7 @@ export default {
     {
       ma: 'DH-2-2', ten: 'Logo rời từng mảnh', coKhi: 'lop-nhom', chay: 'In thử',
       ai: 'sola', mat: 'facepalm', vai: 'SOLA NHỜ',
-      nho: 'Mình kéo logo sang góc poster, chỉ mỗi ngôi sao đi theo. Kéo tiếp thì lệch hết cả.',
+      nho: 'Mình kéo logo sang góc poster, chỉ mỗi hình tròn nền chạy theo, ngôi sao với chữ nằm lại chỗ cũ. Kéo tiếp thì lệch hết cả.',
       muc: 'Đưa nguyên logo vào khung vàng ở góc, tiêu đề giữ nguyên chỗ cũ.',
       dau: {
         manh: [
@@ -69,7 +69,7 @@ export default {
         { txt: 'Bấm <b>In thử</b>.', xong: () => false },
       ],
       tieuChi: [
-        { id: 'roi', ok: (d) => d.roi <= 3, ten: 'Logo còn nguyên hình', loi: 'Các mảnh logo lệch khỏi nhau, in ra sao một đằng chữ một nẻo.', ai: 'sola', matLoi: 'shocked' },
+        { id: 'roi', ok: (d) => d.roi <= 3, ten: 'Logo còn nguyên hình', loi: 'Các mảnh logo lệch khỏi nhau, in ra nền tròn một đằng, sao với chữ một nẻo.', ai: 'sola', matLoi: 'shocked' },
         { id: 'tieu', ok: (d) => d.tieuDeYen, ten: 'Tiêu đề không xê dịch', loi: 'Tiêu đề bị kéo theo hoặc bị nhóm vào logo. Sola bảo tiêu đề phải ở yên.', ai: 'luna', matLoi: 'worried' },
         { id: 'trong', ok: (d) => d.trongVung, ten: 'Nằm trong khung', loi: 'Logo chưa vào hết khung vàng ở góc.', ai: 'luna', matLoi: 'thinking' },
         { id: 'to', ok: (d) => d.phu >= 0.75, ten: 'Đủ to', loi: 'Logo bị thu nhỏ quá tay, khung vàng còn trống nhiều.', ai: 'luna', matLoi: 'thinking' },
@@ -89,7 +89,7 @@ export default {
         l.di(st, 'nen', 183, 7);
       },
       sai: [
-        { ten: 'Chỉ kéo ngôi sao', loi: 'roi', lam(st, l) { l.di(st, 'sao', 180, 10); } },
+        { ten: 'Chỉ kéo hình tròn nền', loi: 'roi', lam(st, l) { l.di(st, 'nen', 180, 10); } },
         { ten: 'Nhóm cả tiêu đề', loi: 'tieu', lam(st, l) { l.nhom(st, [...IDS, 'tieu-de']); l.coCum(st, 'nen', 0.4); l.di(st, 'nen', 183, 7); } },
       ],
     },
@@ -141,7 +141,7 @@ export default {
     {
       ma: 'DH-2-3', ten: 'Năm biểu tượng lởm chởm', coKhi: 'lop-nhom', chay: 'Dán thử', thuThach: true,
       ai: 'luna', mat: 'worried', vai: 'LUNA NHỜ',
-      nho: 'Năm biểu tượng nằm lên xuống, to nhỏ đủ kiểu, thi lập trình còn đứng sau poster.',
+      nho: 'Năm biểu tượng nằm lên xuống, to nhỏ đủ kiểu, biểu tượng Lập trình nhanh còn đứng sau poster.',
       muc: 'Cùng cỡ, thẳng hàng, cách đều trong khung vàng. Thứ tự: lập trình, poster, an toàn mạng, phim, rô bốt.',
       dau: {
         manh: [
